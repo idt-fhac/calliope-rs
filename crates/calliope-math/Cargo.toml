@@ -1,0 +1,13 @@
+[package]
+name = "calliope-math"
+description = "Parsing, type-checking and compiling Calliope math strings into an IR."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true

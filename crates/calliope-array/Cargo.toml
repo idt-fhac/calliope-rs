@@ -1,0 +1,13 @@
+[package]
+name = "calliope-array"
+description = "Labelled N-d arrays with xarray-compatible alignment and missing-value semantics."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true

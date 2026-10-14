@@ -1,0 +1,45 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.89"
+license = "Apache-2.0"
+repository = "https://github.com/calliope-project/calliope"
+publish = false
+
+[workspace.dependencies]
+calliope-array = { path = "crates/calliope-array" }
+calliope-yaml = { path = "crates/calliope-yaml" }
+calliope-schema = { path = "crates/calliope-schema" }
+
+indexmap = { version = "2.14", features = ["serde"] }
+regex = "1.13"
+schemars = { version = "1.2", features = ["indexmap2"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order", "float_roundtrip"] }
+serde_path_to_error = "0.1.20"
+thiserror = "2.0"
+tracing = "0.1"
+yaml-rust2 = { version = "0.13", default-features = false }
+proptest = "1.12"
+tempfile = "3.27"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_debug_implementations = "warn"
+unused_qualifications = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+dbg_macro = "warn"
+todo = "warn"
+unwrap_used = "warn"
+
+[profile.release]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+opt-level = 1
