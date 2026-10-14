@@ -79,7 +79,9 @@ Typed `serde` structs, one per pydantic model:
   - `solve`: the SPORES block (four scoring algorithms: `integer`,
     `relative_deployment`, `random`, `evolving_average`), `shadow_prices`,
     `zero_threshold`, `solver_options`, `save_logs`.
-  - `build.backend` accepts only `highs`. Any other value is a clear error.
+  - `build.backend`: the default is `pyomo`, so existing models set it implicitly.
+    `pyomo` and `gurobi` give a warning and fall back to `highs`, and unknown values
+    are an error.
 - `ModelDef { data_definitions, data_tables, nodes, techs, templates, overrides, scenarios }`:
   - `CalliopeTech` with `base_tech` ∈ {conversion, demand, storage, supply, transmission}.
   - Transmission adds `link_from`, `link_to` and `one_way`.
@@ -103,7 +105,8 @@ Pipeline:
    Parquet via `polars`, or `csv` + `arrow`) with `select`, `drop`, `add_dims`,
    `rename_dims` and `pivot_values_to_dim` for lookups.
 4. Dataset building (`ModelDataBuilder`):
-   - link transmission techs (`<tech>:<node>`);
+   - assign transmission techs to their nodes from `link_from` and `link_to`
+     (`model_data.py:471`);
    - activate and deactivate techs and nodes;
    - expand `carrier_in` and `carrier_out`;
    - compute distances (geodesic, `geographiclib` equivalent: the `geographiclib` crate);
@@ -125,7 +128,7 @@ The core of the port. There are three stages, and each can be tested on its own.
 
 **Parse.** One `pest` grammar covers both languages:
 - `where` strings: `and`, `or`, `not`, comparisons, `config.<key>`, input-presence
-  checks, `[a, b] in dim` subsets, and `defined(...)`-style helpers.
+  checks, `[a, b] in dim` subsets, and the `where`-context helpers (`any`, `sum`, …).
 - Equations: `lhs (<=|>=|==) rhs`, arithmetic with `+ - * / **`, unary sign,
   `$sub_expressions`, `component[dim=$slice]`, and helper calls with args and kwargs.
 
