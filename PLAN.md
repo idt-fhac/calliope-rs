@@ -131,6 +131,18 @@ record the result for each: confirmed, not a bug, or already fixed upstream.
 
 ### Phase 2: foundations (≈6k LOC; 5–6 wk)
 
+**Storage spike (first 1–2 wk, decides SPEC §3.1).** Build both candidates, dense
+`ndarray` (A) and Polars long format (B), behind the same minimal `LArray` API, and use
+them to build one heavy constraint end to end into CSC triples: `system_balance` of
+`national_scale` at 8760 h and on the largest Phase 0 synthetic size.
+- Measure: build time, peak RSS, lines of code for `sum`, `where`, `roll` and
+  `group_sum`, and how many xarray missing-value cases need special handling
+  (`null` vs `NaN`, outer-join fill).
+- Exit: a decision note (`docs/adr/0001-array-storage.md`) choosing A, B or a hybrid
+  (dense for node/tech parameters, long format for anything with timesteps), with
+  the numbers. Option B cuts Phase 2/4 effort if Polars covers group-by, shift and
+  resampling. Option A keeps the dependency light.
+
 **`calliope-array`.** Labelled N-d arrays, plus a written spec of the xarray behaviour that
 Calliope actually relies on:
 - outer-join broadcasting by name;
@@ -496,6 +508,7 @@ models, but Phase 0 must show what share the build actually has.
 | Moving upstream (0.7.1.dev already changing) | Pin to `088eb7e4`; track upstream with a `CHANGELOG` diff each month; make the parity harness re-runnable on new tags |
 | NetCDF/HDF5 C dependencies and CF time encoding | Static build in CI from day one; cross-language round-trip test in Phase 5 |
 | `highs` crate lags HiGHS releases | Use `highs-sys` directly if needed; pin to the oracle's version |
+| Polars Rust API breaks between releases, and its compile time and binary size are heavy | Pin the exact version; enable only the needed features (`lazy`, `csv`, `parquet`, `dtype-categorical`, `temporal`); keep Polars behind the `LArray` API so it can be swapped |
 | Scope creep into a general xarray clone | The array API is driven only by what the math and preprocess use; anything else gets a design note first |
 
 ## Out of scope

@@ -43,10 +43,29 @@ Dependency direction:
 ## 3. Component specifications
 
 ### 3.1 `calliope-array`
+The storage backend is an **open decision**, made in Phase 2 by a spike (`PLAN.md`). The
+public API below is the same either way, so `calliope-math` doesn't depend on the choice.
+
 - `Coord`: a named dimension with ordered labels of type `string`, `datetime`, `date`,
   `int` or `float` (the `Dimension.dtype` options in `math_schema.py`).
-- `LArray<T>`: dense `ndarray::ArrayD<T>` plus `Vec<Coord>`. The element types are
-  `f64` (NaN = missing), `bool`, `i64`, string IDs (interned `u32`) and datetimes (`i64` ns).
+- `LArray<T>`: an array labelled by `Vec<Coord>`. The element types are `f64` (NaN =
+  missing), `bool`, `i64`, string IDs (interned `u32`) and datetimes (`i64` ns).
+- Candidate storage:
+
+  | | A: dense `ndarray` | B: Polars long format |
+  |---|---|---|
+  | Layout | `ndarray::ArrayD<T>` over the full Cartesian product of coordinates | `DataFrame` with one categorical column per dimension and a value column; only active cells are stored |
+  | Broadcasting | stride tricks, no copy | join on shared dimension columns |
+  | `where` | elementwise mask | filter |
+  | `sum(over)` | axis reduction | `group_by` on the remaining dimensions |
+  | `roll`/`shift` | index arithmetic | `shift` over the time column within groups |
+  | Strengths | fast on small, fully populated arrays; simple; light dependency | memory scales with the active cells; feeds the COO/CSC build directly; vectorised and parallel; same model as Pyoframe |
+  | Risks | the full product of dimensions for nodes × techs × carriers × timesteps; needs a separate sparse layer | `null` vs `NaN` and join fill rules differ from xarray outer joins; joins cost more on small arrays; Rust API churn; compile time and binary size |
+
+  Decision criteria: build time and peak RSS on the spike, the effort needed to match
+  xarray missing-value semantics, and the code size of the helper functions.
+  A hybrid is allowed: dense for small parameters indexed by nodes and techs, long format
+  for anything with a time dimension.
 - Operations, matching xarray semantics exactly:
   - outer-join broadcasting by dimension name;
   - `where`, `sel`, `isel`, `fillna`, `sum(over)`, `any(over)`, `shift`/`roll`;
@@ -57,7 +76,8 @@ Dependency direction:
 - Missing-data semantics are documented and tested as a unit (NaN in arithmetic,
   NaN → False in `where`, defaults filled at evaluation time; see CHANGELOG 0.7.0).
 
-Libraries: `ndarray`, `indexmap`, `chrono`, `smallvec`.
+Libraries: `indexmap`, `chrono`, `smallvec`, plus `ndarray` (A) or `polars` (B).
+`polars` is used in `calliope-preprocess` whichever option is chosen.
 
 ### 3.2 `calliope-yaml`
 - A YAML 1.2 loader (`serde_yaml` or `saphyr`) that keeps key order.
@@ -101,9 +121,11 @@ Pipeline:
    (`TemplateSolver`, including nested templates and cycle detection).
 2. Math: load `base.yaml` plus `extra_math` and user math, in the priority order of
    `get_math_priority`.
-3. Data: `data_definitions`, per-node and per-tech values, and data tables (CSV and
-   Parquet via `polars`, or `csv` + `arrow`) with `select`, `drop`, `add_dims`,
-   `rename_dims` and `pivot_values_to_dim` for lookups.
+3. Data: `data_definitions`, per-node and per-tech values, and data tables. Tables are
+   read with **`polars`** (CSV and Parquet, lazy scan) and reshaped with `select`,
+   `drop`, `add_dims`, `rename_dims` and `pivot_values_to_dim` for lookups. CSV type
+   inference is set explicitly to match pandas `read_csv` on the fixtures (the
+   `data_tables` golden files).
 4. Dataset building (`ModelDataBuilder`):
    - assign transmission techs to their nodes from `link_from` and `link_to`
      (`model_data.py:471`);
@@ -114,7 +136,8 @@ Pipeline:
 5. Time:
    - parse datetimes with `datetime_format`;
    - subset;
-   - resample, with the method per parameter;
+   - resample, with the method per parameter (`polars` `group_by_dynamic`, with bin
+     edges matched to pandas `resample`);
    - cluster (representative days, `timestep_cluster`, `timestep_weights`,
      `lookup_cluster_*`);
    - infer `timestep_resolution` and `timestep_weights`.
