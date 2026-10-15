@@ -13,9 +13,11 @@ pub mod diagnostic;
 pub mod helpers;
 pub mod names;
 pub mod parse;
+pub mod typecheck;
 
 pub use ast::{Lang, Node, NodeKind, Role, Span};
 pub use component::{Equation, Group, ParseMode, ParsedComponent, parse_math};
 pub use diagnostic::{MathDiagnostic, StringPath};
 pub use names::{NameContext, Names};
 pub use parse::{ParseError, StringKind, parse};
+pub use typecheck::{InputSchema, TypecheckReport, typecheck};

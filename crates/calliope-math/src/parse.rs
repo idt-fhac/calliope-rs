@@ -77,7 +77,7 @@ pub fn parse(kind: StringKind, text: &str, names: &Names) -> Result<Node> {
     let b = Builder { text, names };
     let mut inner = top.into_inner().filter(|p| p.as_rule() != Rule::EOI);
     let first = inner.next().expect("entry content");
-    match kind {
+    let mut node = match kind {
         StringKind::Where => b.where_expr(first),
         StringKind::Equation => {
             let op = inner.next().expect("operator");
@@ -98,6 +98,38 @@ pub fn parse(kind: StringKind, text: &str, names: &Names) -> Result<Node> {
         StringKind::Arithmetic => b.arith(first, Ctx::Equation),
         StringKind::SubExpression => b.arith(first, Ctx::SubExpression),
         StringKind::Slice => b.slice_value(first),
+    }?;
+    trim_spans(&mut node, text);
+    Ok(node)
+}
+
+/// pest spans of repeated rules can end in the whitespace before a failed repetition.
+fn trim_spans(node: &mut Node, text: &str) {
+    let trimmed = text[node.span.clone()].trim_end().len();
+    node.span.end = node.span.start + trimmed;
+    match &mut node.kind {
+        NodeKind::Sliced { slices, .. } => slices.iter_mut().for_each(|(_, n)| trim_spans(n, text)),
+        NodeKind::List(items) | NodeKind::Subset { items, .. } => {
+            items.iter_mut().for_each(|n| trim_spans(n, text));
+        }
+        NodeKind::Sign(_, n) | NodeKind::Not(n) => trim_spans(n, text),
+        NodeKind::Arith(first, rest) => {
+            trim_spans(first, text);
+            rest.iter_mut().for_each(|(_, n)| trim_spans(n, text));
+        }
+        NodeKind::Logic(first, rest) => {
+            trim_spans(first, text);
+            rest.iter_mut().for_each(|(_, n)| trim_spans(n, text));
+        }
+        NodeKind::Call { args, kwargs, .. } => {
+            args.iter_mut().for_each(|n| trim_spans(n, text));
+            kwargs.iter_mut().for_each(|(_, n)| trim_spans(n, text));
+        }
+        NodeKind::Compare { lhs, rhs, .. } => {
+            trim_spans(lhs, text);
+            trim_spans(rhs, text);
+        }
+        _ => {}
     }
 }
 
