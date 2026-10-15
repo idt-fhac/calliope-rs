@@ -1,6 +1,6 @@
 """Run every ``bugNN_*.py`` repro and print its ``RESULT:`` line.
 
-    ../calliope/.pixi/envs/dev/bin/python oracle/repros/run_all.py
+../calliope/.pixi/envs/dev/bin/python oracle/repros/run_all.py
 """
 
 import subprocess
