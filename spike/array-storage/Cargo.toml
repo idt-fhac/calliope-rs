@@ -1,0 +1,15 @@
+[package]
+name = "array-storage-spike"
+version = "0.0.0"
+edition = "2024"
+publish = false
+description = "Phase 2 spike: dense ndarray vs Polars long format for calliope-array (ADR 0001)."
+
+[workspace]
+
+[dependencies]
+ndarray = "0.17"
+polars = { version = "=0.55.2", default-features = false, features = ["lazy", "fmt", "cross_join"] }
+
+[profile.release]
+debug = false
