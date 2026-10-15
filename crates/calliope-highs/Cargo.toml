@@ -8,9 +8,11 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
+calliope-array.workspace = true
 calliope-lp = { path = "../calliope-lp" }
 # Bundles HiGHS 1.15.0 and builds it with cmake; bindgen needs libclang (LIBCLANG_PATH).
 highs-sys = { version = "=1.15.0", default-features = false, features = ["build", "highs_release"] }
+indexmap.workspace = true
 thiserror.workspace = true
 
 # FFI crate: same lints as the workspace, except that `unsafe` is allowed (only in `ffi.rs`).
@@ -25,5 +27,7 @@ dbg_macro = "warn"
 todo = "warn"
 
 [dev-dependencies]
+calliope-io = { path = "../calliope-io" }
+calliope-preprocess = { path = "../calliope-preprocess" }
 serde_json.workspace = true
 tempfile.workspace = true

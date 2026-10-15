@@ -126,8 +126,12 @@ version = "0.1.0"
 name = "calliope-highs"
 version = "0.1.0"
 dependencies = [
+ "calliope-array",
+ "calliope-io",
  "calliope-lp",
+ "calliope-preprocess",
  "highs-sys",
+ "indexmap",
  "serde_json",
  "tempfile",
  "thiserror",
