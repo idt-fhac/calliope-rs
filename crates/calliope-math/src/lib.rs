@@ -10,6 +10,7 @@
 pub mod ast;
 pub mod component;
 pub mod diagnostic;
+pub mod helpers;
 pub mod names;
 pub mod parse;
 
