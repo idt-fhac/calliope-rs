@@ -1,0 +1,180 @@
+# This file contains the model used to test a range of
+# basic constraints.
+
+##
+# WARNING: When adding tests for new constraints, we now
+# want to create separate models, as in the example of
+# `model_demand_share.yaml`, which can double as minimal
+# working examples of the given functionality.
+##
+
+import:
+  - scenarios.yaml
+
+config:
+  init:
+    name: Test model
+    subset.timesteps: ["2005-01-01", "2005-01-02"]
+    broadcast_input_data: true
+    mode: base
+  solve:
+    solver: cbc
+
+data_definitions:
+  bigM: 1e3
+
+data_tables:
+  demand_elec:
+    table: data_tables/demand_elec.csv
+    rows: timesteps
+    columns: nodes
+    add_dims:
+      inputs: sink_use_equals
+      techs: test_demand_elec
+
+nodes:
+  a.template: init_nodes
+  b.template: init_nodes
+
+techs:
+  test_supply_gas:
+    template: test_controller
+    name: Supply tech
+    carrier_out: gas
+    base_tech: supply
+    flow_cap_max: 15
+    source_use_max: .inf
+    flow_out_eff: 0.9
+
+  test_supply_elec:
+    template: test_controller
+    name: Supply tech
+    carrier_out: electricity
+    base_tech: supply
+    flow_cap_max: 10
+    source_use_max: .inf
+    flow_out_eff: 0.9
+
+  test_supply_coal:
+    template: test_controller
+    name: Supply tech
+    carrier_out: coal
+    base_tech: supply
+    flow_cap_max: 10
+    source_use_max: .inf
+    flow_out_eff: 0.9
+
+  test_supply_plus:
+    template: test_controller
+    name: Supply tech with storage
+    carrier_out: electricity
+    base_tech: supply
+    flow_cap_max: 15
+    source_eff: 0.9
+    flow_out_eff: 0.9
+    storage_cap_max: 35
+    flow_cap_per_storage_cap_max: 0.5
+    storage_loss: 0.01
+    include_storage: true
+
+  test_storage:
+    template: test_controller
+    name: Storage tech
+    carrier_out: electricity
+    carrier_in: electricity
+    base_tech: storage
+    flow_cap_max: 10
+    storage_cap_max: 15
+    flow_cap_per_storage_cap_max: 0.5
+    flow_out_eff: 0.9
+    storage_loss: 0.01
+
+  test_conversion:
+    template: test_controller
+    name: Conversion tech
+    carrier_in: gas
+    carrier_out: heat
+    base_tech: conversion
+    flow_cap_max:
+      data: 15
+      index: heat
+      dims: carriers
+    flow_out_eff: 0.9
+
+  test_conversion_plus:
+    template: test_controller
+    name: Conversion tech with linked carriers out
+    carrier_in: gas
+    carrier_out: [electricity, heat]
+    base_tech: conversion
+    flow_cap_max:
+      data: 20
+      index: electricity
+      dims: carriers
+    heat_to_power_ratio: 0.8
+
+  test_chp:
+    template: test_controller
+    name: Conversion tech with unlinked carriers out
+    carrier_in: gas
+    carrier_out: [electricity, heat]
+    base_tech: conversion
+    flow_out_eff:
+      data: 0.6
+      index: electricity
+      dims: carriers
+    flow_cap_max:
+      data: 20
+      index: electricity
+      dims: carriers
+
+  test_demand_elec:
+    name: Demand elec tech
+    carrier_in: electricity
+    base_tech: demand
+
+  test_demand_heat:
+    name: Demand heat tech
+    carrier_in: heat
+    base_tech: demand
+
+  test_demand_coal:
+    name: Demand coal tech
+    carrier_in: coal
+    base_tech: demand
+    sink_use_max: 10
+
+  test_link_a_b_elec:
+    template: test_transmission_elec
+    distance: 1
+
+  test_link_a_b_heat:
+    template: test_transmission_heat
+    distance: 2
+
+templates:
+  test_controller: {}
+
+  test_transmission:
+    link_from: a
+    link_to: b
+    template: test_controller
+
+  test_transmission_elec:
+    template: test_transmission
+    name: Transmission elec tech
+    carrier_in: electricity
+    carrier_out: electricity
+    base_tech: transmission
+    flow_cap_max: 10
+
+  test_transmission_heat:
+    template: test_transmission
+    name: Transmission heat tech
+    carrier_in: heat
+    carrier_out: heat
+    base_tech: transmission
+    flow_cap_max: 5
+
+  init_nodes:
+    techs.test_demand_elec:
