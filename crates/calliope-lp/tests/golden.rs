@@ -177,3 +177,30 @@ fn pyomo_lp_equals_itself_and_perturbations_are_caught() {
     let renamed = edit(&|v| v[row] = v[row].replacen("region1", "region9", 1));
     assert!(!diff_lp(&text, &renamed, &opts).unwrap().is_equal());
 }
+
+/// `pyomo.lp` → `LpModel` → LP writer (verbose and anonymous) is canonically unchanged.
+#[test]
+fn lp_model_writer_round_trip() {
+    use calliope_lp::{LpModel, LpNames, write_lp_string};
+    let mut n = 0;
+    for d in fixture_dirs() {
+        let p = d.join("pyomo.lp");
+        if !p.exists() || !has_model(&p) {
+            continue;
+        }
+        let text = fs::read_to_string(&p).unwrap();
+        let model = LpModel::from_raw(&parse_lp(&text).unwrap());
+        for names in [LpNames::Verbose, LpNames::Anonymous] {
+            let out = write_lp_string(&model, names);
+            let r = diff_lp(&text, &out, &DiffOptions::default()).unwrap();
+            assert!(
+                r.is_equal(),
+                "{} {names:?}: {:?}",
+                d.display(),
+                r.differences
+            );
+        }
+        n += 1;
+    }
+    assert!(n > 100, "only {n} fixtures");
+}
