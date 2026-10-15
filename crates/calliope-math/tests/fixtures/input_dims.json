@@ -1,0 +1,593 @@
+{
+"milp": {
+"dims": {
+"active": [
+"nodes",
+"techs"
+],
+"area_use_max": [
+"techs"
+],
+"area_use_per_flow_cap": [
+"techs"
+],
+"available_area": [
+"nodes"
+],
+"base_tech": [
+"techs"
+],
+"bigM": [],
+"cap_method": [
+"techs"
+],
+"carrier_export": [
+"techs",
+"carriers"
+],
+"carrier_in": [
+"nodes",
+"techs",
+"carriers"
+],
+"carrier_out": [
+"nodes",
+"techs",
+"carriers"
+],
+"color": [
+"techs"
+],
+"cost_export": [
+"nodes",
+"techs",
+"costs",
+"carriers",
+"timesteps"
+],
+"cost_flow_cap": [
+"nodes",
+"techs",
+"costs",
+"carriers"
+],
+"cost_flow_cap_per_distance": [
+"techs",
+"costs"
+],
+"cost_flow_in": [
+"techs",
+"costs"
+],
+"cost_flow_out": [
+"techs",
+"costs",
+"carriers",
+"nodes"
+],
+"cost_interest_rate": [
+"costs"
+],
+"cost_om_annual": [
+"nodes",
+"techs",
+"costs"
+],
+"cost_purchase": [
+"techs",
+"costs"
+],
+"cost_source_use": [
+"techs",
+"costs"
+],
+"distance": [
+"techs"
+],
+"flow_cap_max": [
+"techs",
+"carriers",
+"nodes"
+],
+"flow_cap_per_unit": [
+"techs",
+"carriers"
+],
+"flow_out_eff": [
+"techs",
+"carriers"
+],
+"flow_out_eff_per_distance": [
+"techs"
+],
+"flow_out_min_relative": [
+"techs",
+"carriers"
+],
+"flow_out_parasitic_eff": [
+"techs"
+],
+"force_async_flow": [
+"techs"
+],
+"heat_to_power_ratio": [
+"techs"
+],
+"integer_dispatch": [
+"techs"
+],
+"latitude": [
+"nodes"
+],
+"lifetime": [
+"techs"
+],
+"link_from": [
+"techs"
+],
+"link_to": [
+"techs"
+],
+"longitude": [
+"nodes"
+],
+"name": [
+"techs"
+],
+"objective_cost_weights": [
+"costs"
+],
+"one_way": [
+"techs"
+],
+"purchased_units_max": [
+"techs"
+],
+"sink_use_equals": [
+"timesteps",
+"techs",
+"nodes"
+],
+"source_unit": [
+"techs"
+],
+"source_use_equals": [
+"techs",
+"timesteps"
+],
+"source_use_max": [
+"techs"
+],
+"timestep_resolution": [
+"timesteps"
+],
+"timestep_weights": [
+"timesteps"
+]
+},
+"extra_math": [
+"milp",
+"additional_math"
+],
+"mode": "base"
+},
+"national_scale": {
+"dims": {
+"active": [
+"nodes",
+"techs"
+],
+"area_use_max": [
+"techs"
+],
+"base_tech": [
+"techs"
+],
+"bigM": [],
+"carrier_in": [
+"nodes",
+"techs",
+"carriers"
+],
+"carrier_out": [
+"nodes",
+"techs",
+"carriers"
+],
+"color": [
+"techs"
+],
+"cost_area_use": [
+"costs",
+"techs"
+],
+"cost_flow_cap": [
+"costs",
+"techs"
+],
+"cost_flow_out": [
+"costs",
+"techs"
+],
+"cost_interest_rate": [
+"costs"
+],
+"cost_source_cap": [
+"costs",
+"techs"
+],
+"cost_source_use": [
+"costs",
+"techs"
+],
+"cost_storage_cap": [
+"costs",
+"techs"
+],
+"distance": [
+"techs"
+],
+"flow_cap_max": [
+"nodes",
+"techs"
+],
+"flow_cap_max_systemwide": [
+"techs"
+],
+"flow_cap_per_storage_cap_max": [
+"techs"
+],
+"flow_in_eff": [
+"techs"
+],
+"flow_out_eff": [
+"techs"
+],
+"flow_out_parasitic_eff": [
+"techs"
+],
+"flow_ramping": [
+"techs"
+],
+"include_storage": [
+"techs"
+],
+"latitude": [
+"nodes"
+],
+"lifetime": [
+"techs"
+],
+"link_from": [
+"techs"
+],
+"link_to": [
+"techs"
+],
+"longitude": [
+"nodes"
+],
+"name": [
+"techs"
+],
+"objective_cost_weights": [
+"costs"
+],
+"one_way": [
+"techs"
+],
+"sink_use_equals": [
+"timesteps",
+"nodes",
+"techs"
+],
+"source_unit": [
+"techs"
+],
+"source_use_max": [
+"timesteps",
+"nodes",
+"techs"
+],
+"storage_cap_max": [
+"techs"
+],
+"storage_loss": [
+"techs"
+],
+"timestep_resolution": [
+"timesteps"
+],
+"timestep_weights": [
+"timesteps"
+]
+},
+"extra_math": [],
+"mode": "base"
+},
+"national_scale_spores": {
+"dims": {
+"active": [
+"nodes",
+"techs"
+],
+"area_use_max": [
+"techs"
+],
+"base_tech": [
+"techs"
+],
+"bigM": [],
+"carrier_in": [
+"nodes",
+"techs",
+"carriers"
+],
+"carrier_out": [
+"nodes",
+"techs",
+"carriers"
+],
+"color": [
+"techs"
+],
+"cost_area_use": [
+"costs",
+"techs"
+],
+"cost_flow_cap": [
+"costs",
+"techs"
+],
+"cost_flow_out": [
+"costs",
+"techs"
+],
+"cost_interest_rate": [
+"costs"
+],
+"cost_source_cap": [
+"costs",
+"techs"
+],
+"cost_source_use": [
+"costs",
+"techs"
+],
+"cost_storage_cap": [
+"costs",
+"techs"
+],
+"distance": [
+"techs"
+],
+"flow_cap_max": [
+"nodes",
+"techs"
+],
+"flow_cap_max_systemwide": [
+"techs"
+],
+"flow_cap_per_storage_cap_max": [
+"techs"
+],
+"flow_in_eff": [
+"techs"
+],
+"flow_out_eff": [
+"techs"
+],
+"flow_out_parasitic_eff": [
+"techs"
+],
+"flow_ramping": [
+"techs"
+],
+"include_storage": [
+"techs"
+],
+"latitude": [
+"nodes"
+],
+"lifetime": [
+"techs"
+],
+"link_from": [
+"techs"
+],
+"link_to": [
+"techs"
+],
+"longitude": [
+"nodes"
+],
+"name": [
+"techs"
+],
+"objective_cost_weights": [
+"costs"
+],
+"one_way": [
+"techs"
+],
+"sink_use_equals": [
+"timesteps",
+"nodes",
+"techs"
+],
+"source_unit": [
+"techs"
+],
+"source_use_max": [
+"timesteps",
+"nodes",
+"techs"
+],
+"spores_slack": [],
+"spores_tracker": [
+"techs"
+],
+"storage_cap_max": [
+"techs"
+],
+"storage_loss": [
+"techs"
+],
+"timestep_resolution": [
+"timesteps"
+],
+"timestep_weights": [
+"timesteps"
+]
+},
+"extra_math": [],
+"mode": "spores"
+},
+"urban_scale": {
+"dims": {
+"active": [
+"nodes",
+"techs"
+],
+"area_use_max": [
+"techs"
+],
+"area_use_per_flow_cap": [
+"techs"
+],
+"available_area": [
+"nodes"
+],
+"base_tech": [
+"techs"
+],
+"bigM": [],
+"carrier_export": [
+"techs",
+"carriers"
+],
+"carrier_in": [
+"nodes",
+"techs",
+"carriers"
+],
+"carrier_out": [
+"nodes",
+"techs",
+"carriers"
+],
+"color": [
+"techs"
+],
+"cost_export": [
+"nodes",
+"techs",
+"costs",
+"carriers",
+"timesteps"
+],
+"cost_flow_cap": [
+"nodes",
+"techs",
+"costs",
+"carriers"
+],
+"cost_flow_cap_per_distance": [
+"techs",
+"costs"
+],
+"cost_flow_in": [
+"techs",
+"costs"
+],
+"cost_flow_out": [
+"techs",
+"costs",
+"carriers",
+"nodes"
+],
+"cost_interest_rate": [
+"costs"
+],
+"cost_om_annual": [
+"nodes",
+"techs",
+"costs"
+],
+"cost_source_use": [
+"techs",
+"costs"
+],
+"distance": [
+"techs"
+],
+"flow_cap_max": [
+"techs",
+"carriers",
+"nodes"
+],
+"flow_out_eff": [
+"techs",
+"carriers"
+],
+"flow_out_eff_per_distance": [
+"techs"
+],
+"flow_out_parasitic_eff": [
+"techs"
+],
+"heat_to_power_ratio": [
+"techs"
+],
+"latitude": [
+"nodes"
+],
+"lifetime": [
+"techs"
+],
+"link_from": [
+"techs"
+],
+"link_to": [
+"techs"
+],
+"longitude": [
+"nodes"
+],
+"name": [
+"techs"
+],
+"objective_cost_weights": [
+"costs"
+],
+"one_way": [
+"techs"
+],
+"sink_use_equals": [
+"timesteps",
+"techs",
+"nodes"
+],
+"source_unit": [
+"techs"
+],
+"source_use_equals": [
+"techs",
+"timesteps"
+],
+"source_use_max": [
+"techs"
+],
+"timestep_resolution": [
+"timesteps"
+],
+"timestep_weights": [
+"timesteps"
+]
+},
+"extra_math": [
+"additional_math"
+],
+"mode": "base"
+}
+}
