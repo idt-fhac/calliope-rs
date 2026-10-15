@@ -3,7 +3,7 @@
 
 use std::path::PathBuf;
 
-use calliope_preprocess::prepare_model_definition;
+use calliope_preprocess::{prepare_model_definition, prepare_model_definition_with};
 use calliope_schema::Backend;
 use calliope_yaml::{AttrTree, read_yaml_file};
 
@@ -33,8 +33,9 @@ fn prepare_example_models() {
     assert!(paths.len() >= 4);
     for path in paths {
         let def = read_yaml_file(&path, false).unwrap();
-        let prepared = prepare_model_definition(&def, &AttrTree::new())
-            .unwrap_or_else(|e| panic!("{}: {e}", path.display()));
+        let prepared =
+            prepare_model_definition_with(&def, None, None, None, Some(&path), &AttrTree::new())
+                .unwrap_or_else(|e| panic!("{}: {e}", path.display()));
         let d = &prepared.definition;
         assert!(
             !d.techs.0.is_empty() || !d.data_tables.0.is_empty(),

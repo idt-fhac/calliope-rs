@@ -1,0 +1,1423 @@
+dimensions:
+  carriers:
+    title: "Energy / commodity carriers"
+    dtype: string
+    ordered: false
+    iterator: carrier
+  costs:
+    title: "Cost classes"
+    dtype: string
+    ordered: false
+    iterator: cost
+  nodes:
+    title: "Geographic spatial nodes"
+    dtype: string
+    ordered: false
+    iterator: node
+  techs:
+    title: "Technologies"
+    dtype: string
+    ordered: false
+    iterator: tech
+  timesteps:
+    title: "Time steps"
+    dtype: datetime
+    ordered: true
+    iterator: timestep
+  clusters:
+    title: "Date clusters"
+    dtype: integer
+    ordered: true
+    iterator: cluster
+  datesteps:
+    title: "Date steps"
+    dtype: date
+    ordered: true
+    iterator: datestep
+
+
+
+parameters:
+  area_use_max:
+    default: .inf
+    title: Maximum usable area.
+    description: >-
+      If set to a finite value, limits the upper bound of the `area_use` decision variable to this value.
+    unit: $\text{area}$
+
+  area_use_min:
+    default: 0
+    title: Minimum usable area.
+    description: >-
+      Limits the lower bound of the `area_use` decision variable to this value.
+    unit: $\text{area}$
+
+  area_use_per_flow_cap:
+    default: .nan
+    title: Area use per flow capacity
+    description: >-
+      If set, forces `area_use` to follow `flow_cap` with the given numerical ratio (e.g. setting to 1.5 means that `area_use == 1.5 * flow_cap`).
+    unit: $\frac{\text{area}}{\text{power}}$
+
+  available_area:
+    default: .inf
+    title: Available area
+    description: >-
+      Available area for resource area use by all technologies at a node.
+    resample_method: mean
+    unit: area.
+
+  bigM:
+    default: 1e6
+    title: Big M
+    description: >-
+      BigM is a large value used to define certain optimisation problems.
+      See https://en.wikipedia.org/wiki/Big_M_method for more information.
+      This value should be larger than the largest values that any decision variables can take, but should not be **too** large
+      (i.e., do not set it greater than 3 orders of magnitude above the numeric range of the model).
+      If too large, numerical problems may arise in the optimisation.
+    unit: unitless
+
+  cost_flow_cap_per_distance:
+    default: 0
+    title: Cost of flow capacity, per unit distance
+    description: >-
+      Cost per unit of the decision variable `flow_cap` and per unit distance of a transmission link.
+      Applied to transmission links only.
+    unit: $\frac{\text{cost}}{\text{power}\times\text{distance}}$
+
+
+  cost_flow_cap:
+    default: 0
+    title: Cost of flow capacity.
+    description: >-
+      Cost per unit of the decision variable `flow_cap`.
+    unit: $\frac{\text{cost}}{\text{power}}$
+
+  cost_export:
+    default: 0
+    resample_method: mean
+    title: Carrier export cost.
+    description: >-
+      Cost per unit of `flow_export` in each timestep.
+      Usually used in the negative sense, as a subsidy.
+    unit: $\frac{\text{cost}}{\text{energy}}$
+
+  cost_interest_rate:
+    default: 0
+    title: Interest rate.
+    description: >-
+      Used when computing levelized costs and technology depreciation_rate (relative to lifetime).
+    unit: unitless
+
+  cost_om_annual:
+    default: 0
+    title: Annual O&M costs
+    description: >-
+      Annual costs applied per unit `flow_cap`.
+      These costs are not subject to being recalculated relative to technology lifetime, only scaled to reflect the fraction of one year that the model represents (e.g., 7 days ~= 0.02 of a year).
+    unit: $\frac{\text{cost}}{\text{power}}$
+
+  cost_om_annual_investment_fraction:
+    default: 0
+    title: Fractional annual O&M costs.
+    description: >-
+      Add an additional cost to total investment costs (except `cost_om_annual`) that is a fraction of that total.
+    unit: unitless.
+
+  cost_flow_in:
+    default: 0
+    resample_method: mean
+    title: Carrier inflow cost.
+    description: >-
+      Cost per unit of `flow_in` in each timestep.
+    unit: $\frac{\text{cost}}{\text{energy}}$
+
+  cost_source_use:
+    default: 0
+    resample_method: mean
+    title: Resource use cost.
+    description: >-
+      Cost per unit of `source_use` in `supply` technologies.
+    unit: $\frac{\text{cost}}{\text{energy}}$
+
+  cost_flow_out:
+    default: 0
+    resample_method: mean
+    title: Carrier outflow cost
+    description: >-
+      Cost per unit of `flow_out` in each timestep.
+    unit: $\frac{\text{cost}}{\text{energy}}$
+
+  cost_area_use:
+    default: 0
+    title: Cost of area use.
+    description: >-
+      Cost per unit `area_use`.
+    unit: $\text{area}$
+
+  cost_source_cap:
+    default: 0
+    title: Cost of source flow capacity.
+    description: >-
+      Cost per unit `source_cap`.
+    unit: $\frac{\text{cost}}{\text{power}}$
+
+  cost_storage_cap:
+    default: 0
+    title: Cost of storage capacity.
+    description: >-
+      Cost per unit `storage_cap`, i.e., the maximum available capacity of the storage technology's "reservoir".
+    unit: $\frac{\text{cost}}{\text{energy}}$
+
+  cost_depreciation_rate:
+    default: 1
+    title: Depreciation rate.
+    description: >-
+      Applied to "annualise" investment costs so they are comparable to variable costs.
+      If not provided, this will be calculated using technology `lifetime` and `cost_interest_rate`.
+    unit: unitless.
+
+  distance:
+    default: 1.0
+    resample_method: mean
+    title: Distance spanned by link.
+    description: >-
+      Used for `..._per_distance` constraints.
+      If not defined, it will be automatically derived from latitude/longitude of nodes in a link.
+    unit: distance.
+
+  export_max:
+    default: .inf
+    title: Maximum allowed carrier export
+    description: >-
+      If `carrier_export` is defined, limit the allowed export of produced carrier for a technology.
+    unit: power.
+
+  export_min:
+    default: 0
+    title: Minimum allowed carrier export
+    description: >-
+      If `carrier_export` is defined, set a lower bound on the amount of produced carrier that _must_ be exported for a technology.
+    unit: power.
+
+  flow_cap_per_storage_cap_min:
+    default: 0
+    title: Minimum flow capacity per storage capacity
+    description: >-
+      ratio of minimum charge/discharge (kW) for a given storage capacity (kWh).
+    unit: $\text{hour}^{-1}$
+
+  flow_cap_per_storage_cap_max:
+    default: .inf
+    title: Maximum flow capacity per storage capacity
+    description: >-
+      ratio of maximum charge/discharge (kW) for a given storage capacity (kWh).
+    unit: $\text{hour}^{-1}$
+
+  flow_cap_max:
+    default: .inf
+    title: Maximum rated flow capacity.
+    description: >-
+      Limits `flow_cap` to a maximum.
+    unit: power.
+
+  flow_cap_max_systemwide:
+    default: .inf
+    title: System-wide maximum rated flow capacity.
+    description: >-
+      Limits the sum of `flow_cap` over all nodes in the model to a maximum.
+    unit: power or $\frac{\text{power}}{\text{unit}}$
+
+  flow_cap_min:
+    default: 0
+    title: Minimum rated flow capacity.
+    description: >-
+      Limits `flow_cap` to a minimum.
+    unit: power or $\frac{\text{power}}{\text{unit}}$
+
+  flow_cap_min_systemwide:
+    default: 0
+    title: System-wide minimum rated flow capacity.
+    description: >-
+      Limits the sum of `flow_cap` over all nodes in the model to a minimum.
+    unit: power.
+
+  flow_out_min_relative:
+    default: 0
+    resample_method: mean
+    title: Minimum outflow
+    description: >-
+      Set to a value between 0 and 1 to force minimum `flow_out` as a fraction of the technology rated capacity.
+    unit: unitless.
+
+  flow_in_eff:
+    default: 1.0
+    resample_method: mean
+    title: Inflow efficiency
+    description: >-
+      Conversion efficiency from `source`/`flow_in` (tech dependent) into the technology.
+      Set as value between 1 (no loss) and 0 (all lost).
+    unit: unitless.
+
+  flow_in_eff_per_distance:
+    default: 1.0
+    resample_method: mean
+    title: Inflow (i.e., export from node) efficiency per distance of transmission links.
+    description: >-
+      Total link efficiency will be calculated as $\text{flow\_in\_eff}\times{}\text{flow\_in\_eff\_per\_distance}^\text{distance}$.
+      Set as value between 1 (no loss) and 0 (all lost).
+    unit: $\frac{\text{1}}{\text{distance}}$
+
+  flow_out_eff:
+    default: 1.0
+    resample_method: mean
+    title: Outflow efficiency
+    description: >-
+      Conversion efficiency from the technology to `sink`/`flow_out` (tech dependent).
+      Set as value between 1 (no loss) and 0 (all lost).
+    unit: unitless.
+
+  flow_out_eff_per_distance:
+    default: 1.0
+    resample_method: mean
+    title: Outflow (i.e., import from node) efficiency per distance of transmission links.
+    description: >-
+      Total link efficiency will be calculated as $\text{flow\_out\_eff}\times{}\text{flow\_out\_eff\_per\_distance}^\text{distance}$.
+      Set as value between 1 (no loss) and 0 (all lost).
+    unit: $\frac{\text{1}}{\text{distance}}$
+
+  flow_out_parasitic_eff:
+    default: 1.0
+    resample_method: mean
+    title: Plant parasitic efficiency
+    description: >-
+      Additional losses as flow gets transferred from the plant to the carrier, e.g. due to plant parasitic consumption.
+      Set as value between 1 (no loss) and 0 (all lost).
+    unit: unitless.
+
+  flow_ramping:
+    default: 1.0
+    title: Ramping rate
+    description: >-
+      limit maximum outflow / inflow / outflow - inflow (technology base class dependent) to a fraction of maximum capacity, which increases by that fraction at each timestep.
+    unit: $\frac{1}{\text{hour}}$
+
+  lifetime:
+    default: .inf
+    resample_method: mean
+    title: Technology lifetime
+    description: >-
+      Must be defined if fixed capital costs are defined.
+      A reasonable value for many technologies is around 20-25 years.
+    unit: years.
+
+  objective_cost_weights:
+    default: 1
+    title: Objective cost class weights.
+    description: Weightings for cost classes to apply in the objective function.
+    unit: unitless
+
+  sink_use_min:
+    default: 0
+    resample_method: sum
+    title: Minimum bound on sink.
+    description: >-
+      Minimum sink use to remove a carrier from the system (e.g., electricity demand, transport distance).
+      Unit dictated by `source_unit`.
+    unit: energy | $\frac{\text{energy}}{\text{power}}$ | $\frac{\text{energy}}{\text{area}}$
+
+  sink_use_max:
+    default: .inf
+    resample_method: sum
+    title: Maximum bound on sink.
+    description: >-
+      Maximum sink use to remove a carrier from the system (e.g., electricity demand, transport distance).
+      Unit dictated by `source_unit`.
+    unit: energy | $\frac{\text{energy}}{\text{power}}$ | $\frac{\text{energy}}{\text{area}}$
+
+  sink_use_equals:
+    default: .nan
+    resample_method: sum
+    title: Required sink use.
+    description: >-
+      Required amount of carrier removal from the system (e.g., electricity demand, transport distance).
+      Unit dictated by `source_unit`.
+    unit: energy | $\frac{\text{energy}}{\text{power}}$ | $\frac{\text{energy}}{\text{area}}$
+
+  source_eff:
+    default: 1.0
+    resample_method: mean
+    title: Source inflow efficiency
+    description: >-
+      Conversion efficiency from the technology from `source`.
+      Set as value between 1 (no loss) and 0 (all lost).
+    unit: unitless.
+
+  source_use_min:
+    default: 0
+    resample_method: sum
+    title: Minimum bound on source.
+    description: >-
+      Minimum source use to add a carrier from the system (e.g., biofuel, coal, rainfall, wind flow).
+      Unit dictated by `source_unit`.
+    unit: energy | $\frac{\text{energy}}{\text{power}}$ | $\frac{\text{energy}}{\text{area}}$
+
+  source_use_max:
+    default: .inf
+    resample_method: sum
+    title: Maximum bound on source.
+    description: >-
+      Maximum source use to add a carrier to the system (e.g., biofuel, coal, rainfall, wind flow).
+      Unit dictated by `source_unit`.
+    unit: energy | $\frac{\text{energy}}{\text{power}}$ | $\frac{\text{energy}}{\text{area}}$
+
+  source_use_equals:
+    default: .nan
+    resample_method: sum
+    title: Required sink use.
+    description: >-
+      Required amount of carrier removal from the system (e.g., biofuel, coal, rainfall, wind flow).
+      Unit dictated by `source_unit`.
+    unit: energy | $\frac{\text{energy}}{\text{power}}$ | $\frac{\text{energy}}{\text{area}}$
+
+  source_cap_max:
+    default: .inf
+    resample_method: mean
+    title: Maximum installed source consumption capacity.
+    description: >-
+      Upper limit on `source_cap` decision variable.
+    unit: power.
+
+  source_cap_min:
+    default: 0
+    resample_method: mean
+    title: Minimum installed source consumption capacity
+    description: >-
+      Lower limit on `source_cap` decision variable.
+    unit: power.
+
+  storage_cap_max:
+    default: .inf
+    title: Maximum storage capacity.
+    description: >-
+      Limit upper bound of `storage_cap` decision variable.
+    unit: energy.
+
+  storage_cap_min:
+    default: 0
+    title: Minimum storage capacity.
+    description: >-
+      Limit lower bound of `storage_cap` decision variable.
+    unit: energy.
+
+  storage_discharge_depth:
+    default: 0
+    resample_method: mean
+    title: Storage depth of discharge.
+    description: >-
+      Defines the minimum level of storage state of charge, as a fraction of total storage capacity.
+    unit: unitless.
+
+  storage_initial:
+    default: 0
+    title: Initial storage level.
+    description: >-
+      Set stored flow in device at the first timestep, as a fraction of total storage capacity.
+    unit: unitless.
+
+  storage_loss:
+    default: 0
+    resample_method: mean
+    title: Storage loss rate
+    description: >-
+        Rate of storage loss per hour, used to calculate lost stored flow as `(1 - storage_loss)^hours_per_timestep`.
+    unit: $\frac{\text{1}}{\text{hour}}$
+
+  timestep_resolution:
+    default: 1
+    resample_method: sum
+    title: Resolution per timestep.
+    unit: hours.
+
+  timestep_weights:
+    default: 1
+    resample_method: mean
+    title: Weight per timestep.
+    unit: unitless.
+
+lookups:
+  base_tech:
+    dtype: string
+    one_of: [demand, supply, conversion, storage, transmission]
+    title: Abstract base technology name.
+    description: Should be the name of one of the abstract base classes, from which some initial parameter defaults will be derived and with which certain base math will be triggered.
+
+  carrier_in:
+    description: >-
+      Carrier(s) consumed by this technology.
+      Only `transmission`, `conversion`, `storage`, and `demand` technologies can define this parameter
+    dtype: bool
+    pivot_values_to_dim: carriers
+    default: False
+
+  carrier_out:
+    description: >-
+      Carrier(s) produced by this technology.
+      Only `transmission`, `conversion`, `storage`, and `supply` technologies can define this parameter
+    dtype: bool
+    default: false
+    pivot_values_to_dim: carriers
+
+  carrier_export:
+    description: >-
+      Carrier(s) produced by this technology that can be exported out of the system boundaries without having to go to a pre-defined `sink` (i.e., via a `demand` technology).
+      Must be a subset of `carrier_out`.
+    dtype: bool
+    default: false
+    pivot_values_to_dim: carriers
+
+  cluster_first_timestep:
+    dtype: bool
+    default: false
+    title: Cluster first timestep.
+    description: >-
+      If true, the timestep is the first in the given clustered day.
+
+  active:
+    dtype: bool
+    default: false
+    description: >-
+      Whether a technology is defined with particular carriers and at a particular node.
+
+  include_storage:
+    dtype: bool
+    default: false
+    title: Storage method switch.
+    description: When true, math will be triggered to allow discontinuous carrier inflow and outflows across timesteps.
+
+  cyclic_storage:
+    dtype: bool
+    default: true
+    title: Cyclic storage switch.
+    description: >
+      If true, link storage levels in the last model timestep with the first model timestep.
+      `inter_cluster_storage` custom math must be included if using time clustering and setting this to `true`.
+
+  sink_unit:
+    dtype: string
+    default: absolute
+    title: Sink unit
+    description: >-
+      Sets the unit of `Sink` to either `absolute` (unit: `energy`), `per_area` (unit: `energy/area`), or `per_cap` (unit: `energy/power`).
+      `per_area` uses the `area_use` decision variable to scale the sink while `per_cap` uses the `flow_cap` decision variable.
+    one_of: [absolute, per_area, per_cap]
+
+  source_unit:
+    dtype: string
+    default: absolute
+    title: Source unit
+    description: >-
+      Sets the unit of `Source` to either `absolute` (unit: `energy`), `per_area` (unit: `energy/area`), or `per_cap` (unit: `energy/power`).
+      `per_area` uses the `area_use` decision variable to scale the source while `per_cap` uses the `flow_cap` decision variable.
+    one_of: [absolute, per_area, per_cap]
+
+  source_cap_equals_flow_cap:
+    dtype: bool
+    default: false
+    title: Source capacity equals flow capacity.
+    description: If true, the decision variables `source_cap` and `flow_cap` are forced to equal one another.
+
+  one_way:
+    dtype: bool
+    default: false
+    title: One way transmission.
+    description: Forces a transmission technology to only move flow in one direction on the link, i.e. from `from` to `to`.
+
+  link_to:
+    dtype: string
+    title: The node a transmission technology links to.
+    description: Defines one end of a transmission technology.
+
+  link_from:
+    dtype: string
+    title: The node a transmission technology links from.
+    description: Defines one end of a transmission technology.
+
+  lookup_cluster_last_timestep:
+    description: The last timestep of each cluster.
+    dtype: datetime
+    resample_method: first
+
+  latitude:
+    title: Latitude (WGS84 / EPSG4326).
+    dtype: float
+    resample_method: mean
+
+  longitude:
+    title: Longitude (WGS84 / EPSG4326).
+    dtype: float
+    resample_method: mean
+
+
+constraints:
+  flow_capacity_per_storage_capacity_min:
+    description: >-
+      Set the lower bound of storage flow capacity relative to its storage capacity.
+    foreach: [nodes, techs, carriers]
+    where: "flow_cap AND storage_cap AND flow_cap_per_storage_cap_min"
+    equations:
+      - expression: flow_cap >= storage_cap * flow_cap_per_storage_cap_min
+
+  flow_capacity_per_storage_capacity_max:
+    description: >-
+      Set the upper bound of storage flow capacity relative to its storage capacity.
+    foreach: [nodes, techs, carriers]
+    where: "flow_cap AND storage_cap AND flow_cap_per_storage_cap_max"
+    equations:
+      - expression: flow_cap <= storage_cap * flow_cap_per_storage_cap_max
+
+  source_capacity_equals_flow_capacity:
+    description: >-
+      Set a `supply` technology's flow capacity to equal its source capacity.
+    foreach: [nodes, techs, carriers]
+    where: "flow_cap AND source_cap AND source_cap_equals_flow_cap==True"
+    equations:
+      - expression: source_cap == flow_cap
+
+  force_zero_area_use:
+    description: >-
+      Set a technology's area use to zero if its flow capacity upper bound is zero.
+    foreach: [nodes, techs]
+    where: "area_use AND flow_cap_max==0"
+    equations:
+      - expression: area_use == 0
+
+  area_use_per_flow_capacity:
+    description: >-
+      Set a fixed relationship between a technology's flow capacity and its area use.
+    foreach: [nodes, techs, carriers]
+    where: "flow_cap AND area_use AND area_use_per_flow_cap"
+    equations:
+      - expression: area_use == flow_cap * area_use_per_flow_cap
+
+  area_use_capacity_per_loc:
+    description: >-
+      Set an upper bound on the total area that all technologies with `area_use` can occupy at a given node.
+    foreach: [nodes]
+    where: "area_use AND available_area"
+    equations:
+      - expression: sum(area_use, over=techs) <= available_area
+
+  flow_capacity_systemwide_max:
+    description: >-
+      Set an upper bound on flow capacity of a technology across all nodes in which the technology exists.
+    foreach: [techs, carriers]
+    where: "any(flow_cap, over=nodes) AND flow_cap_max_systemwide"
+    equations:
+      - expression: sum(flow_cap, over=nodes) <= flow_cap_max_systemwide
+
+  flow_capacity_systemwide_min:
+    description: >-
+      Set a lower bound on flow capacity of a technology across all nodes in which the technology exists.
+    foreach: [techs, carriers]
+    where: "any(flow_cap, over=nodes) AND flow_cap_min_systemwide"
+    equations:
+      - expression: sum(flow_cap, over=nodes) >= flow_cap_min_systemwide
+
+  balance_conversion:
+    description: >-
+      Fix the relationship between a `conversion` technology's outflow and consumption.
+    foreach: [nodes, techs, timesteps]
+    where: base_tech==conversion AND NOT include_storage==true
+    equations:
+      - expression: sum(flow_out_inc_eff, over=carriers) == sum(flow_in_inc_eff, over=carriers)
+
+# --8<-- [start:flow_out_max]
+  flow_out_max:
+    description: >-
+      Set the upper bound of a technology's outflow.
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "carrier_out"
+    equations:
+      - expression: flow_out <= flow_cap * timestep_resolution * flow_out_parasitic_eff
+# --8<-- [end:flow_out_max]
+
+  flow_out_min:
+    description: >-
+      Set the lower bound of a technology's outflow.
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "flow_cap AND flow_out_min_relative"
+    equations:
+      - expression: flow_out >= flow_cap * timestep_resolution * flow_out_min_relative
+
+  flow_in_max:
+    description: >-
+      Set the upper bound of a technology's inflow.
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "carrier_in"
+    equations:
+      - expression: flow_in <= flow_cap * timestep_resolution
+
+  source_max:
+    description: >-
+      Set the upper bound of a `supply` technology's source consumption.
+    foreach: [nodes, techs, timesteps]
+    where: source_cap
+    equations:
+      - expression: source_use <= timestep_resolution * source_cap
+
+  storage_max:
+    description: >-
+      Set the upper bound of the amount of carrier a technology can store.
+    foreach: [nodes, techs, timesteps]
+    where: "storage"
+    equations:
+      - expression: storage <= storage_cap
+
+  storage_discharge_depth_limit:
+    description: >-
+      Set the lower bound of the stored carrier a technology must keep in reserve at all times.
+    foreach: [nodes, techs, timesteps]
+    where: "storage AND storage_discharge_depth"
+    equations:
+      - expression: storage - storage_discharge_depth * storage_cap >= 0
+
+  system_balance:
+    description: >-
+      Set the global carrier balance of the optimisation problem by fixing the total production of
+      a given carrier to equal the total consumption of that carrier at every node in every timestep.
+    foreach: [nodes, carriers, timesteps]
+    where: "any(carrier_in, over=techs) OR any(carrier_out, over=techs)"
+    equations:
+      - expression: >-
+          sum(flow_out, over=techs) -
+          sum(flow_in, over=techs) -
+          sum(flow_export, over=techs) +
+          (unmet_demand + unused_supply) == 0
+
+  balance_demand:
+    description: >-
+      Set the upper bound on, or a fixed total of,
+      that a demand technology must dump to its sink in each timestep.
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "carrier_in AND base_tech==demand"
+    equations:
+      - where: "sink_use_equals"
+        expression: "flow_in_inc_eff == sink_use_equals * $sink_scaler"
+      - where: "NOT sink_use_equals AND sink_use_max"
+        expression: "flow_in_inc_eff <= sink_use_max * $sink_scaler"
+    sub_expressions:
+      sink_scaler: &sink_scaler
+        - where: "sink_unit==per_area"
+          expression: "area_use"
+        - where: "sink_unit==per_cap"
+          expression: "sum(where(flow_cap, carrier_in), over=carriers)"
+        - where: "sink_unit==absolute"
+          expression: "1"
+
+  balance_demand_min_use:
+    description: >-
+      Set the lower bound on the quantity of flow a
+      `demand` technology must dump to its sink in each timestep.
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "carrier_in AND sink_use_min AND NOT sink_use_equals AND base_tech==demand"
+    equations:
+      - expression: "flow_in_inc_eff >= sink_use_min * $sink_scaler"
+    sub_expressions:
+      sink_scaler: *sink_scaler
+
+  balance_supply_no_storage:
+    description: >-
+      Fix the outflow of a `supply` technology to its consumption of the available source.
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "carrier_out AND base_tech==supply AND NOT include_storage==True"
+    equations:
+      - expression: flow_out_inc_eff == source_use * source_eff
+
+  balance_supply_with_storage:
+    description: >-
+      Fix the outflow of a `supply` technology to its consumption of the available source,
+      with a storage buffer to temporally offset the outflow from source consumption.
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "carrier_out AND storage AND base_tech==supply"
+    equations:
+      - expression: storage == $storage_previous_step + source_use * source_eff - flow_out_inc_eff
+    sub_expressions:
+      storage_previous_step: &storage_previous_step
+        - where: timesteps==get_val_at_index(timesteps=0) AND NOT cyclic_storage==True
+          expression: storage_initial * storage_cap
+        - where: >-
+            (
+              (timesteps==get_val_at_index(timesteps=0) AND cyclic_storage==True)
+              OR NOT timesteps==get_val_at_index(timesteps=0)
+            ) AND NOT cluster_first_timestep==True
+          expression: (1 - storage_loss) ** roll(timestep_resolution, timesteps=1) * roll(storage, timesteps=1)
+        - where: >-
+            cluster_first_timestep==True AND NOT
+            (timesteps==get_val_at_index(timesteps=0) AND NOT cyclic_storage==True)
+          expression: >-
+            (1 - storage_loss) **
+            select_from_lookup_arrays(timestep_resolution, timesteps=lookup_cluster_last_timestep) *
+            select_from_lookup_arrays(storage, timesteps=lookup_cluster_last_timestep)
+
+  source_availability_supply:
+    description: >-
+      Set the upper bound on, or a fixed total of,
+      a `supply` technology's ability to consume its available resource.
+    foreach: [nodes, techs, timesteps]
+    where: "source_use AND (source_use_equals OR source_use_max)"
+    equations:
+      - where: "source_use_equals"
+        expression: "source_use == source_use_equals * $source_scaler"
+      - where: "NOT source_use_equals AND source_use_max"
+        expression: "source_use <= source_use_max * $source_scaler"
+    sub_expressions:
+      source_scaler: &source_scaler
+        - where: "source_unit==per_area"
+          expression: "area_use"
+        - where: "source_unit==per_cap"
+          expression: "sum(where(flow_cap, carrier_out), over=carriers)"
+        - where: "source_unit==absolute"
+          expression: "1"
+
+  balance_supply_min_use:
+    description: >-
+      Set the lower bound on the quantity of its source a `supply` technology must use in each timestep.
+    foreach: [nodes, techs, timesteps]
+    where: "source_use_min AND NOT source_use_equals AND base_tech==supply"
+    equations:
+      - expression: "source_use >= source_use_min * $source_scaler"
+    sub_expressions:
+      source_scaler: *source_scaler
+
+  balance_storage:
+    description: >-
+      Fix the quantity of carrier stored in a `storage` technology at the end of each timestep
+      based on the net flow of carrier charged and discharged
+      and the quantity of carrier stored at the start of the timestep.
+    foreach: [nodes, techs, timesteps]
+    where: (include_storage==true or base_tech==storage) AND NOT (base_tech==supply OR base_tech==demand)
+    equations:
+      - expression: >-
+          storage == $storage_previous_step -
+            sum(flow_out_inc_eff, over=carriers) + sum(flow_in_inc_eff, over=carriers)
+    sub_expressions:
+      storage_previous_step: *storage_previous_step
+
+  # --8<-- [start:constraint]
+  set_storage_initial:
+    description: >-
+      Fix the relationship between carrier stored in a `storage` technology at
+      the start and end of the whole model period.
+    foreach: [nodes, techs]
+    where: "storage AND storage_initial AND cyclic_storage==True"
+    equations:
+      - expression: >-
+          storage[timesteps=$final_step] * (
+            (1 - storage_loss) ** timestep_resolution[timesteps=$final_step]
+          ) == storage_initial * storage_cap
+    slices:
+      final_step:
+        - expression: get_val_at_index(timesteps=-1)
+    active: true # optional; defaults to true.
+  # --8<-- [end:constraint]
+
+  balance_transmission:
+    description: >-
+      Fix the relationship between between carrier flowing into and out of a
+      `transmission` link in each timestep.
+    foreach: [techs, timesteps]
+    where: "base_tech==transmission"
+    equations:
+      - expression: sum(flow_out_inc_eff, over=[nodes, carriers]) == sum(flow_in_inc_eff, over=[nodes, carriers])
+
+  symmetric_transmission:
+    description: >-
+      Fix the flow capacity of two `transmission` technologies representing the same link in the system.
+    foreach: [techs, carriers]
+    where: "any(carrier_out, over=nodes) AND base_tech==transmission"
+    equations:
+      - expression: >-
+          sum(where(flow_cap, map_dim(nodes, link_from)), over=nodes) ==
+          sum(where(flow_cap, map_dim(nodes, link_to)), over=nodes)
+
+  export_balance:
+    description: >-
+      Set the lower bound of a technology's outflow to a technology's carrier export,
+      for any technologies that can export carriers out of the system.
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "flow_export"
+    equations:
+      - expression: flow_out >= flow_export
+
+  ramping_up:
+    description: >-
+      Set the upper bound on a technology's ability to ramp outflow up
+      beyond a certain percentage compared to the previous timestep.
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "(carrier_in OR carrier_out) AND flow_ramping AND NOT timesteps==get_val_at_index(timesteps=0)"
+    equations:
+      - expression: $flow - roll($flow, timesteps=1) <= flow_ramping * flow_cap
+    sub_expressions:
+      flow: &ramping_flow
+        - where: "carrier_out AND NOT carrier_in"
+          expression: flow_out / timestep_resolution
+        - where: "carrier_in AND NOT carrier_out"
+          expression: flow_in / timestep_resolution
+        - where: "carrier_in AND carrier_out"
+          expression: (flow_out - flow_in) / timestep_resolution
+
+  ramping_down:
+    description: >-
+      Set the upper bound on a technology's ability to ramp outflow down
+      beyond a certain percentage compared to the previous timestep.
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "(carrier_in OR carrier_out) AND flow_ramping AND NOT timesteps==get_val_at_index(timesteps=0)"
+    equations:
+      - expression: -1 * flow_ramping * flow_cap <= $flow - roll($flow, timesteps=1)
+    sub_expressions:
+      flow: *ramping_flow
+
+variables:
+  flow_cap:
+    title: Technology flow (a.k.a. nominal) capacity
+    description: >-
+      A technology's flow capacity, also known as its nominal or nameplate capacity.
+    default: 0
+    unit: power
+    foreach: [nodes, techs, carriers]
+    where: carrier_in OR carrier_out
+    bounds:
+      min: flow_cap_min
+      max: flow_cap_max
+
+  flow_out:
+    title: Carrier outflow
+    description: >-
+      The outflow of a technology per timestep,
+      also known as the flow discharged (from `storage` technologies)
+      or the flow received (by `transmission` technologies) on a link.
+    default: 0
+    unit: energy
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "carrier_out AND not (one_way AND map_dim(nodes, link_from)==True)"
+    bounds:
+      min: 0
+      max: .inf
+
+  flow_in:
+    title: Carrier inflow
+    description: >-
+      The inflow to a technology per timestep,
+      also known as the flow consumed (by `storage` technologies)
+      or the flow sent (by `transmission` technologies) on a link.
+    default: 0
+    unit: energy
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "carrier_in AND not (one_way AND map_dim(nodes, link_to)==True)"
+    bounds:
+      min: 0
+      max: .inf
+
+  flow_export:
+    title: Carrier export
+    description: >-
+      The flow of a carrier exported outside the system boundaries by a technology per timestep.
+    default: 0
+    unit: energy
+    foreach: [nodes, techs, carriers, timesteps]
+    where: "carrier_export"
+    bounds:
+      min: export_min
+      max: export_max
+
+  area_use:
+    title: Area utilisation
+    description: >-
+      The area in space utilised directly (e.g., solar PV panels)
+      or indirectly (e.g., biofuel crops) by a technology.
+    default: 0
+    unit: area
+    foreach: [nodes, techs]
+    where: "(area_use_min OR area_use_max OR area_use_per_flow_cap OR sink_unit==per_area OR source_unit==per_area)"
+    bounds:
+      min: area_use_min
+      max: area_use_max
+
+  source_use:
+    title: Source flow use
+    description: >-
+      The carrier flow consumed from outside the system boundaries by a `supply` technology.
+    default: 0
+    unit: energy
+    foreach: [nodes, techs, timesteps]
+    where: "base_tech==supply"
+    bounds:
+      min: 0
+      max: .inf
+
+  source_cap:
+    title: Source flow capacity
+    description: >-
+      The upper limit on a flow that can be consumed from outside the system boundaries
+      by a `supply` technology in each timestep.
+    default: 0
+    unit: power
+    foreach: [nodes, techs]
+    where: "base_tech==supply"
+    bounds:
+      min: source_cap_min
+      max: source_cap_max
+
+  # --8<-- [start:variable]
+  storage_cap:
+    title: Stored carrier capacity
+    description: >-
+      The upper limit on a carrier that can
+      be stored by a technology in any timestep.
+    default: 0
+    unit: energy
+    foreach: [nodes, techs]
+    where: "include_storage==True OR base_tech==storage"
+    domain: real # optional; defaults to real.
+    bounds:
+      min: storage_cap_min
+      max: storage_cap_max
+    active: true # optional; defaults to true.
+  # --8<-- [end:variable]
+
+  storage:
+    title: Stored carrier
+    description: >-
+      The carrier stored by a `storage` technology in each timestep.
+    default: 0
+    unit: energy
+    foreach: [nodes, techs, timesteps]
+    where: "include_storage==True OR base_tech==storage"
+    bounds:
+      min: 0
+      max: .inf
+
+  unmet_demand:
+    title: Unmet demand (load shedding)
+    description: >-
+      Virtual source of carrier flow to ensure model feasibility.
+      This should only be considered a debugging rather than a modelling tool as it may
+      distort the model in other ways due to the large impact it has on the objective function value.
+      When present in a model in which it has been requested, it indicates an inability
+      for technologies in the model to reach a sufficient combined supply capacity to meet demand.
+    default: 0
+    unit: energy
+    foreach: [nodes, carriers, timesteps]
+    where: "config.ensure_feasibility==True AND (any(carrier_in, over=techs) OR any(carrier_out, over=techs))"
+    bounds:
+      min: 0
+      max: .inf
+
+  unused_supply:
+    title: Unused supply (curtailment)
+    description: >-
+      Virtual sink of carrier flow to ensure model feasibility.
+      This should only be considered a debugging rather than a modelling tool as it may
+      distort the model in other ways due to the large impact it has on the objective function value.
+      In model results, the negation of this variable is combined with
+      `unmet_demand` and presented as only one variable: `unmet_demand`.
+      When present in a model in which it has been requested, it indicates an inability
+      for technologies in the model to reach a sufficient combined consumption capacity
+      to meet required outflow (e.g. from renewables without the possibility of curtailment).
+    default: 0
+    unit: energy
+    foreach: [nodes, carriers, timesteps]
+    where: "config.ensure_feasibility==True AND (any(carrier_in, over=techs) OR any(carrier_out, over=techs))"
+    bounds:
+      min: -.inf
+      max: 0
+
+objectives:
+  # --8<-- [start:objective]
+  min_cost_optimisation:
+    description: >-
+      Minimise the total cost of installing and operating
+      all technologies in the system.
+      If multiple cost classes are present (e.g., monetary and co2 emissions),
+      the weighted sum of total costs is minimised.
+      Cost class weights can be defined in the indexed parameter
+      `objective_cost_weights`.
+    equations:
+      - expression: >-
+          sum(
+            sum(cost, over=[nodes, techs])
+            * objective_cost_weights,
+            over=costs
+          ) + $unmet_demand
+    sub_expressions:
+      unmet_demand:
+        - expression: >-
+            sum(
+              sum(unmet_demand - unused_supply, over=[carriers, nodes])
+              * timestep_weights,
+              over=timesteps
+            ) * bigM
+    sense: minimise
+    active: true # optional; defaults to true.
+  # --8<-- [end:objective]
+
+global_expressions:
+  flow_out_inc_eff:
+    title: Carrier outflow including losses
+    description: >-
+      Outflows after taking efficiency losses into account.
+    default: 0
+    unit: energy
+    foreach: [nodes, techs, carriers, timesteps]
+    where: flow_out
+    equations:
+      - where: base_tech==transmission
+        expression: >-
+          flow_out / (
+            flow_out_eff * flow_out_parasitic_eff *
+            flow_out_eff_per_distance ** distance
+          )
+      - where: NOT base_tech==transmission
+        expression: flow_out / (flow_out_eff * flow_out_parasitic_eff)
+
+  flow_in_inc_eff:
+    title: Carrier inflow including losses
+    description: >-
+      Inflows after taking efficiency losses into account.
+    default: 0
+    unit: energy
+    foreach: [nodes, techs, carriers, timesteps]
+    where: flow_in
+    equations:
+      - where: base_tech==transmission
+        expression: flow_in * flow_in_eff * flow_in_eff_per_distance ** distance
+      - where: NOT base_tech==transmission
+        expression: flow_in * flow_in_eff
+
+  cost_operation_variable:
+    title: Variable operating costs
+    description: >-
+      The operating costs per timestep of a technology.
+    default: 0
+    unit: $\frac{\text{cost}}{\text{hour}}$
+    foreach: [nodes, techs, costs, timesteps]
+    where: "cost_export OR cost_flow_in OR cost_flow_out OR cost_source_use"
+    equations:
+      - expression: timestep_weights * ($cost_export + $cost_flow_out + $cost_flow_in)
+    sub_expressions:
+      cost_export:
+        - expression: sum(cost_export * flow_export, over=carriers)
+      cost_flow_in:
+        - where: "base_tech==supply"
+          expression: cost_source_use * source_use
+        - where: "NOT base_tech==supply"
+          expression: sum(cost_flow_in * flow_in, over=carriers)
+      cost_flow_out:
+        - expression: sum(cost_flow_out * flow_out, over=carriers)
+
+  cost_investment_flow_cap:
+    title: Flow capacity investment costs
+    description: >-
+      The investment costs associated with the nominal/rated capacity of a technology.
+    default: 0
+    unit: cost
+    foreach: [nodes, techs, carriers, costs]
+    where: flow_cap AND (cost_flow_cap OR cost_flow_cap_per_distance)
+    equations:
+      - expression: $cost_sum * flow_cap
+    sub_expressions:
+      cost_sum:
+        - where: base_tech==transmission
+          expression: (cost_flow_cap + cost_flow_cap_per_distance * distance) * 0.5
+        - where: NOT base_tech==transmission
+          expression: cost_flow_cap
+
+  cost_investment_storage_cap:
+    title: Storage capacity investment costs
+    description: >-
+      The investment costs associated with the storage capacity of a technology.
+    default: 0
+    unit: cost
+    foreach: [nodes, techs, costs]
+    where: cost_storage_cap AND storage_cap
+    equations:
+      - expression: cost_storage_cap * storage_cap
+
+  cost_investment_source_cap:
+    title: Source flow capacity investment costs
+    description: >-
+      The investment costs associated with the source consumption capacity of a technology.
+    default: 0
+    unit: cost
+    foreach: [nodes, techs, costs]
+    where: cost_source_cap AND source_cap
+    equations:
+      - expression: cost_source_cap * source_cap
+
+  cost_investment_area_use:
+    title: Area utilisation investment costs
+    description: >-
+      The investment costs associated with the area used by a technology.
+    default: 0
+    unit: cost
+    foreach: [nodes, techs, costs]
+    where: cost_area_use AND area_use
+    equations:
+      - expression: cost_area_use * area_use
+
+  cost_investment:
+    title: Total investment costs
+    description: >-
+      The installation costs of a technology, including those linked to the nameplate capacity,
+      land use, and storage size.
+    default: 0
+    unit: cost
+    foreach: [nodes, techs, costs]
+    where: >-
+      cost_investment_flow_cap OR cost_investment_storage_cap OR cost_investment_source_cap OR
+      cost_investment_area_use
+    equations:
+      - expression: >-
+          sum(cost_investment_flow_cap, over=carriers) +
+          cost_investment_storage_cap +
+          cost_investment_source_cap +
+          cost_investment_area_use
+
+  cost_investment_annualised:
+    title: Equivalent annual investment costs
+    description: >-
+      An annuity factor has been applied to scale lifetime investment costs to annual values that can be directly compared to operation costs.
+      If the modeling period is not equal to one full year, this will be scaled accordingly.
+    default: 0
+    unit: cost
+    foreach: [nodes, techs, costs]
+    where: cost_investment
+    equations:
+      - expression: $annualisation_weight * $depreciation_rate * cost_investment
+    sub_expressions:
+      annualisation_weight: &annualisation_weight
+        - expression: sum(timestep_resolution * timestep_weights, over=timesteps) / 8760
+      depreciation_rate:
+        - where: cost_depreciation_rate
+          expression: cost_depreciation_rate
+        - where: NOT cost_depreciation_rate AND (NOT cost_interest_rate OR cost_interest_rate==0)
+          expression: 1 / lifetime
+        - where: NOT cost_depreciation_rate AND cost_interest_rate>0
+          expression: >-
+            (cost_interest_rate * ((1 + cost_interest_rate) ** lifetime)) /
+            (((1 + cost_interest_rate) ** lifetime) - 1)
+
+  cost_operation_fixed:
+    title: Total fixed operation costs
+    description: >-
+      The fixed, annual operation costs of a technology, which are calculated relative to investment costs.
+      If the modeling period is not equal to one full year, this will be scaled accordingly.
+    default: 0
+    unit: cost
+    foreach: [nodes, techs, costs]
+    where: (cost_om_annual AND flow_cap) OR (cost_investment AND cost_om_annual_investment_fraction)
+    equations:
+      - expression: >-
+          $annualisation_weight * (
+            sum(cost_om_annual * flow_cap, over=carriers) +
+            cost_investment * cost_om_annual_investment_fraction
+          )
+    sub_expressions:
+      annualisation_weight: *annualisation_weight
+
+  # --8<-- [start:expression]
+  cost:
+    title: Total costs
+    description: >-
+      The total annualised costs of a technology,
+      including installation and operation costs.
+    default: 0
+    unit: cost
+    foreach: [nodes, techs, costs]
+    where: "cost_investment_annualised OR cost_operation_variable OR cost_operation_fixed"
+    equations:
+      - expression: >-
+          cost_investment_annualised + sum(cost_operation_variable, over=timesteps) + cost_operation_fixed
+    active: true # optional; defaults to true.
+  # --8<-- [end:expression]
+
+piecewise_constraints: {}
+
+postprocessed:
+  capacity_factor:
+    title: Capacity factor
+    description: >-
+      The fraction of a technology's capacity that is utilised for carrier outflow in each time period.
+    unit: unitless
+    default: 0
+    foreach: [nodes, techs, carriers, timesteps]
+    where: flow_out AND flow_cap>0
+    equations:
+      - expression: flow_out / (flow_cap * timestep_resolution)
+
+  systemwide_capacity_factor:
+    title: Systemwide capacity factor
+    description: >-
+      The fraction of a technology's capacity that is utilised for carrier outflow,
+      averaged over the full time horizon and all nodes.
+    unit: unitless
+    foreach: [techs, carriers]
+    default: 0
+    where: flow_out AND flow_cap>0
+    equations:
+      - expression: >-
+          sum(flow_out * timestep_weights, over=[nodes, timesteps]) /
+          (sum(flow_cap, over=nodes) * sum(timestep_resolution * timestep_weights, over=timesteps))
+
+  total_generation:
+    title: Total generation
+    description: >-
+      Sum of technology carrier outflow across all nodes and time periods.
+    unit: energy
+    foreach: [techs, carriers]
+    default: 0
+    where: flow_out AND NOT base_tech==demand
+    equations:
+      - expression: sum(flow_out + flow_export * timestep_weights, over=[nodes, timesteps])
+
+  systemwide_levelised_cost:
+    title: Systemwide levelised cost of energy (LCOE)
+    description: >-
+      Levelised cost of each technology's generated carrier,
+      averaged over all nodes and time periods.
+    unit: $\frac{\text{cost}}{\text{energy}}$
+    foreach: [techs, carriers, costs]
+    default: 0
+    where: total_generation>0 AND any(cost, over=nodes)
+    equations:
+      - expression: sum(cost, over=nodes) / total_generation
+
+  total_levelised_cost:
+    title: Total levelised cost of energy (LCOE)
+    description: >-
+      Levelised cost of each carrier in the system,
+      averaged over all technologies, nodes, and time periods.
+    unit: $\frac{\text{cost}}{\text{energy}}$
+    foreach: [carriers, costs]
+    default: 0
+    where: sum(total_generation, over=techs)>0
+    equations:
+      - expression: sum(cost, over=[nodes, techs]) / sum(total_generation, over=techs)
+
+  unmet_sum:
+    title: Net unmet demand
+    description: >-
+      Net unmet demand for each time period, node, and carrier.
+      This accounts for the net effect of the two dummy variables:
+      unmet demand (load shedding) and unused supply (forced curtailment).
+      Note: this should only be used for debugging.
+    unit: energy
+    foreach: [nodes, carriers, timesteps]
+    default: 0
+    where: "unmet_demand AND unused_supply AND config.ensure_feasibility == True"
+    equations:
+      - expression: unmet_demand + unused_supply
+
+  curtailment:
+    title: Curtailment
+    description: >-
+      Fraction of outflow curtailed compared to that could have been generated if utilising all available resource.
+      This is useful for renewable energy technologies, for which unused resource in any hour is effectively lost revenue.
+    unit: unitless
+    foreach: [nodes, techs, timesteps]
+    where: base_tech==supply AND source_use_max>0 AND NOT source_use_max==inf AND source_cap>0 AND flow_cap>0
+    default: 0
+    equations:
+      - expression: 1 - (source_use / (source_use_max * $source_scaler))
+    sub_expressions:
+      source_scaler: *source_scaler
+
+  total_curtailment:
+    title: Total curtailment
+    description: >-
+      Fraction of outflow curtailed compared to that could have been generated if utilising all available resource,
+      averaged over the full time horizon.
+      This is useful for renewable energy technologies, for which unused resource in any hour is effectively lost revenue.
+    unit: unitless
+    foreach: [nodes, techs]
+    where: base_tech==supply AND source_use_max AND source_cap>0
+    default: 0
+    equations:
+      - expression: 1 - (sum(source_use, over=timesteps) / sum(source_use_max * $source_scaler, over=timesteps))
+    sub_expressions:
+      source_scaler: *source_scaler
+
+checks:
+  must_have_base:
+    where: NOT base_tech
+    message: An abstract `base_tech` must be defined for every technology at every node.
+    errors: raise
+
+  distance_only_for_transmission:
+    where: NOT base_tech==transmission AND (distance or flow_in_eff_per_distance or flow_out_eff_per_distance or cost_flow_cap_per_distance)
+    message: Only transmission technologies can define `distance` or `..._per_distance`.
+    errors: raise
+
+  unbounded_flow_cap_cost:
+    where: cost_flow_cap<0 AND NOT flow_cap_max
+    message: Cannot have a negative `cost_flow_cap` as there is an unset corresponding `flow_cap_max` constraint
+    errors: raise
+
+  unbounded_storage_cap_cost:
+    where: cost_storage_cap<0 AND NOT storage_cap_max
+    message: Cannot have a negative `cost_storage_cap` as there is an unset corresponding `storage_cap_max` constraint
+    errors: raise
+
+  unbounded_area_use_cost:
+    where: cost_area_use<0 AND NOT area_use_max
+    message: Cannot have a negative `cost_area_use` as there is an unset corresponding `area_use_max` constraint
+    errors: raise
+
+  unbounded_source_use_cost:
+    where: cost_source_cap<0 AND NOT source_cap_max
+    message: Cannot have a negative `cost_source_cap` as there is an unset corresponding `source_cap_max` constraint
+    errors: raise
+
+  finite_source_use:
+    where: source_use_equals==inf or sink_use_equals==inf
+    message: "Cannot include infinite values in `source_use_equals`/`sink_use_equals`"
+    errors: raise
+
+  all_or_nothing_lat_lon:
+    where: (any(latitude, over=nodes) or any(longitude, over=nodes)) AND NOT (latitude or longitude)
+    message: "Must define node latitude and longitude for _all_ nodes or _no_ nodes."
+    errors: raise
+
+  export_only_for_outflows:
+    where: carrier_export AND NOT any(carrier_out, over=nodes)
+    message: "Export carriers must be one of the technology outflow carriers."
+    errors: raise
+
+  storage_initial_max:
+    where: storage_initial AND (storage_initial<0 OR storage_initial>1)
+    message: "storage_initial is a fraction, requiring values within the interval [0, 1]."
+    errors: raise
+
+  flow_in_for_supply_tech:
+    where: base_tech==supply AND cost_flow_in
+    message: "`cost_flow_in` does not apply to `supply` technologies. Use `cost_source_use` instead."
+    errors: warn
+
+  flow_out_for_demand_tech:
+    where: base_tech==demand AND cost_flow_out
+    message: "`cost_flow_out` does not apply to `demand` technologies. Use `cost_flow_in` instead."
+    errors: warn
+
+  no_storage_discharge_depth_when_clustering:
+    where: storage_discharge_depth AND lookup_cluster_last_timestep
+    message: >-
+      storage_discharge_depth will currently have no effect when time clustering is active.
+    errors: warn
+
+  cyclic_storage_needs_inter_cluster:
+    where: cyclic_storage AND lookup_cluster_last_timestep
+    message: >-
+      Include the `storage_inter_cluster_storage` pre-defined math to allow cyclic storage alongside timeseries clustering.
+    errors: raise
