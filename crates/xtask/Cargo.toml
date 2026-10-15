@@ -9,7 +9,11 @@ publish.workspace = true
 
 [dependencies]
 calliope-schema.workspace = true
+calliope-lp = { path = "../calliope-lp" }
 serde_json.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [lints]
 workspace = true
