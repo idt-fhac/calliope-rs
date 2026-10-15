@@ -1,0 +1,2299 @@
+{
+ "$defs": {
+  "Bounds": {
+   "additionalProperties": false,
+   "description": "Bounds of decision variables.\n\nEither derived per-index item from a multi-dimensional input parameter, or given as\na single value that is applied across all decision variable index items.",
+   "properties": {
+    "max": {
+     "anyOf": [
+      {
+       "pattern": "^[^_^\\d][\\w]*$",
+       "type": "string"
+      },
+      {
+       "type": "integer"
+      },
+      {
+       "type": "number"
+      }
+     ],
+     "default": "inf",
+     "description": "Decision variable upper bound, either as a reference to an input parameter or as a number.",
+     "title": "Max"
+    },
+    "min": {
+     "anyOf": [
+      {
+       "pattern": "^[^_^\\d][\\w]*$",
+       "type": "string"
+      },
+      {
+       "type": "integer"
+      },
+      {
+       "type": "number"
+      }
+     ],
+     "default": "-inf",
+     "description": "Decision variable lower bound, either as a reference to an input parameter or as a number.",
+     "title": "Min"
+    }
+   },
+   "title": "Bounds",
+   "type": "object"
+  },
+  "Build": {
+   "additionalProperties": false,
+   "description": "Base configuration options used when building a Calliope optimisation problem (`calliope.Model.build`).",
+   "properties": {
+    "backend": {
+     "default": "pyomo",
+     "description": "Module with which to build the optimisation problem.",
+     "enum": [
+      "pyomo",
+      "gurobi",
+      "highs"
+     ],
+     "title": "Backend",
+     "type": "string"
+    },
+    "ensure_feasibility": {
+     "default": false,
+     "description": "Whether to include decision variables in the model which will meet unmet demand or consume unused supply in the model so that the optimisation solves successfully.\nThis should only be used as a debugging option (as any unmet demand/unused supply is a sign of improper model formulation).",
+     "title": "Ensure Feasibility",
+     "type": "boolean"
+    },
+    "objective": {
+     "default": "min_cost_optimisation",
+     "description": "Name of internal objective function to use, from those defined in the pre-defined math and any applied additional math.",
+     "title": "Objective",
+     "type": "string"
+    },
+    "operate": {
+     "$ref": "#/$defs/BuildOperate",
+     "default": {
+      "horizon": "48h",
+      "window": "24h"
+     },
+     "description": "Operate mode specific configuration."
+    }
+   },
+   "title": "Model build configuration",
+   "type": "object"
+  },
+  "BuildOperate": {
+   "additionalProperties": false,
+   "description": "Operate mode configuration options used when building a Calliope optimisation problem (`calliope.Model.build`).",
+   "properties": {
+    "horizon": {
+     "default": "48h",
+     "description": "Operate mode rolling `horizon`, given as a pandas frequency string.\nSee [here](https://pandas.pydata.org/docs/user_guide/timeseries.html#offset-aliases) for a list of frequency aliases.\nMust be \u2265 `window`",
+     "title": "Horizon",
+     "type": "string"
+    },
+    "window": {
+     "default": "24h",
+     "description": "Operate mode rolling `window`, given as a pandas frequency string.\nSee [here](https://pandas.pydata.org/docs/user_guide/timeseries.html#offset-aliases) for a list of frequency aliases.",
+     "title": "Window",
+     "type": "string"
+    }
+   },
+   "title": "Model build operate mode configuration",
+   "type": "object"
+  },
+  "CalliopeBuildMath": {
+   "additionalProperties": false,
+   "description": "Mathematical definition of Calliope math.\n\nContains mathematical programming components available for optimising with Calliope.\nCan contain partial definitions if they are meant to be layered on top of another.\nE.g.: layering 'base' and 'operate' math.",
+   "properties": {
+    "checks": {
+     "$ref": "#/$defs/Checks",
+     "default": {},
+     "description": "Checks to apply before building the optimisation problem."
+    },
+    "constraints": {
+     "$ref": "#/$defs/Constraints",
+     "default": {},
+     "description": "All constraints to apply to the optimisation problem."
+    },
+    "dimensions": {
+     "$ref": "#/$defs/Dimensions",
+     "default": {},
+     "description": "All dimensions to include in the optimisation problem."
+    },
+    "global_expressions": {
+     "$ref": "#/$defs/GlobalExpressions",
+     "default": {},
+     "description": "All global expressions that can be applied to the optimisation problem."
+    },
+    "lookups": {
+     "$ref": "#/$defs/Lookups",
+     "default": {},
+     "description": "All lookups to include in the optimisation problem."
+    },
+    "objectives": {
+     "$ref": "#/$defs/Objectives",
+     "default": {},
+     "description": "Possible objectives to apply to the optimisation problem."
+    },
+    "parameters": {
+     "$ref": "#/$defs/Parameters",
+     "default": {},
+     "description": "All parameters to include in the optimisation problem."
+    },
+    "piecewise_constraints": {
+     "$ref": "#/$defs/PiecewiseConstraints",
+     "default": {},
+     "description": "All _piecewise_ constraints to apply to the optimisation problem."
+    },
+    "postprocessed": {
+     "$ref": "#/$defs/PostprocessedExpressions",
+     "default": {},
+     "description": "All postprocessed expressions generated after math has completed."
+    },
+    "variables": {
+     "$ref": "#/$defs/Variables",
+     "default": {},
+     "description": "All decision variables to include in the optimisation problem."
+    }
+   },
+   "title": "Model math schema",
+   "type": "object"
+  },
+  "CalliopeConfig": {
+   "additionalProperties": false,
+   "description": "Calliope configuration class.",
+   "properties": {
+    "build": {
+     "$ref": "#/$defs/Build",
+     "default": {
+      "backend": "pyomo",
+      "ensure_feasibility": false,
+      "objective": "min_cost_optimisation",
+      "operate": {
+       "horizon": "48h",
+       "window": "24h"
+      }
+     }
+    },
+    "init": {
+     "$ref": "#/$defs/Init",
+     "default": {
+      "broadcast_input_data": false,
+      "calliope_version": null,
+      "date_format": "ISO8601",
+      "datetime_format": "ISO8601",
+      "distance_unit": "km",
+      "extra_math": [],
+      "math_paths": {},
+      "mode": "base",
+      "name": null,
+      "pre_validate_math_strings": false,
+      "resample": {},
+      "retain_inactive": false,
+      "subset": {},
+      "time_cluster": null
+     }
+    },
+    "solve": {
+     "$ref": "#/$defs/Solve",
+     "default": {
+      "postprocessing_active": true,
+      "save_logs": null,
+      "shadow_prices": [],
+      "solver": "cbc",
+      "solver_io": null,
+      "solver_options": {},
+      "spores": {
+       "number": 3,
+       "save_per_spore_path": null,
+       "score_threshold_factor": 0.1,
+       "scoring_algorithm": "integer",
+       "tracking_parameter": null,
+       "use_latest_results": false
+      },
+      "zero_threshold": 1e-10
+     }
+    }
+   },
+   "title": "Model configuration schema",
+   "type": "object"
+  },
+  "CalliopeDataDef": {
+   "description": "Calliope data definition dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "integer"
+      },
+      {
+       "type": "number"
+      },
+      {
+       "$ref": "#/$defs/IndexedData"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    }
+   },
+   "title": "CalliopeDataDef",
+   "type": "object"
+  },
+  "CalliopeDataTable": {
+   "additionalProperties": false,
+   "description": "Data table schema.",
+   "properties": {
+    "add_dims": {
+     "anyOf": [
+      {
+       "patternProperties": {
+        "^[^_^\\d][\\w]*$": {
+         "anyOf": [
+          {
+           "pattern": "^[^_^\\d][\\w]*$",
+           "type": "string"
+          },
+          {
+           "items": {
+            "pattern": "^[^_^\\d][\\w]*$",
+            "type": "string"
+           },
+           "type": "array"
+          }
+         ]
+        }
+       },
+       "type": "object"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Data dimensions to add after loading in the array.\nThese allow you to use the same file to assign values to different input/dimension index items\n(e.g., setting `flow_cap_min` and `flow_cap_max` to the same value),\nor to add a dimension which would otherwise be a column containing the same information in each row\n(e.g., assigning the cost class to monetary for a file containing cost data).",
+     "title": "Add Dims"
+    },
+    "columns": {
+     "anyOf": [
+      {
+       "pattern": "^[^_^\\d][\\w]*$",
+       "type": "string"
+      },
+      {
+       "items": {
+        "pattern": "^[^_^\\d][\\w]*$",
+        "type": "string"
+       },
+       "type": "array",
+       "uniqueItems": true
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Names of dimensions defined column-wise.\nEach name should correspond to a row in your data that contains index items.\nThese rows must be above the rows containing your data.",
+     "title": "Columns"
+    },
+    "drop": {
+     "anyOf": [
+      {
+       "pattern": "^[^_^\\d][\\w]*$",
+       "type": "string"
+      },
+      {
+       "items": {
+        "pattern": "^[^_^\\d][\\w]*$",
+        "type": "string"
+       },
+       "type": "array",
+       "uniqueItems": true
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Enables removing rows and/or columns that contain irrelevant data/metadata.\nThese could include comments on the source of the data, the data license, or the parameter units.\nYou can also drop a dimension and then reintroduce it in `add_dims`, but with different index items.",
+     "title": "Drop"
+    },
+    "rename_dims": {
+     "anyOf": [
+      {
+       "patternProperties": {
+        "^[^_^\\d][\\w]*$": {
+         "pattern": "^[^_^\\d][\\w]*$",
+         "type": "string"
+        }
+       },
+       "type": "object"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Mapping between dimension names in the data table being loaded to equivalent Calliope dimension names.\nFor instance, the \"time\" column in the data table would need to be mapped to \"timesteps\": `{\"time\": \"timesteps\"}`.",
+     "title": "Rename Dims"
+    },
+    "rows": {
+     "anyOf": [
+      {
+       "pattern": "^[^_^\\d][\\w]*$",
+       "type": "string"
+      },
+      {
+       "items": {
+        "pattern": "^[^_^\\d][\\w]*$",
+        "type": "string"
+       },
+       "type": "array",
+       "uniqueItems": true
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Names of dimensions defined row-wise.\nEach name should correspond to a column in your data that contains index items.\nThese columns must be to the left of the columns containing your data.",
+     "title": "Rows"
+    },
+    "select": {
+     "anyOf": [
+      {
+       "patternProperties": {
+        "^[^_^\\d][\\w]*$": {
+         "anyOf": [
+          {
+           "pattern": "^[^_^\\d][\\w]*$",
+           "type": "string"
+          },
+          {
+           "items": {
+            "pattern": "^[^_^\\d][\\w]*$",
+            "type": "string"
+           },
+           "type": "array",
+           "uniqueItems": true
+          }
+         ]
+        }
+       },
+       "type": "object"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Select one or more index item from a dimension.\nSelection takes place before `drop` and `add_dims`, so you can select a single\nvalue from a data dimension and then drop the dimension so it doesn't find its way\nthrough to the final dataset.",
+     "title": "Select"
+    },
+    "table": {
+     "description": "Absolute or relative filepath.\nRelative paths are based on the model config file used to initialise the model.",
+     "title": "Table",
+     "type": "string"
+    }
+   },
+   "required": [
+    "table"
+   ],
+   "title": "Data table schema",
+   "type": "object"
+  },
+  "CalliopeDataTables": {
+   "description": "Calliope input data table dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/CalliopeDataTable"
+    }
+   },
+   "title": "CalliopeDataTables",
+   "type": "object"
+  },
+  "CalliopeDictModel": {
+   "description": "Pydantic Model that is used to store dictionaries with user-defined keys and Calliope pydantic model values.",
+   "title": "CalliopeDictModel"
+  },
+  "CalliopeInputMath": {
+   "description": "Calliope input math dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/CalliopeDictModel"
+    }
+   },
+   "title": "CalliopeInputMath",
+   "type": "object"
+  },
+  "CalliopeMath": {
+   "additionalProperties": false,
+   "description": "Calliope math attribute container.",
+   "properties": {
+    "build": {
+     "$ref": "#/$defs/CalliopeBuildMath",
+     "default": {
+      "checks": {},
+      "constraints": {},
+      "dimensions": {},
+      "global_expressions": {},
+      "lookups": {},
+      "objectives": {},
+      "parameters": {},
+      "piecewise_constraints": {},
+      "postprocessed": {},
+      "variables": {}
+     }
+    },
+    "init": {
+     "$ref": "#/$defs/CalliopeInputMath",
+     "default": {}
+    }
+   },
+   "title": "CalliopeMath",
+   "type": "object"
+  },
+  "CalliopeModelDef": {
+   "additionalProperties": false,
+   "description": "Calliope model definition.",
+   "properties": {
+    "data_definitions": {
+     "$ref": "#/$defs/CalliopeDataDef",
+     "default": {},
+     "description": "All YAML-based model input data definitions."
+    },
+    "data_tables": {
+     "$ref": "#/$defs/CalliopeDataTables",
+     "default": {},
+     "description": "All tabular-based model input data definitions."
+    },
+    "nodes": {
+     "$ref": "#/$defs/CalliopeNodes",
+     "default": {},
+     "description": "Node-specific model input data definitions."
+    },
+    "techs": {
+     "$ref": "#/$defs/CalliopeTechs",
+     "default": {},
+     "description": "Tech-specific model input data definitions."
+    }
+   },
+   "title": "Calliope Model Definition",
+   "type": "object"
+  },
+  "CalliopeNode": {
+   "additionalProperties": {
+    "anyOf": [
+     {
+      "$ref": "#/$defs/IndexedTechNodeParam"
+     },
+     {
+      "type": "string"
+     },
+     {
+      "type": "boolean"
+     },
+     {
+      "type": "integer"
+     },
+     {
+      "type": "number"
+     },
+     {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "boolean"
+        },
+        {
+         "type": "integer"
+        },
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   },
+   "description": "Calliope's node dimension schema.",
+   "properties": {
+    "active": {
+     "default": true,
+     "title": "Active",
+     "type": "boolean"
+    },
+    "latitude": {
+     "anyOf": [
+      {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "number"
+        }
+       ],
+       "ge": -90,
+       "le": 90
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Latitude (WGS84 / EPSG4326).",
+     "title": "Latitude"
+    },
+    "longitude": {
+     "anyOf": [
+      {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "number"
+        }
+       ],
+       "ge": -180,
+       "le": 180
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Longitude (WGS84 / EPSG4326).",
+     "title": "Longitude"
+    },
+    "techs": {
+     "$ref": "#/$defs/CalliopeTechs",
+     "description": "Technologies present at this node. Also allows to override technology data."
+    }
+   },
+   "title": "Node dimension",
+   "type": "object"
+  },
+  "CalliopeNodes": {
+   "description": "Calliope Nodes dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/CalliopeNode"
+    }
+   },
+   "title": "CalliopeNodes",
+   "type": "object"
+  },
+  "CalliopeRuntime": {
+   "additionalProperties": false,
+   "description": "Calliope runtime model attributes.",
+   "properties": {
+    "applied_overrides": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Overrides applied when initialising the model.",
+     "title": "Applied Overrides"
+    },
+    "calliope_version_initialised": {
+     "default": "0.7.0",
+     "description": "The calliope version this model was initialised with.",
+     "title": "Calliope Version Initialised",
+     "type": "string"
+    },
+    "instantiated": {
+     "default": false,
+     "description": "Indicates whether the model has been instantiated.",
+     "title": "Instantiated",
+     "type": "boolean"
+    },
+    "math_priority": {
+     "description": "The order of math entries applied to the model, with each subsequent one overwriting the last.",
+     "items": {
+      "pattern": "^[^_^\\d][\\w]*$",
+      "type": "string"
+     },
+     "title": "Math Priority",
+     "type": "array"
+    },
+    "resample": {
+     "$ref": "#/$defs/Resamples",
+     "default": {},
+     "description": "List all applied resamples."
+    },
+    "scenario": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Scenario applied on initialising the model.",
+     "title": "Scenario"
+    },
+    "subset": {
+     "$ref": "#/$defs/Subsets",
+     "default": {},
+     "description": "List all applied subsets."
+    },
+    "termination_condition": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Indicates whether the optimisation problem solved to optimality (`optimal`) or not (e.g. `unbounded`, `infeasible`).",
+     "title": "Termination Condition"
+    },
+    "time_cluster": {
+     "anyOf": [
+      {
+       "pattern": "^[^_^\\d][\\w]*$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Indicates the time clustering applied to the model.",
+     "title": "Time Cluster"
+    },
+    "timings": {
+     "$ref": "#/$defs/CalliopeTimings",
+     "description": "Dictionary of timings that is updated as the model is initialised/built/solved."
+    }
+   },
+   "title": "Calliope Model Attributes",
+   "type": "object"
+  },
+  "CalliopeTech": {
+   "additionalProperties": {
+    "anyOf": [
+     {
+      "$ref": "#/$defs/IndexedTechNodeParam"
+     },
+     {
+      "type": "string"
+     },
+     {
+      "type": "boolean"
+     },
+     {
+      "type": "integer"
+     },
+     {
+      "type": "number"
+     },
+     {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "boolean"
+        },
+        {
+         "type": "integer"
+        },
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   },
+   "description": "Calliope's technology dimension schema.",
+   "properties": {
+    "active": {
+     "default": true,
+     "title": "Active",
+     "type": "boolean"
+    },
+    "base_tech": {
+     "anyOf": [
+      {
+       "enum": [
+        "conversion",
+        "demand",
+        "storage",
+        "supply",
+        "transmission"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "One of the abstract base classes, used to derive specific defaults and\nto activate technology-specific constraints.",
+     "title": "Base Tech"
+    }
+   },
+   "title": "Technology dimension data",
+   "type": "object"
+  },
+  "CalliopeTechs": {
+   "description": "Calliope Techs dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/CalliopeTransmissionTech"
+      },
+      {
+       "$ref": "#/$defs/CalliopeTech"
+      }
+     ]
+    }
+   },
+   "title": "CalliopeTechs",
+   "type": "object"
+  },
+  "CalliopeTimings": {
+   "additionalProperties": {
+    "type": "number"
+   },
+   "description": "Calliope runtime time logging.",
+   "title": "CalliopeTimings",
+   "type": "object"
+  },
+  "CalliopeTransmissionTech": {
+   "additionalProperties": {
+    "anyOf": [
+     {
+      "$ref": "#/$defs/IndexedTechNodeParam"
+     },
+     {
+      "type": "string"
+     },
+     {
+      "type": "boolean"
+     },
+     {
+      "type": "integer"
+     },
+     {
+      "type": "number"
+     },
+     {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "boolean"
+        },
+        {
+         "type": "integer"
+        },
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   },
+   "description": "Calliope's transmission technology dimension schema.",
+   "properties": {
+    "active": {
+     "default": true,
+     "title": "Active",
+     "type": "boolean"
+    },
+    "base_tech": {
+     "anyOf": [
+      {
+       "const": "transmission",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "One of the abstract base classes, used to derive specific defaults and\nto activate technology-specific constraints.",
+     "title": "Base Tech"
+    },
+    "link_from": {
+     "description": "Node from which the transmission technology links.",
+     "pattern": "^[^_^\\d][\\w]*$",
+     "title": "Link From",
+     "type": "string"
+    },
+    "link_to": {
+     "description": "Node to which the transmission technology links.",
+     "pattern": "^[^_^\\d][\\w]*$",
+     "title": "Link To",
+     "type": "string"
+    },
+    "one_way": {
+     "default": false,
+     "description": "Whether the transmission technology only allows flow in one direction (from `link_from` to `link_to`).",
+     "title": "One Way",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "link_from",
+    "link_to"
+   ],
+   "title": "Transmission technology dimension data",
+   "type": "object"
+  },
+  "Check": {
+   "additionalProperties": false,
+   "description": "Schema for input data checks.",
+   "properties": {
+    "active": {
+     "default": true,
+     "description": "If False, this check will be ignored during the build phase.",
+     "title": "Active",
+     "type": "boolean"
+    },
+    "errors": {
+     "default": "raise",
+     "description": "How to respond to any instances in which the `where` array returns True.",
+     "enum": [
+      "raise",
+      "warn"
+     ],
+     "title": "Errors",
+     "type": "string"
+    },
+    "message": {
+     "description": "Message to display when the `where` array returns True, if raising or warning on error.",
+     "title": "Message",
+     "type": "string"
+    },
+    "where": {
+     "description": "Top-level condition to check",
+     "title": "Where",
+     "type": "string"
+    }
+   },
+   "required": [
+    "where",
+    "message"
+   ],
+   "title": "Check",
+   "type": "object"
+  },
+  "Checks": {
+   "description": "Calliope math checks dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/Check"
+    }
+   },
+   "title": "Checks",
+   "type": "object"
+  },
+  "Constraint": {
+   "additionalProperties": false,
+   "description": "Schema for named constraints.",
+   "properties": {
+    "active": {
+     "default": true,
+     "description": "If False, this component will be ignored during the build phase.",
+     "title": "Active",
+     "type": "boolean"
+    },
+    "description": {
+     "default": "",
+     "description": "A verbose description of the component.",
+     "title": "Description",
+     "type": "string"
+    },
+    "equations": {
+     "$ref": "#/$defs/Equations",
+     "default": [],
+     "description": "Constraint math equations."
+    },
+    "foreach": {
+     "description": "Sets (a.k.a. dimensions) of the model over which the math formulation component\nwill be built.",
+     "items": {
+      "pattern": "^[^_^\\d][\\w]*$",
+      "type": "string"
+     },
+     "title": "Foreach",
+     "type": "array",
+     "uniqueItems": true
+    },
+    "slices": {
+     "$ref": "#/$defs/SubExpressions",
+     "default": {},
+     "description": "Named index slices."
+    },
+    "sub_expressions": {
+     "$ref": "#/$defs/SubExpressions",
+     "default": {},
+     "description": "Named sub-expressions."
+    },
+    "title": {
+     "default": "",
+     "description": "The component long name, for use in visualisation.",
+     "title": "Title",
+     "type": "string"
+    },
+    "where": {
+     "default": "True",
+     "description": "Top-level condition to determine whether the component exists in this\noptimisation problem. At all if `foreach` is not given, or for specific index items\nwithin the product of the sets given by `foreach`.",
+     "title": "Where",
+     "type": "string"
+    }
+   },
+   "title": "Constraint",
+   "type": "object"
+  },
+  "Constraints": {
+   "description": "Calliope model constraints dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/Constraint"
+    }
+   },
+   "title": "Constraints",
+   "type": "object"
+  },
+  "Dimension": {
+   "additionalProperties": false,
+   "description": "Schema for named dimension.",
+   "properties": {
+    "active": {
+     "default": true,
+     "description": "If False, this component will be ignored during the build phase.",
+     "title": "Active",
+     "type": "boolean"
+    },
+    "description": {
+     "default": "",
+     "description": "A verbose description of the component.",
+     "title": "Description",
+     "type": "string"
+    },
+    "dtype": {
+     "default": "string",
+     "description": "The data type of this dimension's items.",
+     "enum": [
+      "string",
+      "datetime",
+      "date",
+      "float",
+      "integer"
+     ],
+     "title": "Dtype",
+     "type": "string"
+    },
+    "iterator": {
+     "default": "NEEDS_ITERATOR",
+     "description": "The name of the iterator to use in the LaTeX math formulation for this dimension.",
+     "title": "Iterator",
+     "type": "string"
+    },
+    "ordered": {
+     "default": false,
+     "description": "If True, the order of the dimension items is meaningful (e.g. chronological time).",
+     "title": "Ordered",
+     "type": "boolean"
+    },
+    "title": {
+     "default": "",
+     "description": "The component long name, for use in visualisation.",
+     "title": "Title",
+     "type": "string"
+    }
+   },
+   "title": "Dimension",
+   "type": "object"
+  },
+  "Dimensions": {
+   "description": "Calliope model dimensions dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/Dimension"
+    }
+   },
+   "title": "Dimensions",
+   "type": "object"
+  },
+  "Equations": {
+   "description": "List of equations that can be updated when a parent pydantic model is updated.",
+   "items": {
+    "$ref": "#/$defs/ExpressionItem"
+   },
+   "title": "Equations",
+   "type": "array"
+  },
+  "ExpressionItem": {
+   "additionalProperties": false,
+   "description": "Schema for equations, subexpressions and slices.",
+   "properties": {
+    "expression": {
+     "description": "Expression for this component.\n- Equations: LHS OPERATOR RHS, where LHS and RHS are math expressions and OPERATOR is one of [==, <=, >=].\n- Subexpressions: be one term or a combination of terms using the operators [+, -, *, /, **].\n- Slices: a list of set items or a call to a helper function.",
+     "title": "Expression",
+     "type": "string"
+    },
+    "where": {
+     "default": "True",
+     "description": "Condition to determine whether the accompanying expression is built.",
+     "title": "Where",
+     "type": "string"
+    }
+   },
+   "required": [
+    "expression"
+   ],
+   "title": "ExpressionItem",
+   "type": "object"
+  },
+  "GlobalExpression": {
+   "additionalProperties": false,
+   "description": "Schema for named global expressions.\n\nCan be used to combine parameters and variables and then used in one or more\nexpressions elsewhere in the math formulation (i.e., in constraints, objectives,\nand other global expressions).\n\nNOTE: If expecting to use global expression `A` in global expression `B`, `A` must\nbe defined above `B`.",
+   "properties": {
+    "active": {
+     "default": true,
+     "description": "If False, this component will be ignored during the build phase.",
+     "title": "Active",
+     "type": "boolean"
+    },
+    "default": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "number"
+      }
+     ],
+     "default": "nan",
+     "description": "If set, will be the default value for the expression.",
+     "title": "Default"
+    },
+    "description": {
+     "default": "",
+     "description": "A verbose description of the component.",
+     "title": "Description",
+     "type": "string"
+    },
+    "equations": {
+     "$ref": "#/$defs/Equations",
+     "default": [],
+     "description": "Global expression math equations."
+    },
+    "foreach": {
+     "description": "Sets (a.k.a. dimensions) of the model over which the math formulation component\nwill be built.",
+     "items": {
+      "pattern": "^[^_^\\d][\\w]*$",
+      "type": "string"
+     },
+     "title": "Foreach",
+     "type": "array",
+     "uniqueItems": true
+    },
+    "order": {
+     "default": 0,
+     "description": "Order in which to apply this global expression relative to all others, if different to its definition order.",
+     "title": "Order",
+     "type": "integer"
+    },
+    "slices": {
+     "$ref": "#/$defs/SubExpressions",
+     "default": {},
+     "description": "Global expression named index slices."
+    },
+    "sub_expressions": {
+     "$ref": "#/$defs/SubExpressions",
+     "default": {},
+     "description": "Global expression named sub-expressions."
+    },
+    "title": {
+     "default": "",
+     "description": "The component long name, for use in visualisation.",
+     "title": "Title",
+     "type": "string"
+    },
+    "unit": {
+     "default": "",
+     "description": "Generalised unit of the component (e.g., length, time, quantity_per_hour, ...).",
+     "title": "Unit",
+     "type": "string"
+    },
+    "where": {
+     "default": "True",
+     "description": "Top-level condition to determine whether the component exists in this\noptimisation problem. At all if `foreach` is not given, or for specific index items\nwithin the product of the sets given by `foreach`.",
+     "title": "Where",
+     "type": "string"
+    }
+   },
+   "title": "GlobalExpression",
+   "type": "object"
+  },
+  "GlobalExpressions": {
+   "description": "Calliope model global_expressions dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/GlobalExpression"
+    }
+   },
+   "title": "GlobalExpressions",
+   "type": "object"
+  },
+  "IndexedData": {
+   "additionalProperties": false,
+   "description": "Indexed data schema.",
+   "properties": {
+    "data": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "integer"
+      },
+      {
+       "type": "number"
+      },
+      {
+       "items": {
+        "anyOf": [
+         {
+          "type": "string"
+         },
+         {
+          "type": "boolean"
+         },
+         {
+          "type": "integer"
+         },
+         {
+          "type": "number"
+         },
+         {
+          "type": "null"
+         }
+        ]
+       },
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "description": "Parameter / lookup value(s).\nIf data is one value, will be applied to all dimension members.\nIf a list, must be same length as the index array.",
+     "title": "Data"
+    },
+    "dims": {
+     "description": "Model dimension(s) over which the data is indexed.\nMust be same length as the sub-arrays of `index`.\nI.e., if `index` does not have any sub-arrays or is simply a single value, `dims` must be of length 1.",
+     "items": {
+      "pattern": "^[^_^\\d][\\w]*$",
+      "type": "string"
+     },
+     "title": "Dims",
+     "type": "array",
+     "uniqueItems": true
+    },
+    "index": {
+     "description": "Model dimension members to apply the data value(s) to.\nIf an array of arrays, sub-arrays must have same length as number of `dims`.",
+     "items": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        },
+        {
+         "type": "number"
+        }
+       ]
+      },
+      "type": "array",
+      "uniqueItems": true
+     },
+     "title": "Index",
+     "type": "array"
+    }
+   },
+   "required": [
+    "data"
+   ],
+   "title": "Indexed data definition",
+   "type": "object"
+  },
+  "IndexedTechNodeParam": {
+   "additionalProperties": false,
+   "description": "Tech-specific data schema.",
+   "properties": {
+    "data": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "integer"
+      },
+      {
+       "type": "number"
+      },
+      {
+       "items": {
+        "anyOf": [
+         {
+          "type": "string"
+         },
+         {
+          "type": "boolean"
+         },
+         {
+          "type": "integer"
+         },
+         {
+          "type": "number"
+         },
+         {
+          "type": "null"
+         }
+        ]
+       },
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "description": "Parameter / lookup value(s).\nIf data is one value, will be applied to all dimension members.\nIf a list, must be same length as the index array.",
+     "title": "Data"
+    },
+    "dims": {
+     "description": "Model dimension(s) over which the data is indexed.\nMust be same length as the sub-arrays of `index`.\nI.e., if `index` does not have any sub-arrays or is simply a single value, `dims` must be of length 1.",
+     "items": {
+      "pattern": "^[^_^\\d][\\w]*$",
+      "type": "string"
+     },
+     "title": "Dims",
+     "type": "array",
+     "uniqueItems": true
+    },
+    "index": {
+     "description": "Model dimension members to apply the data value(s) to.\nIf an array of arrays, sub-arrays must have same length as number of `dims`.",
+     "items": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        },
+        {
+         "type": "number"
+        }
+       ]
+      },
+      "type": "array",
+      "uniqueItems": true
+     },
+     "title": "Index",
+     "type": "array"
+    }
+   },
+   "required": [
+    "data"
+   ],
+   "title": "Indexed `techs` data definition",
+   "type": "object"
+  },
+  "Init": {
+   "additionalProperties": false,
+   "description": "All configuration options used when initialising a Calliope model.",
+   "properties": {
+    "broadcast_input_data": {
+     "default": false,
+     "description": "If True, single data entries in YAML indexed data will be broadcast across all index items.\nOtherwise, the number of data entries needs to match the number of index items.\nDefaults to False to mitigate unexpected broadcasting when applying overrides.",
+     "title": "Broadcast Input Data",
+     "type": "boolean"
+    },
+    "calliope_version": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Calliope framework version this model is intended for.",
+     "title": "Calliope Version"
+    },
+    "date_format": {
+     "default": "ISO8601",
+     "description": "Datestamp format of all time series data with `date` dtype when read from file.\n'ISO8601' means '%Y-%m-%d'.",
+     "title": "Date Format",
+     "type": "string"
+    },
+    "datetime_format": {
+     "default": "ISO8601",
+     "description": "Timestamp format of all time series data with `datetime` dtype when read from file.\n'ISO8601' means '%Y-%m-%d %H:%M:%S'.",
+     "title": "Datetime Format",
+     "type": "string"
+    },
+    "distance_unit": {
+     "default": "km",
+     "description": "Unit of transmission link `distance` (m - metres, km - kilometres).\nAutomatically derived distances from lat/lon coordinates will be given in this unit.",
+     "enum": [
+      "km",
+      "m"
+     ],
+     "title": "Distance Unit",
+     "type": "string"
+    },
+    "extra_math": {
+     "description": "List of math entries to be applied on top of the `base` math and `mode` math.\nThe list items must have been defined as keys in `math_paths` (see below).\nMath order: base -> mode -> extra",
+     "items": {
+      "type": "string"
+     },
+     "title": "Extra Math",
+     "type": "array",
+     "uniqueItems": true
+    },
+    "math_paths": {
+     "$ref": "#/$defs/MathPaths",
+     "default": {},
+     "description": "Dictionary with the names and paths of additional math files to add to the available math entries.\nSome math entry names are linked to specific functionality, so re-defining them here will overwrite the pre-defined math.:\n- `base`: replaces the pre-defined base math.\n- `milp`: replaces the mixed integer math.\n- `spores`/`operate`: replaces the respective pre-defined mode math.\n- `storage_inter_cluster`: replaces the pre-defined storage inter-cluster math."
+    },
+    "mode": {
+     "default": "base",
+     "description": "Mode in which to run the optimisation.\nTriggers additional processing and appends additional math formulations.\nMath order: base -> mode",
+     "enum": [
+      "base",
+      "operate",
+      "spores"
+     ],
+     "title": "Mode",
+     "type": "string"
+    },
+    "name": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Model name.",
+     "title": "Name"
+    },
+    "pre_validate_math_strings": {
+     "default": false,
+     "description": "If true, the Calliope math definition will be scanned for parsing errors at model initialisation,\ni.e., _before_ undertaking the much more expensive operation of building the optimisation problem.\nIt is switched off by default to reduce overall build time.",
+     "title": "Pre Validate Math Strings",
+     "type": "boolean"
+    },
+    "resample": {
+     "$ref": "#/$defs/Resamples",
+     "default": {},
+     "description": "Setting to adjust datetime dimension resolution, e.g. '2h' for 2-hourly"
+    },
+    "retain_inactive": {
+     "default": false,
+     "description": "If True, any technologies and/or nodes that have been deactivated (`active: false`) will still be present in the model input data.\nOtherwise, they will be removed from the model when initialised, including all parameter/lookup data associated with them.\n\nRetaining inactive technologies/nodes in the model can be useful for users who want to re-initialise the model with overrides that reactivate them.\nIt is set to False by default since it leads to a larger model input dataset when many inactive technologies/nodes are present.",
+     "title": "Retain Inactive",
+     "type": "boolean"
+    },
+    "subset": {
+     "$ref": "#/$defs/Subsets",
+     "default": {},
+     "description": "Subset of dimensions as a two-element list giving the **inclusive** range. For example,\nassuming hourly timestep data, `timesteps: [\"2005-01\", \"2005-04\"]` will create a time\nsubset starting at \"2005-01-01 00:00\" up to and including \"2005-04-30 23:00\".\n\nFor date dimensions, strings must be ISO8601-compatible, i.e. of the form `YYYY-MM-DD HH:MM:SS`\n(such as '2005-01', '2005-01-01', or '2005-01-01 00:00')."
+    },
+    "time_cluster": {
+     "anyOf": [
+      {
+       "pattern": "^[^_^\\d][\\w]*$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Setting to cluster the timeseries.\nMust reference the name of an input data array.",
+     "title": "Time Cluster"
+    }
+   },
+   "title": "Model initialisation configuration",
+   "type": "object"
+  },
+  "Lookup": {
+   "additionalProperties": false,
+   "description": "Schema for named lookup arrays.",
+   "properties": {
+    "active": {
+     "default": true,
+     "description": "If False, this component will be ignored during the build phase.",
+     "title": "Active",
+     "type": "boolean"
+    },
+    "default": {
+     "anyOf": [
+      {
+       "pattern": "^[^_^\\d][\\w]*$",
+       "type": "string"
+      },
+      {
+       "type": "number"
+      },
+      {
+       "type": "integer"
+      },
+      {
+       "type": "boolean"
+      }
+     ],
+     "default": "nan",
+     "description": "The default value for the lookup, if not set in the data.",
+     "title": "Default"
+    },
+    "description": {
+     "default": "",
+     "description": "A verbose description of the component.",
+     "title": "Description",
+     "type": "string"
+    },
+    "dtype": {
+     "default": "string",
+     "description": "The lookup data type.",
+     "enum": [
+      "float",
+      "string",
+      "bool",
+      "datetime",
+      "date"
+     ],
+     "title": "Dtype",
+     "type": "string"
+    },
+    "one_of": {
+     "anyOf": [
+      {
+       "items": {},
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "If given, the lookup values must be one of these items.",
+     "title": "One Of"
+    },
+    "pivot_values_to_dim": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "If given, the lookup will be pivoted such that its values become the index of a new dimension and its new values are boolean, True where the index values match the old values.\nFor instance, if the lookup starts out indexed over `techs` with values of `[electricity, gas]` and `pivot_values_to_dim: carriers`,\nthen the lookup will be converted to a boolean array with the dimensions ['techs', 'carriers'].",
+     "title": "Pivot Values To Dim"
+    },
+    "resample_method": {
+     "default": "first",
+     "description": "If resampling is applied over any of the lookup's dimensions, the method to use to aggregate the data.",
+     "enum": [
+      "mean",
+      "sum",
+      "first"
+     ],
+     "title": "Resample Method",
+     "type": "string"
+    },
+    "title": {
+     "default": "",
+     "description": "The component long name, for use in visualisation.",
+     "title": "Title",
+     "type": "string"
+    }
+   },
+   "title": "Lookup",
+   "type": "object"
+  },
+  "Lookups": {
+   "description": "Calliope model lookup dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/Lookup"
+    }
+   },
+   "title": "Lookups",
+   "type": "object"
+  },
+  "MathPaths": {
+   "description": "Math paths settings.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "format": "path",
+     "type": "string"
+    }
+   },
+   "title": "MathPaths",
+   "type": "object"
+  },
+  "Objective": {
+   "additionalProperties": false,
+   "description": "Schema for optimisation problem objectives.\n\nOnly one objective, the one referenced in model configuration `build.objective`\nwill be activated for the optimisation problem.",
+   "properties": {
+    "active": {
+     "default": true,
+     "description": "If False, this component will be ignored during the build phase.",
+     "title": "Active",
+     "type": "boolean"
+    },
+    "description": {
+     "default": "",
+     "description": "A verbose description of the component.",
+     "title": "Description",
+     "type": "string"
+    },
+    "equations": {
+     "$ref": "#/$defs/Equations",
+     "default": [],
+     "description": "Constraint math equations."
+    },
+    "sense": {
+     "description": "Whether the objective function should be minimised or maximised in the\noptimisation.",
+     "enum": [
+      "minimise",
+      "maximise",
+      "minimize",
+      "maximize"
+     ],
+     "title": "Sense",
+     "type": "string"
+    },
+    "slices": {
+     "$ref": "#/$defs/SubExpressions",
+     "default": {},
+     "description": "Named index slices."
+    },
+    "sub_expressions": {
+     "$ref": "#/$defs/SubExpressions",
+     "default": {},
+     "description": "Named sub-expressions."
+    },
+    "title": {
+     "default": "",
+     "description": "The component long name, for use in visualisation.",
+     "title": "Title",
+     "type": "string"
+    }
+   },
+   "required": [
+    "sense"
+   ],
+   "title": "Objective",
+   "type": "object"
+  },
+  "Objectives": {
+   "description": "Calliope model objectives dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/Objective"
+    }
+   },
+   "title": "Objectives",
+   "type": "object"
+  },
+  "Parameter": {
+   "additionalProperties": false,
+   "description": "Schema for named parameter.",
+   "properties": {
+    "active": {
+     "default": true,
+     "description": "If False, this component will be ignored during the build phase.",
+     "title": "Active",
+     "type": "boolean"
+    },
+    "default": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "integer"
+      }
+     ],
+     "default": "nan",
+     "description": "The default value for the parameter, if not set in the data.",
+     "title": "Default"
+    },
+    "description": {
+     "default": "",
+     "description": "A verbose description of the component.",
+     "title": "Description",
+     "type": "string"
+    },
+    "resample_method": {
+     "default": "first",
+     "description": "If resampling is applied over any of the parameter's dimensions, the method to use to aggregate the data.",
+     "enum": [
+      "mean",
+      "sum",
+      "first"
+     ],
+     "title": "Resample Method",
+     "type": "string"
+    },
+    "title": {
+     "default": "",
+     "description": "The component long name, for use in visualisation.",
+     "title": "Title",
+     "type": "string"
+    },
+    "unit": {
+     "default": "",
+     "description": "The unit of the parameter, e.g. 'kW', 'm', 'kg', 'energy', 'power', ...",
+     "title": "Unit",
+     "type": "string"
+    }
+   },
+   "title": "Parameter",
+   "type": "object"
+  },
+  "Parameters": {
+   "description": "Calliope model parameters dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/Parameter"
+    }
+   },
+   "title": "Parameters",
+   "type": "object"
+  },
+  "PiecewiseConstraint": {
+   "additionalProperties": false,
+   "description": "Schema for named piece-wise constraints.\n\nThese link an `x`-axis decision variable with a `y`-axis decision variable with\nvalues at specified breakpoints.",
+   "properties": {
+    "active": {
+     "default": true,
+     "description": "If False, this component will be ignored during the build phase.",
+     "title": "Active",
+     "type": "boolean"
+    },
+    "description": {
+     "default": "",
+     "description": "A verbose description of the component.",
+     "title": "Description",
+     "type": "string"
+    },
+    "foreach": {
+     "description": "Sets (a.k.a. dimensions) of the model over which the math formulation component\nwill be built.",
+     "items": {
+      "pattern": "^[^_^\\d][\\w]*$",
+      "type": "string"
+     },
+     "title": "Foreach",
+     "type": "array",
+     "uniqueItems": true
+    },
+    "title": {
+     "default": "",
+     "description": "The component long name, for use in visualisation.",
+     "title": "Title",
+     "type": "string"
+    },
+    "where": {
+     "default": "True",
+     "description": "Top-level condition to determine whether the component exists in this\noptimisation problem. At all if `foreach` is not given, or for specific index items\nwithin the product of the sets given by `foreach`.",
+     "title": "Where",
+     "type": "string"
+    },
+    "x_expression": {
+     "description": "X variable name whose values are assigned at each breakpoint.",
+     "title": "X Expression",
+     "type": "string"
+    },
+    "x_values": {
+     "description": "X parameter name containing data, indexed over the `breakpoints` dimension.",
+     "title": "X Values",
+     "type": "string"
+    },
+    "y_expression": {
+     "description": "Y variable name whose values are assigned at each breakpoint.",
+     "title": "Y Expression",
+     "type": "string"
+    },
+    "y_values": {
+     "description": "Y parameter name containing data, indexed over the `breakpoints` dimension.",
+     "title": "Y Values",
+     "type": "string"
+    }
+   },
+   "required": [
+    "x_expression",
+    "y_expression",
+    "x_values",
+    "y_values"
+   ],
+   "title": "PiecewiseConstraint",
+   "type": "object"
+  },
+  "PiecewiseConstraints": {
+   "description": "Calliope model piecewise_constraints dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/PiecewiseConstraint"
+    }
+   },
+   "title": "PiecewiseConstraints",
+   "type": "object"
+  },
+  "PostprocessedExpression": {
+   "additionalProperties": false,
+   "description": "Schema for postprocessed expressions.\n\nCan be used to combine parameters, variables, and global expressions into a single expression solving the model.\n\nNOTE: If expecting to use postprocessed array `A` in postprocessed array `B`, `A` must\nbe defined above `B`.",
+   "properties": {
+    "active": {
+     "default": true,
+     "description": "If False, this component will be ignored during the build phase.",
+     "title": "Active",
+     "type": "boolean"
+    },
+    "default": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "number"
+      }
+     ],
+     "default": "nan",
+     "description": "If set, will be the default value for the expression.",
+     "title": "Default"
+    },
+    "description": {
+     "default": "",
+     "description": "A verbose description of the component.",
+     "title": "Description",
+     "type": "string"
+    },
+    "equations": {
+     "$ref": "#/$defs/Equations",
+     "default": [],
+     "description": "Global expression math equations."
+    },
+    "foreach": {
+     "description": "Sets (a.k.a. dimensions) of the model over which the math formulation component\nwill be built.",
+     "items": {
+      "pattern": "^[^_^\\d][\\w]*$",
+      "type": "string"
+     },
+     "title": "Foreach",
+     "type": "array",
+     "uniqueItems": true
+    },
+    "order": {
+     "default": 0,
+     "description": "Order in which to apply this global expression relative to all others, if different to its definition order.",
+     "title": "Order",
+     "type": "integer"
+    },
+    "slices": {
+     "$ref": "#/$defs/SubExpressions",
+     "default": {},
+     "description": "Global expression named index slices."
+    },
+    "sub_expressions": {
+     "$ref": "#/$defs/SubExpressions",
+     "default": {},
+     "description": "Global expression named sub-expressions."
+    },
+    "title": {
+     "default": "",
+     "description": "The component long name, for use in visualisation.",
+     "title": "Title",
+     "type": "string"
+    },
+    "unit": {
+     "default": "",
+     "description": "Generalised unit of the component (e.g., length, time, quantity_per_hour, ...).",
+     "title": "Unit",
+     "type": "string"
+    },
+    "where": {
+     "default": "True",
+     "description": "Top-level condition to determine whether the component exists in this\noptimisation problem. At all if `foreach` is not given, or for specific index items\nwithin the product of the sets given by `foreach`.",
+     "title": "Where",
+     "type": "string"
+    }
+   },
+   "title": "PostprocessedExpression",
+   "type": "object"
+  },
+  "PostprocessedExpressions": {
+   "description": "Calliope model postprocessed expressions dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/PostprocessedExpression"
+    }
+   },
+   "title": "PostprocessedExpressions",
+   "type": "object"
+  },
+  "Resamples": {
+   "description": "Dimension resampling settings.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    }
+   },
+   "title": "Resamples",
+   "type": "object"
+  },
+  "Solve": {
+   "additionalProperties": false,
+   "description": "Base configuration options used when solving a Calliope optimisation problem (`calliope.Model.solve`).",
+   "properties": {
+    "postprocessing_active": {
+     "default": true,
+     "description": "If enabled, all active postprocessing functions will be run after the model solves.",
+     "title": "Postprocessing Active",
+     "type": "boolean"
+    },
+    "save_logs": {
+     "anyOf": [
+      {
+       "format": "path",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "If given, should be a path to a directory in which to save optimisation logs.",
+     "title": "Save Logs"
+    },
+    "shadow_prices": {
+     "description": "Names of model constraints.",
+     "items": {
+      "type": "string"
+     },
+     "title": "Shadow Prices",
+     "type": "array",
+     "uniqueItems": true
+    },
+    "solver": {
+     "default": "cbc",
+     "description": "Solver to use. Any solvers that have Pyomo interfaces can be used. Refer to the Pyomo documentation for the latest list.",
+     "title": "Solver",
+     "type": "string"
+    },
+    "solver_io": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Some solvers have different interfaces that perform differently.\nFor instance, setting `solver_io=\"python\"` when using the solver `gurobi` tends to reduce the time to send the optimisation problem to the solver.",
+     "title": "Solver Io"
+    },
+    "solver_options": {
+     "additionalProperties": true,
+     "description": "Any solver options, as key-value pairs, to pass to the chosen solver",
+     "title": "Solver Options",
+     "type": "object"
+    },
+    "spores": {
+     "$ref": "#/$defs/SolveSpores",
+     "default": {
+      "number": 3,
+      "save_per_spore_path": null,
+      "score_threshold_factor": 0.1,
+      "scoring_algorithm": "integer",
+      "tracking_parameter": null,
+      "use_latest_results": false
+     },
+     "description": "Spores configuration."
+    },
+    "zero_threshold": {
+     "default": 1e-10,
+     "description": "On postprocessing the optimisation results, values smaller than this threshold will be considered as optimisation artefacts and will be set to zero.",
+     "title": "Zero Threshold",
+     "type": "number"
+    }
+   },
+   "title": "Model Solve Configuration",
+   "type": "object"
+  },
+  "SolveSpores": {
+   "additionalProperties": false,
+   "description": "SPORES configuration options used when solving a Calliope optimisation problem (`calliope.Model.solve`).",
+   "properties": {
+    "number": {
+     "default": 3,
+     "description": "SPORES mode number of iterations after the initial base run.",
+     "title": "Number",
+     "type": "integer"
+    },
+    "save_per_spore_path": {
+     "anyOf": [
+      {
+       "format": "path",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "If None, the SPORES results will only be available in `calliope.Model.results` once all iterations (defined by `number`) have completed.\nIf a path, as well as consolidating the SPORES results in `calliope.Model.results`, individual SPORES will be saved to file immediately after the iteration has completed.",
+     "title": "Save Per Spore Path"
+    },
+    "score_threshold_factor": {
+     "default": 0.1,
+     "description": "A factor to apply to flow capacities above which they will increment the SPORES score.\nE.g., if the previous iteration flow capacity was `100` then, with a threshold value of 0.1,\nonly capacities above `10` in the current iteration will cause the SPORES score to increase for that technology at that node.\nIf, say, the current iteration's capacity is `8` then the SPORES score will not change for that technology so it will not be further penalised on the next iteration.",
+     "minimum": 0,
+     "title": "Score Threshold Factor",
+     "type": "number"
+    },
+    "scoring_algorithm": {
+     "default": "integer",
+     "description": "Algorithm to apply to update the SPORES score between iterations.\nFor more information on each option, see [Lombardi et al. (2023)](https://doi.org/10.1016/j.apenergy.2023.121002).",
+     "enum": [
+      "integer",
+      "relative_deployment",
+      "random",
+      "evolving_average"
+     ],
+     "title": "Scoring Algorithm",
+     "type": "string"
+    },
+    "tracking_parameter": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "If given, an input parameter name with which to filter technologies for consideration in SPORES scoring.",
+     "title": "Tracking Parameter"
+    },
+    "use_latest_results": {
+     "default": false,
+     "description": "If the model already contains `base` mode results, use them as the baseline results and start with SPORES iterations immediately.\nIf the model already contains `spores` mode results, use the most recent results and continue with the remaining SPORES iterations immediately.",
+     "title": "Use Latest Results",
+     "type": "boolean"
+    }
+   },
+   "title": "Model solve SPORES mode configuration",
+   "type": "object"
+  },
+  "SubExpressions": {
+   "description": "Dictionary of sub-expressions that can be updated when a parent pydantic model is updated.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/Equations"
+    }
+   },
+   "title": "SubExpressions",
+   "type": "object"
+  },
+  "Subsets": {
+   "description": "Dimension subsets.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "anyOf": [
+      {
+       "items": {
+        "anyOf": [
+         {
+          "type": "string"
+         },
+         {
+          "type": "integer"
+         },
+         {
+          "type": "number"
+         }
+        ]
+       },
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    }
+   },
+   "title": "Subsets",
+   "type": "object"
+  },
+  "Variable": {
+   "additionalProperties": false,
+   "description": "Schema for optimisation problem variables.\n\nA decision variable must be referenced in at least one constraint or in the\nobjective for it to exist in the optimisation problem that is sent to the solver.",
+   "properties": {
+    "active": {
+     "default": true,
+     "description": "If False, this component will be ignored during the build phase.",
+     "title": "Active",
+     "type": "boolean"
+    },
+    "bounds": {
+     "$ref": "#/$defs/Bounds",
+     "default": {
+      "max": "inf",
+      "min": "-inf"
+     }
+    },
+    "default": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "number"
+      }
+     ],
+     "default": "nan",
+     "description": "If set, will be the default value for the variable.",
+     "title": "Default"
+    },
+    "description": {
+     "default": "",
+     "description": "A verbose description of the component.",
+     "title": "Description",
+     "type": "string"
+    },
+    "domain": {
+     "default": "real",
+     "description": "Allowed values that the decision variable can take.\nEither real (a.k.a. continuous) or integer.",
+     "enum": [
+      "real",
+      "integer"
+     ],
+     "title": "Domain",
+     "type": "string"
+    },
+    "foreach": {
+     "description": "Sets (a.k.a. dimensions) of the model over which the math formulation component\nwill be built.",
+     "items": {
+      "pattern": "^[^_^\\d][\\w]*$",
+      "type": "string"
+     },
+     "title": "Foreach",
+     "type": "array",
+     "uniqueItems": true
+    },
+    "title": {
+     "default": "",
+     "description": "The component long name, for use in visualisation.",
+     "title": "Title",
+     "type": "string"
+    },
+    "unit": {
+     "default": "",
+     "description": "Generalised unit of the component (e.g., length, time, quantity_per_hour, ...).",
+     "title": "Unit",
+     "type": "string"
+    },
+    "where": {
+     "default": "True",
+     "description": "Top-level condition to determine whether the component exists in this\noptimisation problem. At all if `foreach` is not given, or for specific index items\nwithin the product of the sets given by `foreach`.",
+     "title": "Where",
+     "type": "string"
+    }
+   },
+   "title": "Variable",
+   "type": "object"
+  },
+  "Variables": {
+   "description": "Calliope model variables dictionary.",
+   "patternProperties": {
+    "^[^_^\\d][\\w]*$": {
+     "$ref": "#/$defs/Variable"
+    }
+   },
+   "title": "Variables",
+   "type": "object"
+  }
+ },
+ "additionalProperties": false,
+ "description": "All Calliope attributes.",
+ "properties": {
+  "config": {
+   "$ref": "#/$defs/CalliopeConfig",
+   "default": {
+    "build": {
+     "backend": "pyomo",
+     "ensure_feasibility": false,
+     "objective": "min_cost_optimisation",
+     "operate": {
+      "horizon": "48h",
+      "window": "24h"
+     }
+    },
+    "init": {
+     "broadcast_input_data": false,
+     "calliope_version": null,
+     "date_format": "ISO8601",
+     "datetime_format": "ISO8601",
+     "distance_unit": "km",
+     "extra_math": [],
+     "math_paths": {},
+     "mode": "base",
+     "name": null,
+     "pre_validate_math_strings": false,
+     "resample": {},
+     "retain_inactive": false,
+     "subset": {},
+     "time_cluster": null
+    },
+    "solve": {
+     "postprocessing_active": true,
+     "save_logs": null,
+     "shadow_prices": [],
+     "solver": "cbc",
+     "solver_io": null,
+     "solver_options": {},
+     "spores": {
+      "number": 3,
+      "save_per_spore_path": null,
+      "score_threshold_factor": 0.1,
+      "scoring_algorithm": "integer",
+      "tracking_parameter": null,
+      "use_latest_results": false
+     },
+     "zero_threshold": 1e-10
+    }
+   }
+  },
+  "definition": {
+   "$ref": "#/$defs/CalliopeModelDef",
+   "default": {
+    "data_definitions": {},
+    "data_tables": {},
+    "nodes": {},
+    "techs": {}
+   }
+  },
+  "math": {
+   "$ref": "#/$defs/CalliopeMath",
+   "default": {
+    "build": {
+     "checks": {},
+     "constraints": {},
+     "dimensions": {},
+     "global_expressions": {},
+     "lookups": {},
+     "objectives": {},
+     "parameters": {},
+     "piecewise_constraints": {},
+     "postprocessed": {},
+     "variables": {}
+    },
+    "init": {}
+   }
+  },
+  "runtime": {
+   "$ref": "#/$defs/CalliopeRuntime",
+   "default": {
+    "applied_overrides": null,
+    "calliope_version_initialised": "0.7.0",
+    "instantiated": false,
+    "math_priority": [],
+    "resample": {},
+    "scenario": null,
+    "subset": {},
+    "termination_condition": null,
+    "time_cluster": null,
+    "timings": {}
+   }
+  }
+ },
+ "title": "CalliopeAttrs",
+ "type": "object"
+}
