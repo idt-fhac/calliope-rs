@@ -111,6 +111,10 @@ def child(case: str, variant: str, out: Path):
     with rec.stage("build"):
         model.build()
     dump()
+    if os.environ.get("BENCH_BUILD_ONLY"):
+        result["status"] = "ok-build-only"
+        dump()
+        return
     if variant == "pyomo":
         # Pyomo's HiGHS interfaces (`highs`, `appsi_highs`) do not work on the
         # pyomo.kernel model Calliope builds, so the reference is: Pyomo LP
@@ -154,7 +158,7 @@ def child(case: str, variant: str, out: Path):
     dump()
 
 
-def run_one(case: str, variant: str, timeout: int) -> dict:
+def run_one(case: str, variant: str, timeout: int, build_only: bool = False) -> dict:
     WORK.mkdir(parents=True, exist_ok=True)
     RESULTS.mkdir(parents=True, exist_ok=True)
     out = RESULTS / f"{case.replace(':', '_')}__{variant}.json"
@@ -163,6 +167,8 @@ def run_one(case: str, variant: str, timeout: int) -> dict:
     env["PATH"] = f"{Path(sys.executable).parent}{os.pathsep}{env['PATH']}"
     if variant == "speedups":
         env["PYTHONPATH"] = str(SPEEDUPS / "src")
+    if build_only:
+        env["BENCH_BUILD_ONLY"] = "1"
     t0 = time.perf_counter()
     proc = subprocess.Popen(
         [sys.executable, __file__, "child", case, variant, str(out)],
@@ -217,7 +223,7 @@ def matrix(variants: list[str], timeout: int, only: str | None = None):
     cases += [f"syn:{n}:{t}" for n in SYN_NODES for t in SYN_HOURS]
     cases += ["operate:10", "operate:31", "spores:10", "spores:31"]
     if only:
-        cases = [c for c in cases if c.startswith(only)]
+        cases = [c for c in cases if c.startswith(tuple(only.split(",")))]
     for variant in variants:
         dead: set = set()
         for case in cases:
@@ -237,7 +243,12 @@ def matrix(variants: list[str], timeout: int, only: str | None = None):
                         )
                     )
                     continue
-            res = run_one(case, variant, timeout)
+            build_only = False
+            if case.startswith("syn:"):
+                _, n, t = case.split(":")
+                # single-thread HiGHS needs > 20 min beyond this size: build only
+                build_only = int(n) * int(t) > 5 * 8760 or int(n) >= 250
+            res = run_one(case, variant, timeout, build_only)
             st = res.get("status")
             stages = res.get("timings", {}).get("stages", {})
             brief = " ".join(f"{k}={v['wall_s']:.1f}s" for k, v in stages.items())
@@ -246,7 +257,7 @@ def matrix(variants: list[str], timeout: int, only: str | None = None):
                 f"peak={res['observed_peak_rss_mb']:.0f}MB {brief}",
                 flush=True,
             )
-            if st != "ok" and case.startswith("syn:"):
+            if not st.startswith("ok") and case.startswith("syn:"):
                 _, n, t = case.split(":")
                 dead.add((int(n), int(t)))
 
@@ -265,7 +276,7 @@ def main():
     m = sub.add_parser("matrix")
     m.add_argument("--variants", default="main,speedups,pyomo")
     m.add_argument("--timeout", type=int, default=1200)
-    m.add_argument("--only")
+    m.add_argument("--only", help="comma-separated case prefixes")
     a = ap.parse_args()
     if a.cmd == "child":
         child(a.case, a.variant, a.out)

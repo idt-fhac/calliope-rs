@@ -1,0 +1,64 @@
+{
+ "case": "operate:10",
+ "variant": "pyomo",
+ "calliope_file": "/home/idt/workspace/calliope/src/calliope/__init__.py",
+ "status": "ok",
+ "sizes": {
+  "costs": 1,
+  "techs": 7,
+  "nodes": 4,
+  "carriers": 1,
+  "timesteps": 240
+ },
+ "timings": {
+  "stages": {
+   "preprocess": {
+    "wall_s": 1.0796680804342031,
+    "peak_rss_mb": 198.3828125,
+    "start_rss_mb": 156.48046875,
+    "share": 0.2615353886494781
+   },
+   "build": {
+    "wall_s": 3.01524069160223,
+    "peak_rss_mb": 202.26953125,
+    "start_rss_mb": 171.32421875,
+    "share": 0.7304023898092527
+   },
+   "lp_write": {
+    "wall_s": 0.022689707577228546,
+    "peak_rss_mb": 202.23046875,
+    "start_rss_mb": 202.23046875,
+    "share": 0.005496283160623747
+   },
+   "solve": {
+    "wall_s": 0.010592684149742126,
+    "peak_rss_mb": 204.9609375,
+    "start_rss_mb": 202.23046875,
+    "wall_s_incl_postprocess": 0.010592684149742126,
+    "share": 0.002565938380645499
+   },
+   "postprocess": {
+    "wall_s": 0,
+    "nested_in": "solve",
+    "share": 0.0
+   }
+  },
+  "total_wall_s": 4.128191163763404,
+  "process_peak_rss_mb": 204.7890625,
+  "events": [
+   {
+    "kind": "model_build",
+    "t": 4.095688,
+    "wall_s": 3.0151498522609472,
+    "rss_mb": 202.23046875
+   }
+  ]
+ },
+ "termination_condition": "Optimal",
+ "objective": [
+  23044.26941438927
+ ],
+ "lp_mb": 0.13170528411865234,
+ "wall_total_s": 5.607631688937545,
+ "observed_peak_rss_mb": 205.0859375
+}

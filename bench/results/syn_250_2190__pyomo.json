@@ -1,0 +1,28 @@
+{
+ "case": "syn:250:2190",
+ "variant": "pyomo",
+ "calliope_file": "/home/idt/workspace/calliope/src/calliope/__init__.py",
+ "status": "killed: RSS > 28.0 GB",
+ "sizes": {
+  "costs": 1,
+  "nodes": 250,
+  "techs": 254,
+  "carriers": 1,
+  "timesteps": 2190
+ },
+ "timings": {
+  "stages": {
+   "preprocess": {
+    "wall_s": 47.69170029275119,
+    "peak_rss_mb": 11891.37109375,
+    "start_rss_mb": 172.6484375,
+    "share": 1.0
+   }
+  },
+  "total_wall_s": 47.69170029275119,
+  "process_peak_rss_mb": 11893.19140625,
+  "events": []
+ },
+ "wall_total_s": 159.85646290704608,
+ "observed_peak_rss_mb": 28749.19140625
+}

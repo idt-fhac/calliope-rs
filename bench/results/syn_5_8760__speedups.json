@@ -1,0 +1,76 @@
+{
+ "case": "syn:5:8760",
+ "variant": "speedups",
+ "calliope_file": "/home/idt/workspace/calliope-speedups/src/calliope/__init__.py",
+ "status": "ok",
+ "sizes": {
+  "costs": 1,
+  "nodes": 5,
+  "techs": 8,
+  "carriers": 1,
+  "timesteps": 8760
+ },
+ "timings": {
+  "stages": {
+   "preprocess": {
+    "wall_s": 1.057788783684373,
+    "peak_rss_mb": 200.609375,
+    "start_rss_mb": 164.82421875,
+    "share": 0.00466158059616669
+   },
+   "build": {
+    "wall_s": 23.232219064608216,
+    "peak_rss_mb": 541.1640625,
+    "start_rss_mb": 182.5859375,
+    "share": 0.10238231229892313
+   },
+   "solve": {
+    "wall_s": 199.0671875588596,
+    "peak_rss_mb": 1078.234375,
+    "start_rss_mb": 520.8671875,
+    "wall_s_incl_postprocess": 202.04659650288522,
+    "share": 0.8772712976078838
+   },
+   "write": {
+    "wall_s": 0.5797305405139923,
+    "peak_rss_mb": 1101.1796875,
+    "start_rss_mb": 1078.234375,
+    "share": 0.0025548206601816495
+   },
+   "postprocess": {
+    "wall_s": 2.9794089440256357,
+    "nested_in": "solve",
+    "share": 0.01312998883684474
+   }
+  },
+  "total_wall_s": 226.9163348916918,
+  "process_peak_rss_mb": 1100.90234375,
+  "events": [
+   {
+    "kind": "model_build",
+    "t": 24.411485,
+    "wall_s": 23.232076914981008,
+    "rss_mb": 520.8671875
+   },
+   {
+    "kind": "load_results",
+    "t": 226.447854,
+    "wall_s": 2.9794089440256357,
+    "rss_mb": 1078.234375
+   },
+   {
+    "kind": "backend_solve",
+    "t": 226.448015,
+    "wall_s": 202.03527295030653,
+    "rss_mb": 1078.234375
+   }
+  ]
+ },
+ "termination_condition": "optimal",
+ "objective": [
+  13283728.47155997
+ ],
+ "netcdf_mb": 1.7806015014648438,
+ "wall_total_s": 229.07586906850338,
+ "observed_peak_rss_mb": 1101.3046875
+}

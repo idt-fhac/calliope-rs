@@ -1,0 +1,28 @@
+{
+ "case": "syn:250:2190",
+ "variant": "main",
+ "calliope_file": "/home/idt/workspace/calliope/src/calliope/__init__.py",
+ "status": "killed: RSS > 28.0 GB",
+ "sizes": {
+  "costs": 1,
+  "nodes": 250,
+  "techs": 254,
+  "carriers": 1,
+  "timesteps": 2190
+ },
+ "timings": {
+  "stages": {
+   "preprocess": {
+    "wall_s": 53.67151864245534,
+    "peak_rss_mb": 11893.65625,
+    "start_rss_mb": 172.7265625,
+    "share": 1.0
+   }
+  },
+  "total_wall_s": 53.67151864245534,
+  "process_peak_rss_mb": 11893.4140625,
+  "events": []
+ },
+ "wall_total_s": 306.30932399630547,
+ "observed_peak_rss_mb": 28742.53125
+}
