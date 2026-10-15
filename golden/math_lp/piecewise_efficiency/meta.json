@@ -1,0 +1,68 @@
+{
+  "args": [],
+  "highs_lp_names": "default",
+  "highs_verbose_error": "ValueError: invalid literal for int() with base 10: '_'",
+  "kwargs": {},
+  "lp_file": "piecewise_efficiency.lp",
+  "math_dict": {
+    "constraints": {
+      "piecewise_efficiency": {
+        "active": true,
+        "description": "Limit the lower bound of inflow requirements to monotonically increasing values as the quantity of technology outflow increases. Since the model is cost minimising and higher inflows translate to higher costs (because more carrier flow is needed in the system), this is equivalent to forcing the inflow to a specific point along the curve that is traced by the superposition of all pieces.\n",
+        "equations": [
+          {
+            "expression": "sum(flow_in, over=carriers) >= flow_eff_piecewise_slopes * sum(flow_out, over=carriers) + flow_eff_piecewise_intercept * sum(available_flow_cap, over=carriers)\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps",
+          "pieces"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "flow_eff_piecewise_slopes AND flow_eff_piecewise_intercept AND available_flow_cap\n"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones11/barebones.yaml"
+    },
+    "data_definitions": {
+      "flow_eff_piecewise_intercept": {
+        "data": [
+          0,
+          -2,
+          -16
+        ],
+        "dims": "pieces",
+        "index": [
+          0,
+          1,
+          2
+        ]
+      },
+      "flow_eff_piecewise_slopes": {
+        "data": [
+          5,
+          7,
+          14
+        ],
+        "dims": "pieces",
+        "index": [
+          0,
+          1,
+          2
+        ]
+      }
+    }
+  },
+  "scenario": "conversion_milp,two_hours",
+  "test": "tests/math/math_test.py::TestPiecewiseEfficiency::test_piecewise"
+}

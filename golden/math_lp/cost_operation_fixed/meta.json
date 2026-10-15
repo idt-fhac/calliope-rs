@@ -1,0 +1,107 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "cost_operation_fixed.lp",
+  "math_dict": {
+    "global_expressions": {
+      "cost_operation_fixed": {
+        "active": true,
+        "default": 0,
+        "description": "The fixed, annual operation costs of a technology, which are calculated relative to investment costs. If the modeling period is not equal to one full year, this will be scaled accordingly.",
+        "equations": [
+          {
+            "expression": "$annualisation_weight * (\n  sum(cost_om_annual * flow_cap, over=carriers) +\n  cost_investment * cost_om_annual_investment_fraction\n)",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "costs"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {
+          "annualisation_weight": [
+            {
+              "expression": "sum(timestep_resolution * timestep_weights, over=timesteps) / 8760",
+              "where": "True"
+            }
+          ]
+        },
+        "title": "Total fixed operation costs",
+        "unit": "cost",
+        "where": "(cost_om_annual AND flow_cap) OR (cost_investment AND cost_om_annual_investment_fraction)"
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_operation_fixed, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    },
+    "parameters": {
+      "cost_om_annual": {
+        "active": true,
+        "default": 0,
+        "description": "Annual costs applied per unit `flow_cap`. These costs are not subject to being recalculated relative to technology lifetime, only scaled to reflect the fraction of one year that the model represents (e.g., 7 days ~= 0.02 of a year).",
+        "resample_method": "first",
+        "title": "Annual O&M costs",
+        "unit": "$\\frac{\\text{cost}}{\\text{power}}$"
+      },
+      "cost_om_annual_investment_fraction": {
+        "active": true,
+        "default": 0,
+        "description": "Add an additional cost to total investment costs (except `cost_om_annual`) that is a fraction of that total.",
+        "resample_method": "first",
+        "title": "Fractional annual O&M costs.",
+        "unit": "unitless."
+      }
+    },
+    "variables": {
+      "flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": "flow_cap_max",
+          "min": "flow_cap_min"
+        },
+        "default": 0,
+        "description": "A technology's flow capacity, also known as its nominal or nameplate capacity.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "title": "Technology flow (a.k.a. nominal) capacity",
+        "unit": "power",
+        "where": "carrier_in OR carrier_out"
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "techs": {
+      "test_supply_elec": {
+        "cost_om_annual": {
+          "data": 50,
+          "dims": "costs",
+          "index": "monetary"
+        },
+        "cost_om_annual_investment_fraction": 0.1
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[cost_operation_fixed]"
+}

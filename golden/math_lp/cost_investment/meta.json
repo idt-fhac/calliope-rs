@@ -1,0 +1,226 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "cost_investment.lp",
+  "math_dict": {
+    "global_expressions": {
+      "cost_investment": {
+        "active": true,
+        "default": 0,
+        "description": "The installation costs of a technology, including those linked to the nameplate capacity, land use, and storage size.",
+        "equations": [
+          {
+            "expression": "sum(cost_investment_flow_cap, over=carriers) + cost_investment_storage_cap + cost_investment_source_cap + cost_investment_area_use",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "costs"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Total investment costs",
+        "unit": "cost",
+        "where": "cost_investment_flow_cap OR cost_investment_storage_cap OR cost_investment_source_cap OR cost_investment_area_use"
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_investment, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    },
+    "parameters": {
+      "area_use_max": {
+        "active": true,
+        "default": Infinity,
+        "description": "If set to a finite value, limits the upper bound of the `area_use` decision variable to this value.",
+        "resample_method": "first",
+        "title": "Maximum usable area.",
+        "unit": "$\\text{area}$"
+      },
+      "area_use_min": {
+        "active": true,
+        "default": 0,
+        "description": "Limits the lower bound of the `area_use` decision variable to this value.",
+        "resample_method": "first",
+        "title": "Minimum usable area.",
+        "unit": "$\\text{area}$"
+      },
+      "cost_area_use": {
+        "active": true,
+        "default": 0,
+        "description": "Cost per unit `area_use`.",
+        "resample_method": "first",
+        "title": "Cost of area use.",
+        "unit": "$\\text{area}$"
+      },
+      "cost_source_cap": {
+        "active": true,
+        "default": 0,
+        "description": "Cost per unit `source_cap`.",
+        "resample_method": "first",
+        "title": "Cost of source flow capacity.",
+        "unit": "$\\frac{\\text{cost}}{\\text{power}}$"
+      },
+      "cost_storage_cap": {
+        "active": true,
+        "default": 0,
+        "description": "Cost per unit `storage_cap`, i.e., the maximum available capacity of the storage technology's \"reservoir\".",
+        "resample_method": "first",
+        "title": "Cost of storage capacity.",
+        "unit": "$\\frac{\\text{cost}}{\\text{energy}}$"
+      },
+      "flow_cap_max": {
+        "active": true,
+        "default": Infinity,
+        "description": "Limits `flow_cap` to a maximum.",
+        "resample_method": "first",
+        "title": "Maximum rated flow capacity.",
+        "unit": "power."
+      },
+      "flow_cap_min": {
+        "active": true,
+        "default": 0,
+        "description": "Limits `flow_cap` to a minimum.",
+        "resample_method": "first",
+        "title": "Minimum rated flow capacity.",
+        "unit": "power or $\\frac{\\text{power}}{\\text{unit}}$"
+      },
+      "source_cap_max": {
+        "active": true,
+        "default": Infinity,
+        "description": "Upper limit on `source_cap` decision variable.",
+        "resample_method": "mean",
+        "title": "Maximum installed source consumption capacity.",
+        "unit": "power."
+      },
+      "source_cap_min": {
+        "active": true,
+        "default": 0,
+        "description": "Lower limit on `source_cap` decision variable.",
+        "resample_method": "mean",
+        "title": "Minimum installed source consumption capacity",
+        "unit": "power."
+      },
+      "storage_cap_max": {
+        "active": true,
+        "default": Infinity,
+        "description": "Limit upper bound of `storage_cap` decision variable.",
+        "resample_method": "first",
+        "title": "Maximum storage capacity.",
+        "unit": "energy."
+      },
+      "storage_cap_min": {
+        "active": true,
+        "default": 0,
+        "description": "Limit lower bound of `storage_cap` decision variable.",
+        "resample_method": "first",
+        "title": "Minimum storage capacity.",
+        "unit": "energy."
+      }
+    },
+    "variables": {
+      "area_use": {
+        "active": true,
+        "bounds": {
+          "max": "area_use_max",
+          "min": "area_use_min"
+        },
+        "default": 0,
+        "description": "The area in space utilised directly (e.g., solar PV panels) or indirectly (e.g., biofuel crops) by a technology.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Area utilisation",
+        "unit": "area",
+        "where": "(area_use_min OR area_use_max OR area_use_per_flow_cap OR sink_unit==per_area OR source_unit==per_area)"
+      },
+      "flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": "flow_cap_max",
+          "min": "flow_cap_min"
+        },
+        "default": 0,
+        "description": "A technology's flow capacity, also known as its nominal or nameplate capacity.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "title": "Technology flow (a.k.a. nominal) capacity",
+        "unit": "power",
+        "where": "carrier_in OR carrier_out"
+      },
+      "source_cap": {
+        "active": true,
+        "bounds": {
+          "max": "source_cap_max",
+          "min": "source_cap_min"
+        },
+        "default": 0,
+        "description": "The upper limit on a flow that can be consumed from outside the system boundaries by a `supply` technology in each timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Source flow capacity",
+        "unit": "power",
+        "where": "base_tech==supply"
+      },
+      "storage_cap": {
+        "active": true,
+        "bounds": {
+          "max": "storage_cap_max",
+          "min": "storage_cap_min"
+        },
+        "default": 0,
+        "description": "The upper limit on a carrier that can be stored by a technology in any timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Stored carrier capacity",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "techs": {
+      "test_supply_plus": {
+        "area_use_per_flow_cap": 1.0,
+        "cost_area_use": 20,
+        "cost_flow_cap": {
+          "data": 10,
+          "dims": "costs",
+          "index": "monetary"
+        },
+        "cost_source_cap": 30,
+        "cost_storage_cap": 50
+      }
+    }
+  },
+  "scenario": "simple_supply_plus,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[cost_investment]"
+}

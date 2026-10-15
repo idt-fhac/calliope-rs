@@ -1,0 +1,50 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "demand_share_per_timestep_equals_per_tech.lp",
+  "math_dict": {
+    "constraints": {
+      "demand_share_per_timestep_equals_per_tech": {
+        "active": true,
+        "description": "Set the per-timestep outflow of certain technologies which produce the `power` carrier to a share of demand inflow.\n",
+        "equations": [
+          {
+            "expression": "sum(flow_out, over=carriers) == sum(flow_in[techs=$demand_tech], over=carriers) * demand_share_per_timestep_equals\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {
+          "demand_tech": [
+            {
+              "expression": "demand_share_tech",
+              "where": "True"
+            }
+          ]
+        },
+        "sub_expressions": {},
+        "title": "",
+        "where": "demand_share_per_timestep_equals"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones7/barebones.yaml"
+    },
+    "data_definitions": {
+      "demand_share_tech": "test_demand_elec"
+    },
+    "nodes.a.techs.test_supply_elec.demand_share_per_timestep_equals": 0.5,
+    "nodes.b.techs.test_supply_elec.demand_share_per_timestep_equals": 0.8
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestSharePerTimestep::test_demand_share_per_timestep_equals_per_tech"
+}

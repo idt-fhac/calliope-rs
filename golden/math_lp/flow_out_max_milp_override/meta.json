@@ -1,0 +1,62 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones1/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "flow_out_max_milp_override.lp",
+  "math_dict": {
+    "constraints": {
+      "flow_out_max": {
+        "active": true,
+        "description": "Set the upper bound of a continuous technology's outflow.",
+        "equations": [
+          {
+            "expression": "flow_out <= flow_cap * timestep_resolution * flow_out_parasitic_eff",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "carrier_out AND NOT operating_units"
+      }
+    },
+    "parameters": {
+      "flow_cap_max": {
+        "active": true,
+        "default": Infinity,
+        "description": "Limits `flow_cap` to a maximum.",
+        "resample_method": "first",
+        "title": "Maximum rated flow capacity.",
+        "unit": "power."
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_conversion": {
+            "cap_method": "integer"
+          },
+          "test_supply_elec": {
+            "flow_cap_max": 50
+          }
+        }
+      }
+    }
+  },
+  "scenario": "simple_conversion,two_hours",
+  "test": "tests/math/math_test.py::TestMILPMath::test_math[flow_out_max]"
+}

@@ -1,0 +1,117 @@
+{
+  "fixture": {
+    "name": "test_model__simple_chp__two_hours",
+    "model": "tests/common/test_model/model.yaml",
+    "scenario": "simple_chp,two_hours",
+    "override_dict": {
+      "config.build.backend": "highs"
+    },
+    "math_dict": null,
+    "init_kwargs": {},
+    "solve_kwargs": {
+      "solver_options": {
+        "threads": 1,
+        "random_seed": 0
+      }
+    },
+    "backend": "highs",
+    "solver": "highs",
+    "numpy_seed": 0,
+    "notes": ""
+  },
+  "versions": {
+    "python": "3.14.7",
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "xarray": "2026.9.0",
+    "pandas": "3.0.6",
+    "numpy": "2.5.3",
+    "pyparsing": "3.3.2",
+    "pyomo": "6.10.1",
+    "highs": "1.15.1"
+  },
+  "errors": {},
+  "lp_names": "verbose",
+  "objective_name": "min_cost_optimisation",
+  "solver_objective_last": 0.0,
+  "objectives": {},
+  "termination_condition": "infeasible",
+  "timings": {
+    "stages": {
+      "preprocess": {
+        "wall_s": 0.6022669430822134,
+        "peak_rss_mb": 166.25,
+        "start_rss_mb": 157.09765625,
+        "share": 0.22510376943895424
+      },
+      "build": {
+        "wall_s": 1.7758955657482147,
+        "peak_rss_mb": 198.30859375,
+        "start_rss_mb": 172.6796875,
+        "share": 0.6637601325651329
+      },
+      "solve": {
+        "wall_s": 0.017225099727511406,
+        "peak_rss_mb": 199.0078125,
+        "start_rss_mb": 198.3828125,
+        "wall_s_incl_postprocess": 0.017225099727511406,
+        "share": 0.006438066910631397
+      },
+      "write": {
+        "wall_s": 0.2801204230636358,
+        "peak_rss_mb": 200.06640625,
+        "start_rss_mb": 199.0078125,
+        "share": 0.10469803108528143
+      },
+      "postprocess": {
+        "wall_s": 0,
+        "nested_in": "solve",
+        "share": 0.0
+      }
+    },
+    "total_wall_s": 2.6755080316215754,
+    "process_peak_rss_mb": 199.828125,
+    "events": [
+      {
+        "kind": "model_build",
+        "t": 2.662027,
+        "wall_s": 1.7757488712668419,
+        "rss_mb": 198.27734375
+      },
+      {
+        "kind": "backend_solve",
+        "t": 2.779914,
+        "wall_s": 0.0006910562515258789,
+        "rss_mb": 199.0078125
+      },
+      {
+        "kind": "model_build",
+        "t": 4.998976,
+        "wall_s": 1.9226082973182201,
+        "rss_mb": 211.15625
+      }
+    ],
+    "pyomo_build_s": 1.9227218143641949
+  },
+  "runtime_timings": {
+    "root": {
+      "preprocess_start": 1792022218.31561,
+      "init_complete": 1792022218.694434,
+      "build_start": 1792022218.978587,
+      "build_complete": 1792022220.754179,
+      "solve_start": 1792022220.871428,
+      "solver_exit": 1792022220.872272,
+      "postprocess_complete": 1792022220.888051,
+      "solve_complete": 1792022220.888114
+    }
+  },
+  "sizes": {
+    "dims": {
+      "nodes": 2,
+      "techs": 5,
+      "carriers": 3,
+      "timesteps": 2
+    },
+    "n_results_vars": 0
+  }
+}

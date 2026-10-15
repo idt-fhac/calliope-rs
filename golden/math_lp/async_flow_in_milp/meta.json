@@ -1,0 +1,95 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones1/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "async_flow_in_milp.lp",
+  "math_dict": {
+    "constraints": {
+      "async_flow_in_milp": {
+        "active": true,
+        "description": "Set a technology's ability to have inflow in the same timestep that it has outflow, for any technology using the asynchronous flow binary switch.",
+        "equations": [
+          {
+            "expression": "sum(flow_in, over=carriers) <= (1 - async_flow_switch) * bigM",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "async_flow_switch"
+      }
+    },
+    "lookups": {
+      "force_async_flow": {
+        "active": true,
+        "default": false,
+        "description": "If True, non-zero `flow_out` and `flow_in` cannot both occur in the same timestep.",
+        "dtype": "bool",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": "Force asynchronous out/inflow."
+      }
+    },
+    "variables": {
+      "async_flow_switch": {
+        "active": true,
+        "bounds": {
+          "max": 1,
+          "min": 0
+        },
+        "default": 0,
+        "description": "Binary switch to force asynchronous outflow/consumption of technologies with both `flow_in` and `flow_out` defined. This ensures that a technology with carrier flow efficiencies < 100% cannot produce and consume a flow simultaneously to remove unwanted carrier from the system.",
+        "domain": "integer",
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "title": "Asynchronous carrier flow switch",
+        "unit": "integer",
+        "where": "force_async_flow==True"
+      },
+      "flow_in": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The inflow to a technology per timestep, also known as the flow consumed (by `storage` technologies) or the flow sent (by `transmission` technologies) on a link.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Carrier inflow",
+        "unit": "energy",
+        "where": "carrier_in AND not (one_way AND map_dim(nodes, link_to)==True)"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "techs": {
+      "test_conversion_plus": {
+        "force_async_flow": true
+      }
+    }
+  },
+  "scenario": "conversion_and_conversion_plus,two_hours",
+  "test": "tests/math/math_test.py::TestMILPMath::test_math[async_flow_in_milp]"
+}

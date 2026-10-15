@@ -1,0 +1,247 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "balance_storage.lp",
+  "math_dict": {
+    "constraints": {
+      "balance_storage": {
+        "active": true,
+        "description": "Fix the quantity of carrier stored in a `storage` technology at the end of each timestep based on the net flow of carrier charged and discharged and the quantity of carrier stored at the start of the timestep.",
+        "equations": [
+          {
+            "expression": "storage == $storage_previous_step -\n  sum(flow_out_inc_eff, over=carriers) + sum(flow_in_inc_eff, over=carriers)",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {
+          "storage_previous_step": [
+            {
+              "expression": "storage_initial * storage_cap",
+              "where": "timesteps==get_val_at_index(timesteps=0) AND NOT cyclic_storage==True"
+            },
+            {
+              "expression": "(1 - storage_loss) ** roll(timestep_resolution, timesteps=1) * roll(storage, timesteps=1)",
+              "where": "(\n  (timesteps==get_val_at_index(timesteps=0) AND cyclic_storage==True)\n  OR NOT timesteps==get_val_at_index(timesteps=0)\n) AND NOT cluster_first_timestep==True"
+            },
+            {
+              "expression": "(1 - storage_loss) ** select_from_lookup_arrays(timestep_resolution, timesteps=lookup_cluster_last_timestep) * select_from_lookup_arrays(storage, timesteps=lookup_cluster_last_timestep)",
+              "where": "cluster_first_timestep==True AND NOT (timesteps==get_val_at_index(timesteps=0) AND NOT cyclic_storage==True)"
+            }
+          ]
+        },
+        "title": "",
+        "where": "(include_storage==true or base_tech==storage) AND NOT (base_tech==supply OR base_tech==demand)"
+      }
+    },
+    "global_expressions": {
+      "flow_in_inc_eff": {
+        "active": true,
+        "default": 0,
+        "description": "Inflows after taking efficiency losses into account.",
+        "equations": [
+          {
+            "expression": "flow_in * flow_in_eff * flow_in_eff_per_distance ** distance",
+            "where": "base_tech==transmission"
+          },
+          {
+            "expression": "flow_in * flow_in_eff",
+            "where": "NOT base_tech==transmission"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Carrier inflow including losses",
+        "unit": "energy",
+        "where": "flow_in"
+      },
+      "flow_out_inc_eff": {
+        "active": true,
+        "default": 0,
+        "description": "Outflows after taking efficiency losses into account.",
+        "equations": [
+          {
+            "expression": "flow_out / (\n  flow_out_eff * flow_out_parasitic_eff *\n  flow_out_eff_per_distance ** distance\n)",
+            "where": "base_tech==transmission"
+          },
+          {
+            "expression": "flow_out / (flow_out_eff * flow_out_parasitic_eff)",
+            "where": "NOT base_tech==transmission"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Carrier outflow including losses",
+        "unit": "energy",
+        "where": "flow_out"
+      }
+    },
+    "lookups": {
+      "base_tech": {
+        "active": true,
+        "default": NaN,
+        "description": "Should be the name of one of the abstract base classes, from which some initial parameter defaults will be derived and with which certain base math will be triggered.",
+        "dtype": "string",
+        "one_of": [
+          "demand",
+          "supply",
+          "conversion",
+          "storage",
+          "transmission"
+        ],
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": "Abstract base technology name."
+      },
+      "cluster_first_timestep": {
+        "active": true,
+        "default": false,
+        "description": "If true, the timestep is the first in the given clustered day.",
+        "dtype": "bool",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": "Cluster first timestep."
+      },
+      "cyclic_storage": {
+        "active": true,
+        "default": true,
+        "description": "If true, link storage levels in the last model timestep with the first model timestep. `inter_cluster_storage` custom math must be included if using time clustering and setting this to `true`.\n",
+        "dtype": "bool",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": "Cyclic storage switch."
+      },
+      "include_storage": {
+        "active": true,
+        "default": false,
+        "description": "When true, math will be triggered to allow discontinuous carrier inflow and outflows across timesteps.",
+        "dtype": "bool",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": "Storage method switch."
+      },
+      "lookup_cluster_last_timestep": {
+        "active": true,
+        "default": NaN,
+        "description": "The last timestep of each cluster.",
+        "dtype": "datetime",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": ""
+      }
+    },
+    "parameters": {
+      "storage_initial": {
+        "active": true,
+        "default": 0,
+        "description": "Set stored flow in device at the first timestep, as a fraction of total storage capacity.",
+        "resample_method": "first",
+        "title": "Initial storage level.",
+        "unit": "unitless."
+      },
+      "storage_loss": {
+        "active": true,
+        "default": 0,
+        "description": "Rate of storage loss per hour, used to calculate lost stored flow as `(1 - storage_loss)^hours_per_timestep`.",
+        "resample_method": "mean",
+        "title": "Storage loss rate",
+        "unit": "$\\frac{\\text{1}}{\\text{hour}}$"
+      },
+      "timestep_resolution": {
+        "active": true,
+        "default": 1,
+        "description": "",
+        "resample_method": "sum",
+        "title": "Resolution per timestep.",
+        "unit": "hours."
+      }
+    },
+    "variables": {
+      "storage": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The carrier stored by a `storage` technology in each timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "title": "Stored carrier",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      },
+      "storage_cap": {
+        "active": true,
+        "bounds": {
+          "max": "storage_cap_max",
+          "min": "storage_cap_min"
+        },
+        "default": 0,
+        "description": "The upper limit on a carrier that can be stored by a technology in any timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Stored carrier capacity",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_storage": {
+            "cyclic_storage": true
+          }
+        }
+      },
+      "b": {
+        "techs": {
+          "test_storage": {
+            "cyclic_storage": false
+          }
+        }
+      }
+    }
+  },
+  "scenario": "simple_storage,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[balance_storage]"
+}

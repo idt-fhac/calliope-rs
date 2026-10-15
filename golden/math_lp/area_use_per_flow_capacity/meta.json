@@ -1,0 +1,95 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "area_use_per_flow_capacity.lp",
+  "math_dict": {
+    "constraints": {
+      "area_use_per_flow_capacity": {
+        "active": true,
+        "description": "Set a fixed relationship between a technology's flow capacity and its area use.",
+        "equations": [
+          {
+            "expression": "area_use == flow_cap * area_use_per_flow_cap",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "flow_cap AND area_use AND area_use_per_flow_cap"
+      }
+    },
+    "parameters": {
+      "area_use_per_flow_cap": {
+        "active": true,
+        "default": NaN,
+        "description": "If set, forces `area_use` to follow `flow_cap` with the given numerical ratio (e.g. setting to 1.5 means that `area_use == 1.5 * flow_cap`).",
+        "resample_method": "first",
+        "title": "Area use per flow capacity",
+        "unit": "$\\frac{\\text{area}}{\\text{power}}$"
+      }
+    },
+    "variables": {
+      "area_use": {
+        "active": true,
+        "bounds": {
+          "max": "area_use_max",
+          "min": "area_use_min"
+        },
+        "default": 0,
+        "description": "The area in space utilised directly (e.g., solar PV panels) or indirectly (e.g., biofuel crops) by a technology.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Area utilisation",
+        "unit": "area",
+        "where": "(area_use_min OR area_use_max OR area_use_per_flow_cap OR sink_unit==per_area OR source_unit==per_area)"
+      },
+      "flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": "flow_cap_max",
+          "min": "flow_cap_min"
+        },
+        "default": 0,
+        "description": "A technology's flow capacity, also known as its nominal or nameplate capacity.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "title": "Technology flow (a.k.a. nominal) capacity",
+        "unit": "power",
+        "where": "carrier_in OR carrier_out"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_supply_elec": {
+            "area_use_per_flow_cap": 1.5
+          }
+        }
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[area_use_per_flow_capacity]"
+}

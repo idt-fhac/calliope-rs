@@ -1,0 +1,128 @@
+{
+  "fixture": {
+    "name": "national_scale_check_feasibility",
+    "model": "src/calliope/example_models/national_scale/model.yaml",
+    "scenario": "check_feasibility",
+    "override_dict": {
+      "config.build.backend": "highs"
+    },
+    "math_dict": null,
+    "init_kwargs": {},
+    "solve_kwargs": {
+      "solver_options": {
+        "threads": 1,
+        "random_seed": 0
+      }
+    },
+    "backend": "highs",
+    "solver": "highs",
+    "numpy_seed": 0,
+    "notes": ""
+  },
+  "versions": {
+    "python": "3.14.7",
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "xarray": "2026.9.0",
+    "pandas": "3.0.6",
+    "numpy": "2.5.3",
+    "pyparsing": "3.3.2",
+    "pyomo": "6.10.1",
+    "highs": "1.15.1"
+  },
+  "errors": {
+    "pyomo_lp": "IndexError: list index out of range"
+  },
+  "lp_names": "verbose",
+  "objective_name": "check_feasibility",
+  "solver_objective_last": 0.0,
+  "objectives": {
+    "min_cost_optimisation": 254837.99011411204
+  },
+  "termination_condition": "optimal",
+  "timings": {
+    "stages": {
+      "preprocess": {
+        "wall_s": 1.027894876897335,
+        "peak_rss_mb": 200.8515625,
+        "start_rss_mb": 156.76171875,
+        "share": 0.16731093288589574
+      },
+      "build": {
+        "wall_s": 3.9702728874981403,
+        "peak_rss_mb": 212.546875,
+        "start_rss_mb": 175.56640625,
+        "share": 0.646243186486121
+      },
+      "solve": {
+        "wall_s": 0.017853323370218277,
+        "peak_rss_mb": 214.10546875,
+        "start_rss_mb": 212.6640625,
+        "wall_s_incl_postprocess": 0.7796304002404213,
+        "share": 0.002905993847543155
+      },
+      "write": {
+        "wall_s": 0.36582233384251595,
+        "peak_rss_mb": 214.30859375,
+        "start_rss_mb": 214.07421875,
+        "share": 0.05954507345190332
+      },
+      "postprocess": {
+        "wall_s": 0.761777076870203,
+        "nested_in": "solve",
+        "share": 0.1239948133285368
+      }
+    },
+    "total_wall_s": 6.143620498478413,
+    "process_peak_rss_mb": 214.1015625,
+    "events": [
+      {
+        "kind": "model_build",
+        "t": 5.311488,
+        "wall_s": 3.970098551362753,
+        "rss_mb": 212.5390625
+      },
+      {
+        "kind": "load_results",
+        "t": 6.268062,
+        "wall_s": 0.761777076870203,
+        "rss_mb": 214.07421875
+      },
+      {
+        "kind": "backend_solve",
+        "t": 6.268228,
+        "wall_s": 0.7682510986924171,
+        "rss_mb": 214.07421875
+      },
+      {
+        "kind": "model_build",
+        "t": 10.670915,
+        "wall_s": 4.025476416572928,
+        "rss_mb": 214.59765625
+      }
+    ],
+    "pyomo_build_s": 4.0255973264575005
+  },
+  "runtime_timings": {
+    "root": {
+      "preprocess_start": 1792022006.348593,
+      "init_complete": 1792022007.181689,
+      "build_start": 1792022007.49595,
+      "build_complete": 1792022011.465879,
+      "solve_start": 1792022011.654426,
+      "solver_exit": 1792022012.422829,
+      "postprocess_complete": 1792022012.433415,
+      "solve_complete": 1792022012.433481
+    }
+  },
+  "sizes": {
+    "dims": {
+      "costs": 1,
+      "nodes": 5,
+      "techs": 8,
+      "carriers": 1,
+      "timesteps": 24
+    },
+    "n_results_vars": 26
+  }
+}

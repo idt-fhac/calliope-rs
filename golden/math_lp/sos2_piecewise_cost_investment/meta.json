@@ -1,0 +1,83 @@
+{
+  "args": [],
+  "highs_error": "NotImplementedError: Piecewise constraints are not yet implemented for the HiGHS backend.",
+  "kwargs": {},
+  "lp_file": "sos2_piecewise_cost_investment.lp",
+  "math_dict": {
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_investment, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    },
+    "piecewise_constraints": {
+      "sos2_piecewise_costs": {
+        "active": true,
+        "description": "Set investment cost values along a piecewise curve using special ordered sets of type 2 (SOS2).\n",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "costs"
+        ],
+        "title": "",
+        "where": "any(piecewise_cost_investment_x, over=breakpoints) AND any(piecewise_cost_investment_y, over=breakpoints)",
+        "x_expression": "flow_cap",
+        "x_values": "piecewise_cost_investment_x",
+        "y_expression": "piecewise_cost_investment",
+        "y_values": "piecewise_cost_investment_y"
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones10/barebones.yaml"
+    },
+    "techs.test_supply_elec": {
+      "piecewise_cost_investment_x": {
+        "data": [
+          0,
+          1,
+          2,
+          10
+        ],
+        "dims": "breakpoints",
+        "index": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "piecewise_cost_investment_y": {
+        "data": [
+          0,
+          5,
+          8,
+          20
+        ],
+        "dims": "breakpoints",
+        "index": [
+          0,
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    "techs.test_supply_elec.cost_interest_rate": {
+      "data": 0.1,
+      "dims": "costs",
+      "index": "monetary"
+    },
+    "techs.test_supply_elec.lifetime": 10
+  },
+  "scenario": "supply_purchase,two_hours",
+  "test": "tests/math/math_test.py::TestSOS2PiecewiseCosts::test_piecewise"
+}

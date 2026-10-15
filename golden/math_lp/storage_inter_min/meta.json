@@ -1,0 +1,106 @@
+{
+  "args": [],
+  "highs_lp_names": "default",
+  "highs_verbose_error": "ValueError: invalid literal for int() with base 10: '_'",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones2/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "storage_inter_min.lp",
+  "math_dict": {
+    "constraints": {
+      "storage_inter_min": {
+        "active": true,
+        "description": "Set the lower bound of a `storage` technology's stored carrier across all days in the timeseries.",
+        "equations": [
+          {
+            "expression": "storage_inter_cluster * ((1 - storage_loss) ** 24) + storage_intra_cluster_min[clusters=$cluster] >= 0",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "datesteps"
+        ],
+        "slices": {
+          "cluster": [
+            {
+              "expression": "lookup_datestep_cluster",
+              "where": "True"
+            }
+          ]
+        },
+        "sub_expressions": {},
+        "title": "",
+        "where": "include_storage==True OR base_tech==storage"
+      }
+    },
+    "lookups": {
+      "lookup_datestep_cluster": {
+        "active": true,
+        "default": NaN,
+        "description": "The cluster to which each datestep belongs.",
+        "dtype": "float",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": ""
+      }
+    },
+    "parameters": {
+      "storage_loss": {
+        "active": true,
+        "default": 0,
+        "description": "Rate of storage loss per hour, used to calculate lost stored flow as `(1 - storage_loss)^hours_per_timestep`.",
+        "resample_method": "mean",
+        "title": "Storage loss rate",
+        "unit": "$\\frac{\\text{1}}{\\text{hour}}$"
+      }
+    },
+    "variables": {
+      "storage_inter_cluster": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The virtual carrier stored by any technology using storage between days of the entire timeseries. Only together with `storage` does this variable's values gain physical significance.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "datesteps"
+        ],
+        "title": "Virtual inter-cluster stored carrier",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      },
+      "storage_intra_cluster_min": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": -Infinity
+        },
+        "default": -Infinity,
+        "description": "Virtual variable to limit the minimum value of `storage` in a given representative day.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "clusters"
+        ],
+        "title": "Virtual minimum intra-cluster stored carrier",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {},
+  "scenario": "simple_storage,inter_cluster_storage",
+  "test": "tests/math/math_test.py::TestInterClusterStorageMath::test_math[storage_inter_min]"
+}

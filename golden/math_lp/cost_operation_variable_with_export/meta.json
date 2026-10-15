@@ -1,0 +1,156 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "cost_operation_variable_with_export.lp",
+  "math_dict": {
+    "global_expressions": {
+      "cost_operation_variable": {
+        "active": true,
+        "default": 0,
+        "description": "The operating costs per timestep of a technology.",
+        "equations": [
+          {
+            "expression": "timestep_weights * ($cost_export + $cost_flow_out + $cost_flow_in)",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "costs",
+          "timesteps"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {
+          "cost_export": [
+            {
+              "expression": "sum(cost_export * flow_export, over=carriers)",
+              "where": "True"
+            }
+          ],
+          "cost_flow_in": [
+            {
+              "expression": "cost_source_use * source_use",
+              "where": "base_tech==supply"
+            },
+            {
+              "expression": "sum(cost_flow_in * flow_in, over=carriers)",
+              "where": "NOT base_tech==supply"
+            }
+          ],
+          "cost_flow_out": [
+            {
+              "expression": "sum(cost_flow_out * flow_out, over=carriers)",
+              "where": "True"
+            }
+          ]
+        },
+        "title": "Variable operating costs",
+        "unit": "$\\frac{\\text{cost}}{\\text{hour}}$",
+        "where": "cost_export OR cost_flow_in OR cost_flow_out OR cost_source_use"
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_operation_variable, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    },
+    "parameters": {
+      "cost_export": {
+        "active": true,
+        "default": 0,
+        "description": "Cost per unit of `flow_export` in each timestep. Usually used in the negative sense, as a subsidy.",
+        "resample_method": "mean",
+        "title": "Carrier export cost.",
+        "unit": "$\\frac{\\text{cost}}{\\text{energy}}$"
+      },
+      "export_max": {
+        "active": true,
+        "default": Infinity,
+        "description": "If `carrier_export` is defined, limit the allowed export of produced carrier for a technology.",
+        "resample_method": "first",
+        "title": "Maximum allowed carrier export",
+        "unit": "power."
+      },
+      "export_min": {
+        "active": true,
+        "default": 0,
+        "description": "If `carrier_export` is defined, set a lower bound on the amount of produced carrier that _must_ be exported for a technology.",
+        "resample_method": "first",
+        "title": "Minimum allowed carrier export",
+        "unit": "power."
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "techs": {
+      "simple_supply": {
+        "cost_source_use": 10
+      },
+      "test_conversion_plus": {
+        "carrier_export": "heat",
+        "cost_export": {
+          "data": 3,
+          "dims": [
+            "carriers",
+            "costs"
+          ],
+          "index": [
+            [
+              "heat",
+              "monetary"
+            ]
+          ]
+        },
+        "cost_flow_in": {
+          "data": 4,
+          "dims": "costs",
+          "index": "monetary"
+        },
+        "cost_flow_out": {
+          "data": [
+            1,
+            2
+          ],
+          "dims": [
+            "carriers",
+            "costs"
+          ],
+          "index": [
+            [
+              "electricity",
+              "monetary"
+            ],
+            [
+              "heat",
+              "monetary"
+            ]
+          ]
+        }
+      },
+      "test_supply_elec": {
+        "carrier_export": "electricity",
+        "cost_export": {
+          "data": 5,
+          "dims": "costs",
+          "index": "monetary"
+        }
+      }
+    }
+  },
+  "scenario": "conversion_and_conversion_plus,var_costs,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[cost_operation_variable_with_export]"
+}

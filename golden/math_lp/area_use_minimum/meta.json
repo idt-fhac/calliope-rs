@@ -1,0 +1,67 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones1/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "area_use_minimum.lp",
+  "math_dict": {
+    "constraints": {
+      "area_use_minimum": {
+        "active": true,
+        "description": "Set the lower bound on a technology's area use for any technology with a non-zero lower bound, with or without integer capacity purchasing.",
+        "equations": [
+          {
+            "expression": "area_use >= area_use_min",
+            "where": "NOT purchased_units"
+          },
+          {
+            "expression": "area_use >= area_use_min * purchased_units",
+            "where": "purchased_units"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "area_use_min"
+      }
+    },
+    "variables": {
+      "area_use": {
+        "active": true,
+        "bounds": {
+          "max": "area_use_max",
+          "min": 0
+        },
+        "default": 0,
+        "description": "The area in space utilised directly (e.g., solar PV panels) or indirectly (e.g., biofuel crops) by a technology. Minimum is set to 0 and handled in a distinct constraint to handle the integer purchase variable.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Area utilisation",
+        "unit": "area",
+        "where": "(area_use_min OR area_use_max OR area_use_per_flow_cap OR sink_unit==per_area OR source_unit==per_area)"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "techs": {
+      "test_supply_elec": {
+        "area_use_min": 5,
+        "area_use_per_flow_cap": 1.5
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours,investment_costs",
+  "test": "tests/math/math_test.py::TestMILPMath::test_math[area_use_minimum]"
+}

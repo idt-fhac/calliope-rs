@@ -1,0 +1,88 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones1/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "storage_capacity_max_purchase_milp.lp",
+  "math_dict": {
+    "constraints": {
+      "storage_capacity_max_purchase_milp": {
+        "active": true,
+        "description": "Set the upper bound on a technology's storage capacity, for any technology with integer capacity purchasing.",
+        "equations": [
+          {
+            "expression": "storage_cap <= storage_cap_max * purchased_units",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "purchased_units AND storage_cap_max"
+      }
+    },
+    "variables": {
+      "purchased_units": {
+        "active": true,
+        "bounds": {
+          "max": "purchased_units_max",
+          "min": "purchased_units_min"
+        },
+        "default": 0,
+        "description": "Integer number of a technology that has been purchased, for any technology set to require integer capacity purchasing. This is used to allow installation of fixed capacity units of technologies ( if `flow_cap_max` == `flow_cap_min`) and/or to set a fixed cost for a technology, irrespective of its installed capacity. On top of a fixed technology cost, a continuous cost for the quantity of installed capacity can still be applied.\nSince technology capacity is no longer a continuous decision variable, it is possible for these technologies to have a lower bound set on outflow/consumption which will only be enforced in those timesteps that the technology is operating. Otherwise, the same lower bound forces the technology to produce/consume that minimum amount of carrier in *every* timestep.",
+        "domain": "integer",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Number of purchased units",
+        "unit": "integer",
+        "where": "cap_method==integer"
+      },
+      "storage_cap": {
+        "active": true,
+        "bounds": {
+          "max": "storage_cap_max",
+          "min": 0
+        },
+        "default": 0,
+        "description": "The upper limit on a carrier that can be stored by a technology in any timestep. Minimum is set to 0 and handled in a distinct constraint to handle the integer purchase variable.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Stored carrier capacity",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_supply_elec": {
+            "storage_cap_max": 200
+          }
+        }
+      }
+    },
+    "techs": {
+      "test_supply_elec": {
+        "include_storage": true
+      }
+    }
+  },
+  "scenario": "supply_milp,two_hours",
+  "test": "tests/math/math_test.py::TestMILPMath::test_math[storage_capacity_max_purchase_milp]"
+}

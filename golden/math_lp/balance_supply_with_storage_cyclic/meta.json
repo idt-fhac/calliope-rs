@@ -1,0 +1,148 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "balance_supply_with_storage_cyclic.lp",
+  "math_dict": {
+    "constraints": {
+      "balance_supply_with_storage": {
+        "active": true,
+        "description": "Fix the outflow of a `supply` technology to its consumption of the available source, with a storage buffer to temporally offset the outflow from source consumption.",
+        "equations": [
+          {
+            "expression": "storage == $storage_previous_step + source_use * source_eff - flow_out_inc_eff",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {
+          "storage_previous_step": [
+            {
+              "expression": "storage_initial * storage_cap",
+              "where": "timesteps==get_val_at_index(timesteps=0) AND NOT cyclic_storage==True"
+            },
+            {
+              "expression": "(1 - storage_loss) ** roll(timestep_resolution, timesteps=1) * roll(storage, timesteps=1)",
+              "where": "(\n  (timesteps==get_val_at_index(timesteps=0) AND cyclic_storage==True)\n  OR NOT timesteps==get_val_at_index(timesteps=0)\n) AND NOT cluster_first_timestep==True"
+            },
+            {
+              "expression": "(1 - storage_loss) ** select_from_lookup_arrays(timestep_resolution, timesteps=lookup_cluster_last_timestep) * select_from_lookup_arrays(storage, timesteps=lookup_cluster_last_timestep)",
+              "where": "cluster_first_timestep==True AND NOT (timesteps==get_val_at_index(timesteps=0) AND NOT cyclic_storage==True)"
+            }
+          ]
+        },
+        "title": "",
+        "where": "carrier_out AND storage AND base_tech==supply"
+      }
+    },
+    "global_expressions": {
+      "flow_out_inc_eff": {
+        "active": true,
+        "default": 0,
+        "description": "Outflows after taking efficiency losses into account.",
+        "equations": [
+          {
+            "expression": "flow_out / (\n  flow_out_eff * flow_out_parasitic_eff *\n  flow_out_eff_per_distance ** distance\n)",
+            "where": "base_tech==transmission"
+          },
+          {
+            "expression": "flow_out / (flow_out_eff * flow_out_parasitic_eff)",
+            "where": "NOT base_tech==transmission"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Carrier outflow including losses",
+        "unit": "energy",
+        "where": "flow_out"
+      }
+    },
+    "variables": {
+      "source_use": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The carrier flow consumed from outside the system boundaries by a `supply` technology.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "title": "Source flow use",
+        "unit": "energy",
+        "where": "base_tech==supply"
+      },
+      "storage": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The carrier stored by a `storage` technology in each timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "title": "Stored carrier",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      },
+      "storage_cap": {
+        "active": true,
+        "bounds": {
+          "max": "storage_cap_max",
+          "min": "storage_cap_min"
+        },
+        "default": 0,
+        "description": "The upper limit on a carrier that can be stored by a technology in any timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Stored carrier capacity",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_supply_plus": {
+            "cyclic_storage": true
+          }
+        }
+      }
+    }
+  },
+  "scenario": "simple_supply_plus,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[balance_supply_with_storage_cyclic]"
+}

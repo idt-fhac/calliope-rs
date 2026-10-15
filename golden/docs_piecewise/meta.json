@@ -1,0 +1,226 @@
+{
+  "fixture": {
+    "name": "docs_piecewise",
+    "model": "src/calliope/example_models/national_scale/model.yaml",
+    "scenario": null,
+    "override_dict": {
+      "data_definitions": {
+        "capacity_steps": {
+          "data": [
+            0,
+            2500,
+            5000,
+            7500,
+            10000
+          ],
+          "index": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "dims": "breakpoints"
+        },
+        "cost_steps": {
+          "data": [
+            0,
+            3750000.0,
+            6000000.0,
+            7500000.0,
+            8000000.0
+          ],
+          "index": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "dims": "breakpoints"
+        }
+      },
+      "config.build.backend": "pyomo",
+      "config.solve.solver": "cbc"
+    },
+    "math_dict": {
+      "piecewise_math": {
+        "dimensions": {
+          "breakpoints": {
+            "dtype": "integer",
+            "ordered": true,
+            "iterator": "breakpoint"
+          }
+        },
+        "parameters": {
+          "capacity_steps": {
+            "description": "Capacity at each piecewise curve breakpoint",
+            "unit": "power"
+          },
+          "cost_steps": {
+            "description": "Investment cost at each piecewise curve breakpoint",
+            "unit": "cost"
+          }
+        },
+        "variables": {
+          "piecewise_cost_investment": {
+            "description": "Investment cost that increases monotonically",
+            "foreach": [
+              "nodes",
+              "techs",
+              "carriers",
+              "costs"
+            ],
+            "where": "[csp] in techs",
+            "bounds": {
+              "min": 0,
+              "max": Infinity
+            },
+            "default": 0,
+            "unit": "cost"
+          }
+        },
+        "global_expressions": {
+          "cost_investment_flow_cap": {
+            "where": "(flow_cap AND (cost_flow_cap OR cost_flow_cap_per_distance)) OR piecewise_cost_investment",
+            "equations": [
+              {
+                "expression": "$cost_sum * flow_cap",
+                "where": "NOT [csp] in techs"
+              },
+              {
+                "expression": "piecewise_cost_investment",
+                "where": "[csp] in techs"
+              }
+            ]
+          }
+        },
+        "piecewise_constraints": {
+          "csp_piecewise_costs": {
+            "description": "Set investment costs values along a piecewise curve using special ordered sets of type 2 (SOS2).",
+            "foreach": [
+              "nodes",
+              "techs",
+              "carriers",
+              "costs"
+            ],
+            "where": "piecewise_cost_investment",
+            "x_expression": "flow_cap",
+            "x_values": "capacity_steps",
+            "y_expression": "piecewise_cost_investment",
+            "y_values": "cost_steps"
+          }
+        }
+      }
+    },
+    "init_kwargs": {
+      "extra_math": [
+        "piecewise_math"
+      ]
+    },
+    "solve_kwargs": {
+      "solver_options": {}
+    },
+    "backend": "pyomo",
+    "solver": "cbc",
+    "numpy_seed": 0,
+    "notes": "HiGHS backend lacks piecewise constraints; Pyomo backend + CBC"
+  },
+  "versions": {
+    "python": "3.14.7",
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "xarray": "2026.9.0",
+    "pandas": "3.0.6",
+    "numpy": "2.5.3",
+    "pyparsing": "3.3.2",
+    "pyomo": "6.10.1",
+    "highs": "1.15.1"
+  },
+  "errors": {},
+  "lp_names": "verbose",
+  "objective_name": "min_cost_optimisation",
+  "objectives": {
+    "min_cost_optimisation": 275911.52053239144
+  },
+  "termination_condition": "optimal",
+  "timings": {
+    "stages": {
+      "preprocess": {
+        "wall_s": 1.0743546411395073,
+        "peak_rss_mb": 201.0390625,
+        "start_rss_mb": 156.90625,
+        "share": 0.1348814452173456
+      },
+      "build": {
+        "wall_s": 4.523340864107013,
+        "peak_rss_mb": 210.875,
+        "start_rss_mb": 176.26953125,
+        "share": 0.5678895306993942
+      },
+      "solve": {
+        "wall_s": 0.8824900910258293,
+        "peak_rss_mb": 223.67578125,
+        "start_rss_mb": 212.1484375,
+        "wall_s_incl_postprocess": 1.8034680467098951,
+        "share": 0.11079352600115425
+      },
+      "write": {
+        "wall_s": 0.5640138629823923,
+        "peak_rss_mb": 224.05859375,
+        "start_rss_mb": 223.67578125,
+        "share": 0.07080995608767936
+      },
+      "postprocess": {
+        "wall_s": 0.9209779556840658,
+        "nested_in": "solve",
+        "share": 0.11562554199442665
+      }
+    },
+    "total_wall_s": 7.9651774149388075,
+    "process_peak_rss_mb": 223.46484375,
+    "events": [
+      {
+        "kind": "model_build",
+        "t": 5.947255,
+        "wall_s": 4.523116251453757,
+        "rss_mb": 210.85546875
+      },
+      {
+        "kind": "load_results",
+        "t": 8.24905,
+        "wall_s": 0.9209779556840658,
+        "rss_mb": 223.63671875
+      },
+      {
+        "kind": "backend_solve",
+        "t": 8.251758,
+        "wall_s": 1.789475355297327,
+        "rss_mb": 223.63671875
+      }
+    ]
+  },
+  "runtime_timings": {
+    "root": {
+      "preprocess_start": 1792022157.0029,
+      "init_complete": 1792022157.88443,
+      "build_start": 1792022158.235007,
+      "build_complete": 1792022162.757931,
+      "solve_start": 1792022163.273001,
+      "solver_exit": 1792022165.062717,
+      "postprocess_complete": 1792022165.075394,
+      "solve_complete": 1792022165.075468
+    }
+  },
+  "sizes": {
+    "dims": {
+      "breakpoints": 5,
+      "costs": 1,
+      "nodes": 5,
+      "techs": 8,
+      "carriers": 1,
+      "timesteps": 120
+    },
+    "n_results_vars": 30
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "storage_discharge_depth_limit.lp",
+  "math_dict": {
+    "constraints": {
+      "storage_discharge_depth_limit": {
+        "active": true,
+        "description": "Set the lower bound of the stored carrier a technology must keep in reserve at all times.",
+        "equations": [
+          {
+            "expression": "storage - storage_discharge_depth * storage_cap >= 0",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "storage AND storage_discharge_depth"
+      }
+    },
+    "parameters": {
+      "storage_discharge_depth": {
+        "active": true,
+        "default": 0,
+        "description": "Defines the minimum level of storage state of charge, as a fraction of total storage capacity.",
+        "resample_method": "mean",
+        "title": "Storage depth of discharge.",
+        "unit": "unitless."
+      }
+    },
+    "variables": {
+      "storage": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The carrier stored by a `storage` technology in each timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "title": "Stored carrier",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      },
+      "storage_cap": {
+        "active": true,
+        "bounds": {
+          "max": "storage_cap_max",
+          "min": "storage_cap_min"
+        },
+        "default": 0,
+        "description": "The upper limit on a carrier that can be stored by a technology in any timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Stored carrier capacity",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_storage": {
+            "storage_discharge_depth": 0.2
+          }
+        }
+      }
+    }
+  },
+  "scenario": "simple_storage,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[storage_discharge_depth_limit]"
+}

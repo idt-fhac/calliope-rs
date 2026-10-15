@@ -1,0 +1,126 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones1/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "flow_out_min_milp.lp",
+  "math_dict": {
+    "constraints": {
+      "flow_out_min_milp": {
+        "active": true,
+        "description": "Set the lower bound of a technology's ability to produce carriers, for any technology using integer units to define its capacity.",
+        "equations": [
+          {
+            "expression": "flow_out >= operating_units * timestep_resolution * flow_cap_per_unit * flow_out_min_relative",
+            "where": "flow_cap_per_unit"
+          },
+          {
+            "expression": "flow_out >= available_flow_cap * timestep_resolution * flow_out_min_relative",
+            "where": "available_flow_cap"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "flow_out AND operating_units AND flow_out_min_relative"
+      }
+    },
+    "parameters": {
+      "flow_cap_per_unit": {
+        "active": true,
+        "default": Infinity,
+        "description": "Set the capacity of each integer unit of a technology purchased, if `cap_method` is `integer`.",
+        "resample_method": "first",
+        "title": "Flow capacity per purchased unit",
+        "unit": "$\\frac{\\text{power}}{\\text{unit}}$"
+      },
+      "flow_out_min_relative": {
+        "active": true,
+        "default": 0,
+        "description": "Set to a value between 0 and 1 to force minimum `flow_out` as a fraction of the technology rated capacity. If non-zero and `cap_method` is `continuous`, this will force the technology to operate above its minimum value at every timestep.",
+        "resample_method": "mean",
+        "title": "Minimum outflow",
+        "unit": "unitless."
+      }
+    },
+    "variables": {
+      "available_flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "Flow capacity that will be set to zero if the technology is not operating in a given timestep and will be set to the value of the decision variable `flow_cap` otherwise. This is useful when you want to set a minimum flow capacity for any technology investment, but also want to allow the model to decide the capacity. It is expected to only be used when `purchased_units_max == 1`, i.e., the `purchased_units` decision variable is binary. If `purchased_units_max > 1`, you may get strange results and should instead use the less flexible `flow_cap_per_unit`.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Available carrier flow capacity",
+        "unit": "power",
+        "where": "flow_cap AND integer_dispatch==True AND flow_cap_max AND NOT flow_cap_per_unit"
+      },
+      "flow_out": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The outflow of a technology per timestep, also known as the flow discharged (from `storage` technologies) or the flow received (by `transmission` technologies) on a link.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Carrier outflow",
+        "unit": "energy",
+        "where": "carrier_out AND not (one_way AND map_dim(nodes, link_from)==True)"
+      },
+      "operating_units": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "Integer number of a technology that is operating in each timestep, for any technology set to require integer capacity purchasing.",
+        "domain": "integer",
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "title": "Number of operating units",
+        "unit": "integer",
+        "where": "integer_dispatch==True AND cap_method==integer"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "techs": {
+      "test_supply_elec": {
+        "flow_cap_per_unit": 10,
+        "flow_out_min_relative": 0.2
+      }
+    }
+  },
+  "scenario": "supply_milp,two_hours",
+  "test": "tests/math/math_test.py::TestMILPMath::test_math[flow_out_min_milp]"
+}

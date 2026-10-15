@@ -1,0 +1,4906 @@
+{
+ "fixtures": {
+  "docs_modes_base": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 577435,
+     "sha256": "934b78f215bfcb2f35b2aa1d5f21e6bcddd4ffb2b71b6932babffd4b7c135097"
+    },
+    "inputs.nc": {
+     "bytes": 361323,
+     "sha256": "e4dea57c672dbbf39985873d761d478b3e1ac5bb8b69c05068556a082a090ed4"
+    },
+    "pyomo.lp": {
+     "bytes": 4519049,
+     "sha256": "3932ebfcf3cef9ddff401843fc111e59b9aff43b71b7551542b9b372d88753dd"
+    },
+    "results.nc": {
+     "bytes": 580590,
+     "sha256": "5eb51ecbf71a3e3d588fe16c03aee78c2b43cc8bcf82ad6a29e21ada745c8697"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 559525.0280058957
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "docs_piecewise": {
+   "expected_error": null,
+   "files": {
+    "inputs.nc": {
+     "bytes": 370230,
+     "sha256": "29c1c9acd7518d8cbd721460d788a23af15f2cfa8bb099068b58e5e7c0986047"
+    },
+    "pyomo.lp": {
+     "bytes": 2269089,
+     "sha256": "dc82e7970773957944a9b53dec074d59b598233857bb3d367106c6af7cc8dc8e"
+    },
+    "results.nc": {
+     "bytes": 577503,
+     "sha256": "51940965eda3a78c80ffe2dece443dd143f297ffaee2b6b4b00b602348ad9e6c"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 275911.52053239144
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 284780,
+     "sha256": "b9d911c488aae626a77a369c86a8356c2ae8fc6345c6d12e5d2ef242e2f87c3d"
+    },
+    "inputs.nc": {
+     "bytes": 354923,
+     "sha256": "89b054ce26ffb986f08b59e9f0c75beda97ad007cdcb8ee100c3d89f96f54265"
+    },
+    "pyomo.lp": {
+     "bytes": 2261125,
+     "sha256": "ad9426a62655004ef52c83d5357143ba79bd7f99c44f132c7b503dfdfc84d1e8"
+    },
+    "results.nc": {
+     "bytes": 555974,
+     "sha256": "5cf6b9958b8906015eaa26ad54d6ef66628e40a1e16e64649acb85b990623447"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 277048.47863920795
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_capacity_factor": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 284780,
+     "sha256": "b9d911c488aae626a77a369c86a8356c2ae8fc6345c6d12e5d2ef242e2f87c3d"
+    },
+    "inputs.nc": {
+     "bytes": 364419,
+     "sha256": "121e3e252ee1aef98c0ce020bcaa0176112a30c4d70fcd6d616539542e50cdac"
+    },
+    "pyomo.lp": {
+     "bytes": 2261125,
+     "sha256": "ad9426a62655004ef52c83d5357143ba79bd7f99c44f132c7b503dfdfc84d1e8"
+    },
+    "results.nc": {
+     "bytes": 567216,
+     "sha256": "9f492ed3b2dd0383056578b3b5e032046f34a44566987d00282e6f943a4184ee"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 277048.47863920795
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_check_feasibility": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 44195,
+     "sha256": "53fca678a5ad9e7fd07e85246bfa8d72b9df2dd09e34a5e5cc8d2c445db0a214"
+    },
+    "inputs.nc": {
+     "bytes": 349355,
+     "sha256": "46d6fe9746d32b352d71ba301d559b29503810c7d94db117ab26133acc566720"
+    },
+    "pyomo.lp": {
+     "bytes": 36,
+     "sha256": "8a381852415ee1577a6431510fc8ae4f27565079de66f2cec51c9b78a259d5df"
+    },
+    "results.nc": {
+     "bytes": 513711,
+     "sha256": "813bd4e10c0bcdda6e9ad4985f08bacf42d240ddd3091f95aec806d1f824d41c"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 254837.99011411204
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_cold_fusion": {
+   "expected_error": {
+    "message": "'cost_dim_setter'",
+    "type": "KeyError"
+   },
+   "files": {},
+   "objectives": null,
+   "termination_condition": null,
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_maximize_utility": {
+   "expected_error": {
+    "message": "9 validation errors for CalliopeAttrs\ndefinition.data_definitions.objective_cost_weights.str\n  Input should be a valid string [type=string_type, input_value={'data': {'utility': -1, 'monetary': 0}}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_type\ndefinition.data_definitions.objective_cost_weights.bool\n  Input should be a valid boolean [type=bool_type, input_value={'data': {'utility': -1, 'monetary': 0}}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/bool_type\ndefinition.data_definitions.objective_cost_weights.int\n  Input should be a valid integer [type=int_type, input_value={'data': {'utility': -1, 'monetary': 0}}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type\ndefinition.data_definitions.objective_cost_weights.float\n  Input should be a valid number [type=float_type, input_value={'data': {'utility': -1, 'monetary': 0}}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/float_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.str\n  Input should be a valid string [type=string_type, input_value={'utility': -1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.bool\n  Input should be a valid boolean [type=bool_type, input_value={'utility': -1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/bool_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.int\n  Input should be a valid integer [type=int_type, input_value={'utility': -1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.float\n  Input should be a valid number [type=float_type, input_value={'utility': -1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/float_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.list[nullable[union[str,bool,int,float]]]\n  Input should be a valid list [type=list_type, input_value={'utility': -1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type",
+    "type": "ValidationError"
+   },
+   "files": {},
+   "objectives": null,
+   "termination_condition": null,
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_minimize_emissions": {
+   "expected_error": {
+    "message": "9 validation errors for CalliopeAttrs\ndefinition.data_definitions.objective_cost_weights.str\n  Input should be a valid string [type=string_type, input_value={'data': {'emissions': 1, 'monetary': 0}}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_type\ndefinition.data_definitions.objective_cost_weights.bool\n  Input should be a valid boolean [type=bool_type, input_value={'data': {'emissions': 1, 'monetary': 0}}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/bool_type\ndefinition.data_definitions.objective_cost_weights.int\n  Input should be a valid integer [type=int_type, input_value={'data': {'emissions': 1, 'monetary': 0}}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type\ndefinition.data_definitions.objective_cost_weights.float\n  Input should be a valid number [type=float_type, input_value={'data': {'emissions': 1, 'monetary': 0}}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/float_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.str\n  Input should be a valid string [type=string_type, input_value={'emissions': 1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.bool\n  Input should be a valid boolean [type=bool_type, input_value={'emissions': 1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/bool_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.int\n  Input should be a valid integer [type=int_type, input_value={'emissions': 1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.float\n  Input should be a valid number [type=float_type, input_value={'emissions': 1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/float_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.list[nullable[union[str,bool,int,float]]]\n  Input should be a valid list [type=list_type, input_value={'emissions': 1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type",
+    "type": "ValidationError"
+   },
+   "files": {},
+   "objectives": null,
+   "termination_condition": null,
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_operate": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 34177,
+     "sha256": "d4b3f9b02254962ace645b265aad34caa391e1eaaf3e2abf78d5f4c86ff73ebe"
+    },
+    "inputs.nc": {
+     "bytes": 381101,
+     "sha256": "560af44dbfef134a2784e8fb4fc28b41feccb23682612c779af6283f36d1c76c"
+    },
+    "pyomo.lp": {
+     "bytes": 143868,
+     "sha256": "a1d509ddea24cc0785628cd95a267b3c8f7068128ec61bdbdcb9ee1dfe4647f3"
+    },
+    "results.nc": {
+     "bytes": 548911,
+     "sha256": "2877484a7cf033350131d92660016bbae255290610c7dd1888dd1a9832cd099c"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": [
+     23044.269414389262,
+     23044.269414389262,
+     23044.269414389262,
+     23044.269414389262,
+     23044.269414389262,
+     23044.269414389262,
+     23044.269414389262,
+     23044.269414389262,
+     23044.269414389262,
+     23044.269414389262,
+     23044.269414389262,
+     23044.269414389262,
+     25073.73850995564,
+     25073.73850995564,
+     25073.73850995564,
+     25073.73850995564,
+     25073.73850995564,
+     25073.73850995564,
+     25073.73850995564,
+     25073.73850995564,
+     25073.73850995564,
+     25073.73850995564,
+     25073.73850995564,
+     25073.73850995564,
+     26851.68071286204,
+     26851.68071286204,
+     26851.68071286204,
+     26851.68071286204,
+     26851.68071286204,
+     26851.68071286204,
+     26851.68071286204,
+     26851.68071286204,
+     26851.68071286204,
+     26851.68071286204,
+     26851.68071286204,
+     26851.68071286204,
+     28220.170031050533,
+     28220.170031050533,
+     28220.170031050533,
+     28220.170031050533,
+     28220.170031050533,
+     28220.170031050533,
+     28220.170031050533,
+     28220.170031050533,
+     28220.170031050533,
+     28220.170031050533,
+     28220.170031050533,
+     28220.170031050533,
+     28041.882373742246,
+     28041.882373742246,
+     28041.882373742246,
+     28041.882373742246,
+     28041.882373742246,
+     28041.882373742246,
+     28041.882373742246,
+     28041.882373742246,
+     28041.882373742246,
+     28041.882373742246,
+     28041.882373742246,
+     28041.882373742246,
+     28949.368960043892,
+     28949.368960043892,
+     28949.368960043892,
+     28949.368960043892,
+     28949.368960043892,
+     28949.368960043892,
+     28949.368960043892,
+     28949.368960043892,
+     28949.368960043892,
+     28949.368960043892,
+     28949.368960043892,
+     28949.368960043892,
+     3552638580.2645917,
+     3552638580.2645917,
+     3552638580.2645917,
+     3552638580.2645917,
+     3552638580.2645917,
+     3552638580.2645917,
+     3552638580.2645917,
+     3552638580.2645917,
+     3552638580.2645917,
+     3552638580.2645917,
+     3552638580.2645917,
+     3552638580.2645917,
+     8179208966.626823,
+     8179208966.626823,
+     8179208966.626823,
+     8179208966.626823,
+     8179208966.626823,
+     8179208966.626823,
+     8179208966.626823,
+     8179208966.626823,
+     8179208966.626823,
+     8179208966.626823,
+     8179208966.626823,
+     8179208966.626823,
+     10060973516.379368,
+     10060973516.379368,
+     10060973516.379368,
+     10060973516.379368,
+     10060973516.379368,
+     10060973516.379368,
+     10060973516.379368,
+     10060973516.379368,
+     10060973516.379368,
+     10060973516.379368,
+     10060973516.379368,
+     10060973516.379368,
+     6732440802.274576,
+     6732440802.274576,
+     6732440802.274576,
+     6732440802.274576,
+     6732440802.274576,
+     6732440802.274576,
+     6732440802.274576,
+     6732440802.274576,
+     6732440802.274576,
+     6732440802.274576,
+     6732440802.274576,
+     6732440802.274576,
+     27520.87057456739,
+     27520.87057456739,
+     27520.87057456739,
+     27520.87057456739,
+     27520.87057456739,
+     27520.87057456739,
+     27520.87057456739,
+     27520.87057456739,
+     27520.87057456739,
+     27520.87057456739,
+     27520.87057456739,
+     27520.87057456739,
+     27392.868233524154,
+     27392.868233524154,
+     27392.868233524154,
+     27392.868233524154,
+     27392.868233524154,
+     27392.868233524154,
+     27392.868233524154,
+     27392.868233524154,
+     27392.868233524154,
+     27392.868233524154,
+     27392.868233524154,
+     27392.868233524154,
+     26632.081869764137,
+     26632.081869764137,
+     26632.081869764137,
+     26632.081869764137,
+     26632.081869764137,
+     26632.081869764137,
+     26632.081869764137,
+     26632.081869764137,
+     26632.081869764137,
+     26632.081869764137,
+     26632.081869764137,
+     26632.081869764137,
+     25867.153696214667,
+     25867.153696214667,
+     25867.153696214667,
+     25867.153696214667,
+     25867.153696214667,
+     25867.153696214667,
+     25867.153696214667,
+     25867.153696214667,
+     25867.153696214667,
+     25867.153696214667,
+     25867.153696214667,
+     25867.153696214667,
+     25326.94436161915,
+     25326.94436161915,
+     25326.94436161915,
+     25326.94436161915,
+     25326.94436161915,
+     25326.94436161915,
+     25326.94436161915,
+     25326.94436161915,
+     25326.94436161915,
+     25326.94436161915,
+     25326.94436161915,
+     25326.94436161915,
+     27814.73530965685,
+     27814.73530965685,
+     27814.73530965685,
+     27814.73530965685,
+     27814.73530965685,
+     27814.73530965685,
+     27814.73530965685,
+     27814.73530965685,
+     27814.73530965685,
+     27814.73530965685,
+     27814.73530965685,
+     27814.73530965685,
+     5538410759.687248,
+     5538410759.687248,
+     5538410759.687248,
+     5538410759.687248,
+     5538410759.687248,
+     5538410759.687248,
+     5538410759.687248,
+     5538410759.687248,
+     5538410759.687248,
+     5538410759.687248,
+     5538410759.687248,
+     5538410759.687248,
+     16388724249.353146,
+     16388724249.353146,
+     16388724249.353146,
+     16388724249.353146,
+     16388724249.353146,
+     16388724249.353146,
+     16388724249.353146,
+     16388724249.353146,
+     16388724249.353146,
+     16388724249.353146,
+     16388724249.353146,
+     16388724249.353146,
+     19495523761.28471,
+     19495523761.28471,
+     19495523761.28471,
+     19495523761.28471,
+     19495523761.28471,
+     19495523761.28471,
+     19495523761.28471,
+     19495523761.28471,
+     19495523761.28471,
+     19495523761.28471,
+     19495523761.28471,
+     19495523761.28471,
+     9719630691.893541,
+     9719630691.893541,
+     9719630691.893541,
+     9719630691.893541,
+     9719630691.893541,
+     9719630691.893541,
+     9719630691.893541,
+     9719630691.893541,
+     9719630691.893541,
+     9719630691.893541,
+     9719630691.893541,
+     9719630691.893541
+    ]
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_reserve_margin": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 284780,
+     "sha256": "b9d911c488aae626a77a369c86a8356c2ae8fc6345c6d12e5d2ef242e2f87c3d"
+    },
+    "inputs.nc": {
+     "bytes": 358826,
+     "sha256": "16566d519e4bfe427cc7613bde1e05343d93abcf5f0345fdbc571b1011502b73"
+    },
+    "pyomo.lp": {
+     "bytes": 2261125,
+     "sha256": "ad9426a62655004ef52c83d5357143ba79bd7f99c44f132c7b503dfdfc84d1e8"
+    },
+    "results.nc": {
+     "bytes": 559877,
+     "sha256": "96b4c75de791d60f7f850fae0a400d4eaefc3f3f6e582a98993d97c0bbb221ec"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 277048.47863920795
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_spores_evolving_average": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 577435,
+     "sha256": "934b78f215bfcb2f35b2aa1d5f21e6bcddd4ffb2b71b6932babffd4b7c135097"
+    },
+    "inputs.nc": {
+     "bytes": 368199,
+     "sha256": "abb9dadbd5b6c5d79312e03b04571682292a8c33dc4e8fedd9c9849ecfd6c9e8"
+    },
+    "pyomo.lp": {
+     "bytes": 4519049,
+     "sha256": "3932ebfcf3cef9ddff401843fc111e59b9aff43b71b7551542b9b372d88753dd"
+    },
+    "results.nc": {
+     "bytes": 721735,
+     "sha256": "4bb95806e13ec9801aca833965e25d059e504527ee5ac86ef5953336276bf73d"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": [
+     559525.0280058957,
+     839287.5420088434,
+     839287.5420088436,
+     839287.5420088416
+    ],
+    "min_spores": [
+     0.0,
+     33179646.53594771,
+     23220827.635113504,
+     179759.2988521482
+    ]
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_spores_integer": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 577435,
+     "sha256": "934b78f215bfcb2f35b2aa1d5f21e6bcddd4ffb2b71b6932babffd4b7c135097"
+    },
+    "inputs.nc": {
+     "bytes": 368199,
+     "sha256": "277ca0488d5e05f6413a1cc2829dc9e2731839979c006b51317b4b765afacb73"
+    },
+    "pyomo.lp": {
+     "bytes": 4519049,
+     "sha256": "3932ebfcf3cef9ddff401843fc111e59b9aff43b71b7551542b9b372d88753dd"
+    },
+    "results.nc": {
+     "bytes": 726900,
+     "sha256": "c6789dc0d7d28e1f3a754a056d06971f24c4df2bca599710e4b5e968da87f6cc"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": [
+     559525.0280058957,
+     839287.5420088434,
+     839287.5420088369,
+     839287.5420088429
+    ],
+    "min_spores": [
+     0.0,
+     33179646.53594771,
+     67723363.76470588,
+     110642260.31884594
+    ]
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_spores_random": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 577435,
+     "sha256": "934b78f215bfcb2f35b2aa1d5f21e6bcddd4ffb2b71b6932babffd4b7c135097"
+    },
+    "inputs.nc": {
+     "bytes": 368199,
+     "sha256": "307ec8b81df77a1d843c6f0ab9c2a1a76f1f5b2bfef4036f08b5b68f1addfcb0"
+    },
+    "pyomo.lp": {
+     "bytes": 4519049,
+     "sha256": "3932ebfcf3cef9ddff401843fc111e59b9aff43b71b7551542b9b372d88753dd"
+    },
+    "results.nc": {
+     "bytes": 734489,
+     "sha256": "a7311afff9c1ca22c6935e51d5976f95658f3b7391ea597ac08bd6812f1c24cc"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": [
+     559525.0280058957,
+     839287.5420088434,
+     839287.5420088423,
+     839287.5420088439
+    ],
+    "min_spores": [
+     0.0,
+     34179646.53594771,
+     58303816.163396426,
+     100295424.13568467
+    ]
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_spores_relative_deployment": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 577435,
+     "sha256": "934b78f215bfcb2f35b2aa1d5f21e6bcddd4ffb2b71b6932babffd4b7c135097"
+    },
+    "inputs.nc": {
+     "bytes": 368199,
+     "sha256": "add5eb71505d20a63c862f4fcc54e1ac7582ce772bb07b11f94f24b7f5c5870f"
+    },
+    "pyomo.lp": {
+     "bytes": 4519049,
+     "sha256": "3932ebfcf3cef9ddff401843fc111e59b9aff43b71b7551542b9b372d88753dd"
+    },
+    "results.nc": {
+     "bytes": 723965,
+     "sha256": "9377b4ef29fd0bf813aec88e826db718c72a4cfed8eadf76e25e1ccd48b4044b"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": [
+     559525.0280058957,
+     839287.5420088456,
+     839287.5420088415,
+     839287.5420088422
+    ],
+    "min_spores": [
+     0.0,
+     30666.462720244035,
+     65733.23955112424,
+     97862.70706841025
+    ]
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_time_clustering": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 580765,
+     "sha256": "8d835d3db6632b5cba48dd853f39345a739721cdda6f58aec69575e7885cada6"
+    },
+    "inputs.nc": {
+     "bytes": 411693,
+     "sha256": "d39d8b8b428526f724f7543150b97eccc79671af8fb514b99c40d61d3c3d13a7"
+    },
+    "pyomo.lp": {
+     "bytes": 4524977,
+     "sha256": "5cec199eea5c17b3c35f5addadafae5a45b6a5690bb9fc51539e02e2547dac0f"
+    },
+    "results.nc": {
+     "bytes": 635494,
+     "sha256": "a7831e6f83c2a505f064ee6a68937bc6eb8e5de661d71f918b3acc0e1052e435"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 342848650171.91986
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "national_scale_time_resampling": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 308205,
+     "sha256": "68e737624b1735ab6a96ed1f833c59fe958452553d294001d06dcd69fc94851d"
+    },
+    "inputs.nc": {
+     "bytes": 356018,
+     "sha256": "98d8dbddcbe4b428ea44f68180a7878f9dbe4c7899107531187787a0084cb007"
+    },
+    "pyomo.lp": {
+     "bytes": 2354635,
+     "sha256": "9ee0278ebd1da7434080c025bc9fd1b13a470ce08bce2790392db7a3c362ce62"
+    },
+    "results.nc": {
+     "bytes": 563106,
+     "sha256": "d50596e8702709c70fa3d7ddebef4455d00f656f0a1b12ed71a9aaa12db4b11f"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 1822788.6073297148
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__conversion_and_conversion_plus__two_hours": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 1570,
+     "sha256": "8f21bb1ebabbeef304427ba380a9f5479553fb1ca0acf61b50ecfb9cf0a1f9d3"
+    },
+    "inputs.nc": {
+     "bytes": 228644,
+     "sha256": "7ed5672806d43ab194bd5db9e996f2aad5190fc57907e1aa262e7ac565959c91"
+    },
+    "pyomo.lp": {
+     "bytes": 15068,
+     "sha256": "8c142e359f42b603c3e7bc4af9cf436edd2ab84a084264fe5b733849e3dfc026"
+    },
+    "results.nc": {
+     "bytes": 234237,
+     "sha256": "68ea1ca1f10e3be46cf28ca3681619cbe1149dce2ff7bcfab6d202ff557f4f19"
+    }
+   },
+   "objectives": {},
+   "termination_condition": "infeasible",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__conversion_milp__two_hours": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 1297,
+     "sha256": "681f5b86cd6d54550027e7690c723c90f0f12ca45e0b3b93c55316ca198db8ce"
+    },
+    "inputs.nc": {
+     "bytes": 249119,
+     "sha256": "c6f7103ed93791d16fbd88abd81e5d7f1bdc2251f9c30abb9ec4844522a28393"
+    },
+    "pyomo.lp": {
+     "bytes": 12205,
+     "sha256": "e8dd4b6020b1bb51f5748a948245773c8bc98e6ca254809eb1eec466aad421db"
+    },
+    "results.nc": {
+     "bytes": 254566,
+     "sha256": "f336a9f45ae10e3845f9e48ac864c9ae666a21b388cfdb015f3b7e657a00a487"
+    }
+   },
+   "objectives": {},
+   "termination_condition": "infeasible",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__fuel_distribution__two_hours": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 2030,
+     "sha256": "9884ddcefb356a96326b495933023c8622fb743188a7927f7001c44ef563835c"
+    },
+    "inputs.nc": {
+     "bytes": 237938,
+     "sha256": "8d44c042bee01a9cf801c02d8db98f117bcfd2fd793f54ee9a2d4cb756e9e25a"
+    },
+    "pyomo.lp": {
+     "bytes": 19023,
+     "sha256": "559bd339e97a97d24312de9db2dcce55caafdcc92372911be25138c9854ffaf7"
+    },
+    "results.nc": {
+     "bytes": 338013,
+     "sha256": "ae6330c7a2ff396cbc6c2509065c65ea8163559e20c75a2627091799b3445f44"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 11.11111111111111
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__simple_chp__two_hours": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 1146,
+     "sha256": "4ebb8f1969e68349983b4fee55d7cf4feecb2f0cf9a420e9882e2eff0460695f"
+    },
+    "inputs.nc": {
+     "bytes": 223997,
+     "sha256": "9007ab53fb5061654ef14749251547eb64ee88d9b3355f787e0916ab65445967"
+    },
+    "pyomo.lp": {
+     "bytes": 10631,
+     "sha256": "c6e84bdf067aa94503ea52c48c0ec0ba06c568466ccabeaa8253ebc8fed865c2"
+    },
+    "results.nc": {
+     "bytes": 229444,
+     "sha256": "f71507ec7f7a8d353564b3b1df3051dd7e20dcc37fa60614cd5ea7eedb5fb3dd"
+    }
+   },
+   "objectives": {},
+   "termination_condition": "infeasible",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__simple_conversion__two_hours__investment_costs": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 2918,
+     "sha256": "4e748080fb173d80016975fa8659860c73e8018e62718e95296117948c973abc"
+    },
+    "inputs.nc": {
+     "bytes": 257048,
+     "sha256": "10001676fff957f6970138aca3cf94fea9940cdf62c3ec1ac82e23df8d446f88"
+    },
+    "pyomo.lp": {
+     "bytes": 26174,
+     "sha256": "1cd837f9cd7be8694407b77d2a41820569fcedf8210859dd10540a03ed21bfaf"
+    },
+    "results.nc": {
+     "bytes": 372469,
+     "sha256": "3355eed851fa7f340cd93fd5cb85029bffb04b6fa082e73ce3c384130dea3202"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 0.002515252789726503
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__simple_storage__two_hours__investment_costs": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 2388,
+     "sha256": "e660a056d03f6ce81da62d81e1492e43cf3884a1897774bd4472aff96ed7670e"
+    },
+    "inputs.nc": {
+     "bytes": 270230,
+     "sha256": "12b7616cc265084595880d5b8989a05636e7ccd3f06347a548532764eec99182"
+    },
+    "pyomo.lp": {
+     "bytes": 21868,
+     "sha256": "fa3f543091ee9ae0734a4d959083425ba21e73dd8aa8ef3b62b727a7caeabd65"
+    },
+    "results.nc": {
+     "bytes": 395062,
+     "sha256": "6ca9d2e8332ac669a912e63bd5bf70e4c69c76d9f94b5c894240f9965c3175de"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 0.0025152527897265024
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__simple_supply__one_day": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 17564,
+     "sha256": "c974ed3f10ca43b71a2347710946450e21d9087149650a8eaeae8947fb2b2e2e"
+    },
+    "inputs.nc": {
+     "bytes": 233326,
+     "sha256": "da7bc6edd57e3f87aa892c2f52c65f6be85edbbb1cf8fda0f3ded481e9ecc91e"
+    },
+    "pyomo.lp": {
+     "bytes": 170538,
+     "sha256": "34b88e4bf7001da4165f5098cebd3f14be3bcacd5dd0b96fcc7562b805b0d7bd"
+    },
+    "results.nc": {
+     "bytes": 307882,
+     "sha256": "138a2240028e92839a53de7a4e0c8428b339411aab5e1c99f037590f69e1d029"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 0.0
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__simple_supply__operate__var_costs__investment_costs": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 7597,
+     "sha256": "f2ac570bba143203842177458f9667146805f944401c87be4d37e0405468df09"
+    },
+    "inputs.nc": {
+     "bytes": 270734,
+     "sha256": "f99ca891c84e0613e5f2cf3fd0a8ce0f4f06595d92f2b4076bd6597561f00395"
+    },
+    "pyomo.lp": {
+     "bytes": 36061,
+     "sha256": "e24e98b65a67c7708b7e8a7f7ebd22be5121d12933af56060d97ad64f043f021"
+    },
+    "results.nc": {
+     "bytes": 391487,
+     "sha256": "623e5107b8025f2d377f955d5c59b70d19d056cc1fe2ee3a7b011e907b88b55d"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": [
+     20.0,
+     20.0,
+     20.0,
+     20.0,
+     20.0,
+     20.0,
+     26.666666666666668,
+     26.666666666666668,
+     26.666666666666668,
+     26.666666666666668,
+     26.666666666666668,
+     26.666666666666668,
+     20.0,
+     20.0,
+     20.0,
+     20.0,
+     20.0,
+     20.0,
+     13.333333333333334,
+     13.333333333333334,
+     13.333333333333334,
+     13.333333333333334,
+     13.333333333333334,
+     13.333333333333334,
+     20.0,
+     20.0,
+     20.0,
+     20.0,
+     20.0,
+     20.0,
+     26.666666666666668,
+     26.666666666666668,
+     26.666666666666668,
+     26.666666666666668,
+     26.666666666666668,
+     26.666666666666668,
+     20.0,
+     20.0,
+     20.0,
+     20.0,
+     20.0,
+     20.0,
+     6.666666666666667,
+     6.666666666666667,
+     6.666666666666667,
+     6.666666666666667,
+     6.666666666666667,
+     6.666666666666667
+    ]
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__simple_supply__two_hours": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 1502,
+     "sha256": "01d7d51e58006cf774eadc0c57cb7753fd6b3cf7b528973230f20511c28fb107"
+    },
+    "inputs.nc": {
+     "bytes": 233344,
+     "sha256": "62a9963c89be7914c3931ed331a6709e8f7fdf41d8ffc5884cc1063be1ecf2b3"
+    },
+    "pyomo.lp": {
+     "bytes": 15326,
+     "sha256": "77e95f605b0af1cfa8d9de98bc8e546a26c6e770f0ed432e3c2df8232fc6ac2f"
+    },
+    "results.nc": {
+     "bytes": 307900,
+     "sha256": "c7ee0e593a5ba039ab0a4a1591f95e7e306cec3d6852fe5bc49f382d2d9f68d2"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 0.0
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__simple_supply__two_hours__investment_costs": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 1650,
+     "sha256": "d41258ff14a85883f1370ae044c3847a13b3c27357c7f8f42861d5c3a0fb7846"
+    },
+    "inputs.nc": {
+     "bytes": 256064,
+     "sha256": "cf77a65721619e76a0e135519287a5ed990ccd37ec83b691b9d9857374baaa6d"
+    },
+    "pyomo.lp": {
+     "bytes": 15736,
+     "sha256": "479f08d8d94e3add3555721e4f683e2fa0424017ce4bdedbe8a618a370966c66"
+    },
+    "results.nc": {
+     "bytes": 367535,
+     "sha256": "ce8f0cd46ccc2659b9d8b0be6c91a4bf34ef9d3aa06dd1f889d91fe8f6a4e6b3"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 0.002515252789726503
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__simple_supply__two_hours__investment_costs__shadow_prices": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 1650,
+     "sha256": "d41258ff14a85883f1370ae044c3847a13b3c27357c7f8f42861d5c3a0fb7846"
+    },
+    "inputs.nc": {
+     "bytes": 256119,
+     "sha256": "9a68032923dc99d3b27db9655521813a0efd0c004189faaec90a9f4684ab37d7"
+    },
+    "pyomo.lp": {
+     "bytes": 15736,
+     "sha256": "479f08d8d94e3add3555721e4f683e2fa0424017ce4bdedbe8a618a370966c66"
+    },
+    "results.nc": {
+     "bytes": 383642,
+     "sha256": "53fe29eb3537280a87aafb1dbdc6dd743a16036fdc3194803e108067cb3ddf36"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 0.002515252789726503
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__simple_supply__two_hours__weighted_costs": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 1708,
+     "sha256": "49c81e48e549f52022901c7f949a6d3e1338f1eadfdff3e31c8edd549d44ac41"
+    },
+    "inputs.nc": {
+     "bytes": 263217,
+     "sha256": "73bec0994b2272f93077d931a32f4fa0b9afb5939f6c2e34c8a56d1a49a8cc1e"
+    },
+    "pyomo.lp": {
+     "bytes": 16318,
+     "sha256": "215d1bb7234a9c5e6385dab16ddf77ca83dd97d7233a77e3c1a73e6aa4e0a993"
+    },
+    "results.nc": {
+     "bytes": 384888,
+     "sha256": "6b649cee6700a3d04e23c7df78db44be6a115fdfe8c96c55da30212986f87b43"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 0.4794520547945205
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__simple_supply_and_supply_plus__two_hours": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 2252,
+     "sha256": "12b2e4743227d43b2f99381d9fcb9b5834a3f2da7624ee365faaa331043993a2"
+    },
+    "inputs.nc": {
+     "bytes": 254680,
+     "sha256": "78a261d641c4a1d4fe5e7b0bce408288ae99fae61aa147b71091388339675a99"
+    },
+    "pyomo.lp": {
+     "bytes": 21996,
+     "sha256": "00d64961841257c1f513dd2efea4ae7d9772db09d94b463ed1d932493dd5c049"
+    },
+    "results.nc": {
+     "bytes": 339945,
+     "sha256": "1a635d81f910b033c0b188f1f653703be32b74228813f2413efdc0006a022470"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 0.0
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__simple_supply_locations__one_day__investment_costs": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 17702,
+     "sha256": "c46b0ae781e942e29d13fec4683a19fcb5f9a07f57c612d421f81fedf49d1e29"
+    },
+    "inputs.nc": {
+     "bytes": 255912,
+     "sha256": "115dc84c33b07f4e42a3e7f0a3a88b3cfddd27217e67ddf5247d3c81e2569d11"
+    },
+    "pyomo.lp": {
+     "bytes": 170942,
+     "sha256": "40e8beb12408387dfbd856043e85812f81716014b1187fb5d4958841bfd5ec2b"
+    },
+    "results.nc": {
+     "bytes": 367383,
+     "sha256": "f1bd23760dacf68888650b8b5ceb2712b49ab53fdb16d806b5e59e4552c549f2"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 0.060366066953436055
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__spores__var_costs__two_hours__simple_supply_spores_ready__investment_costs": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 1701,
+     "sha256": "a6ec2006be24dbf5347751cacbcea212b565a9665f8ee97f111acabb3ccceeae"
+    },
+    "inputs.nc": {
+     "bytes": 273533,
+     "sha256": "c88e8478bce942f8901815383ef61da78e2225a2db95542979649b353d04d8ca"
+    },
+    "pyomo.lp": {
+     "bytes": 16583,
+     "sha256": "bb3ca1fd1d721c51f3c153a6d27b91817a9696b151c603a701220c3cb8d18eae"
+    },
+    "results.nc": {
+     "bytes": 427464,
+     "sha256": "3a14fcd0186c3512b34c82f8c8475731475e33968c965fdb506f15b8904044ef"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": [
+     2.2247374750119486,
+     2.5025152527897263,
+     2.892158717515533
+    ],
+    "min_spores": [
+     0.0,
+     10000.0,
+     30000.0
+    ]
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__supply_milp__two_hours__investment_costs": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 521,
+     "sha256": "587e6323a304e06b7e8057fb4051c54f5f28cdb5ae51a3a37d312fa8bebe7157"
+    },
+    "inputs.nc": {
+     "bytes": 270941,
+     "sha256": "9d449c31da28161d7e97b3ae8301e76b6fcd39cbad491414ee73d5bdcf88328e"
+    },
+    "pyomo.lp": {
+     "bytes": 4762,
+     "sha256": "6e7c25bad73dc40920d80f0603a92fdc99919de9bc4336011ad477e91561e0f1"
+    },
+    "results.nc": {
+     "bytes": 391823,
+     "sha256": "7d53c8826f3d01686214fff835a3c3f700bf5d2198ecb92eb7728b8ffc4e8a6f"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 0.003772879184589754
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "test_model__supply_purchase__two_hours": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 540,
+     "sha256": "1a0fc6d72af4fcc0b50010fbf4161858669454d93d1fa997bea2e10ef496465f"
+    },
+    "inputs.nc": {
+     "bytes": 263604,
+     "sha256": "99a552b55fb2405f5ff1605bcfc218cac68aa1bff0c244d9e16cd45482a830e1"
+    },
+    "pyomo.lp": {
+     "bytes": 5106,
+     "sha256": "370bb55ab5de25ac6caed8662bc875af37202d5e3d408cd660f36ef83ddcc8e5"
+    },
+    "results.nc": {
+     "bytes": 269197,
+     "sha256": "66e21285b8435122c84056d3f7b271d029f7d0b6df366d29a60fb005cd3a928d"
+    }
+   },
+   "objectives": {},
+   "termination_condition": "infeasible",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "urban_scale": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 191298,
+     "sha256": "dead7e6b3722b23c5887a7aa037ec69a0e08319425f8c85846048465501d73c1"
+    },
+    "inputs.nc": {
+     "bytes": 364634,
+     "sha256": "c48b81be8281bd4f2cdfc7a1abb562de4fbf4ee5dd1f0253c624b50d688ac55d"
+    },
+    "pyomo.lp": {
+     "bytes": 1318798,
+     "sha256": "b09ea724df34b4b638126f834a6f906b65aad320a19e13537b5e288d896ee07d"
+    },
+    "results.nc": {
+     "bytes": 544581,
+     "sha256": "3aa3b6ddecf007c8b84fbbec5c8da416e6a70df04c32584e34776e53c1a444bc"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 842.337196706969
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "urban_scale_milp": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 221322,
+     "sha256": "95ce782cae2eb41e29d6d801827ce776948abb3df2898b5c0cc14fcd5e544bad"
+    },
+    "inputs.nc": {
+     "bytes": 412716,
+     "sha256": "b15f8e4f84d32879a25960e8a70eea2cdd478f359b142a7ff0878012fdac9b82"
+    },
+    "pyomo.lp": {
+     "bytes": 1493716,
+     "sha256": "b7f4de00e06bfcdacf1dc614a3f4eda711caee548eb6124c64004f5400864879"
+    },
+    "results.nc": {
+     "bytes": 620420,
+     "sha256": "a97eb491444657168bdb7c004e1d6eb2970646a0a215b348688d47f213eac8fb"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": 901.5138663355216
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "urban_scale_operate": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 138360,
+     "sha256": "96607c9e67206ed76991c8d90a765819f52453f3ea93eb9bfafaaf7441f6188e"
+    },
+    "inputs.nc": {
+     "bytes": 394974,
+     "sha256": "5dcf4e4a355422b94b73c05f062ccb8457d3c7bfb2660d6b71de94b73439d86b"
+    },
+    "pyomo.lp": {
+     "bytes": 245051,
+     "sha256": "d3ae6248b009d26748fc22a1644b662fe0fe6f9af6b2bea851fe6041308a14f7"
+    },
+    "results.nc": {
+     "bytes": 630020,
+     "sha256": "91666264dfcb2919e9968ef9d6a9ea5f3d1cfe9e4350a139a82b96f439a7bd5b"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": [
+     2203760860.9309626,
+     2203760860.9309626,
+     2203760860.9309626,
+     2203760860.9309626,
+     2203760860.9309626,
+     2203760860.9309626,
+     2203760860.9309626,
+     2203760860.9309626,
+     2203760860.9309626,
+     2203760860.9309626,
+     2203760860.9309626,
+     2203760860.9309626,
+     2426438716.042479,
+     2426438716.042479,
+     2426438716.042479,
+     2426438716.042479,
+     2426438716.042479,
+     2426438716.042479,
+     2426438716.042479,
+     2426438716.042479,
+     2426438716.042479,
+     2426438716.042479,
+     2426438716.042479,
+     2426438716.042479,
+     2860069022.691154,
+     2860069022.691154,
+     2860069022.691154,
+     2860069022.691154,
+     2860069022.691154,
+     2860069022.691154,
+     2860069022.691154,
+     2860069022.691154,
+     2860069022.691154,
+     2860069022.691154,
+     2860069022.691154,
+     2860069022.691154,
+     2838056844.194086,
+     2838056844.194086,
+     2838056844.194086,
+     2838056844.194086,
+     2838056844.194086,
+     2838056844.194086,
+     2838056844.194086,
+     2838056844.194086,
+     2838056844.194086,
+     2838056844.194086,
+     2838056844.194086,
+     2838056844.194086,
+     2788383781.9261527,
+     2788383781.9261527,
+     2788383781.9261527,
+     2788383781.9261527,
+     2788383781.9261527,
+     2788383781.9261527,
+     2788383781.9261527,
+     2788383781.9261527,
+     2788383781.9261527,
+     2788383781.9261527,
+     2788383781.9261527,
+     2788383781.9261527,
+     2910004668.1516676,
+     2910004668.1516676,
+     2910004668.1516676,
+     2910004668.1516676,
+     2910004668.1516676,
+     2910004668.1516676,
+     2910004668.1516676,
+     2910004668.1516676,
+     2910004668.1516676,
+     2910004668.1516676,
+     2910004668.1516676,
+     2910004668.1516676,
+     3031002927.5319104,
+     3031002927.5319104,
+     3031002927.5319104,
+     3031002927.5319104,
+     3031002927.5319104,
+     3031002927.5319104,
+     3031002927.5319104,
+     3031002927.5319104,
+     3031002927.5319104,
+     3031002927.5319104,
+     3031002927.5319104,
+     3031002927.5319104,
+     3615367765.5595384,
+     3615367765.5595384,
+     3615367765.5595384,
+     3615367765.5595384,
+     3615367765.5595384,
+     3615367765.5595384,
+     3615367765.5595384,
+     3615367765.5595384,
+     3615367765.5595384,
+     3615367765.5595384,
+     3615367765.5595384,
+     3615367765.5595384,
+     4282997646.564144,
+     4282997646.564144,
+     4282997646.564144,
+     4282997646.564144,
+     4282997646.564144,
+     4282997646.564144,
+     4282997646.564144,
+     4282997646.564144,
+     4282997646.564144,
+     4282997646.564144,
+     4282997646.564144,
+     4282997646.564144,
+     4138845422.8108635,
+     4138845422.8108635,
+     4138845422.8108635,
+     4138845422.8108635,
+     4138845422.8108635,
+     4138845422.8108635,
+     4138845422.8108635,
+     4138845422.8108635,
+     4138845422.8108635,
+     4138845422.8108635,
+     4138845422.8108635,
+     4138845422.8108635,
+     4162993909.4101877,
+     4162993909.4101877,
+     4162993909.4101877,
+     4162993909.4101877,
+     4162993909.4101877,
+     4162993909.4101877,
+     4162993909.4101877,
+     4162993909.4101877,
+     4162993909.4101877,
+     4162993909.4101877,
+     4162993909.4101877,
+     4162993909.4101877,
+     3926003696.043491,
+     3926003696.043491,
+     3926003696.043491,
+     3926003696.043491,
+     3926003696.043491,
+     3926003696.043491,
+     3926003696.043491,
+     3926003696.043491,
+     3926003696.043491,
+     3926003696.043491,
+     3926003696.043491,
+     3926003696.043491,
+     3504747232.3040395,
+     3504747232.3040395,
+     3504747232.3040395,
+     3504747232.3040395,
+     3504747232.3040395,
+     3504747232.3040395,
+     3504747232.3040395,
+     3504747232.3040395,
+     3504747232.3040395,
+     3504747232.3040395,
+     3504747232.3040395,
+     3504747232.3040395,
+     3067929975.5191464,
+     3067929975.5191464,
+     3067929975.5191464,
+     3067929975.5191464,
+     3067929975.5191464,
+     3067929975.5191464,
+     3067929975.5191464,
+     3067929975.5191464,
+     3067929975.5191464,
+     3067929975.5191464,
+     3067929975.5191464,
+     3067929975.5191464,
+     2374560802.7079935,
+     2374560802.7079935,
+     2374560802.7079935,
+     2374560802.7079935,
+     2374560802.7079935,
+     2374560802.7079935,
+     2374560802.7079935,
+     2374560802.7079935,
+     2374560802.7079935,
+     2374560802.7079935,
+     2374560802.7079935,
+     2374560802.7079935,
+     2665013262.908599,
+     2665013262.908599,
+     2665013262.908599,
+     2665013262.908599,
+     2665013262.908599,
+     2665013262.908599,
+     2665013262.908599,
+     2665013262.908599,
+     2665013262.908599,
+     2665013262.908599,
+     2665013262.908599,
+     2665013262.908599,
+     3186884231.9575343,
+     3186884231.9575343,
+     3186884231.9575343,
+     3186884231.9575343,
+     3186884231.9575343,
+     3186884231.9575343,
+     3186884231.9575343,
+     3186884231.9575343,
+     3186884231.9575343,
+     3186884231.9575343,
+     3186884231.9575343,
+     3186884231.9575343,
+     2842574017.9086876,
+     2842574017.9086876,
+     2842574017.9086876,
+     2842574017.9086876,
+     2842574017.9086876,
+     2842574017.9086876,
+     2842574017.9086876,
+     2842574017.9086876,
+     2842574017.9086876,
+     2842574017.9086876,
+     2842574017.9086876,
+     2842574017.9086876,
+     2247627090.9690223,
+     2247627090.9690223,
+     2247627090.9690223,
+     2247627090.9690223,
+     2247627090.9690223,
+     2247627090.9690223,
+     2247627090.9690223,
+     2247627090.9690223,
+     2247627090.9690223,
+     2247627090.9690223,
+     2247627090.9690223,
+     2247627090.9690223,
+     1324901953.2110589,
+     1324901953.2110589,
+     1324901953.2110589,
+     1324901953.2110589,
+     1324901953.2110589,
+     1324901953.2110589,
+     1324901953.2110589,
+     1324901953.2110589,
+     1324901953.2110589,
+     1324901953.2110589,
+     1324901953.2110589,
+     1324901953.2110589
+    ]
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  },
+  "urban_scale_operate_milp": {
+   "expected_error": null,
+   "files": {
+    "highs.lp": {
+     "bytes": 166879,
+     "sha256": "6970d32dbae2a57508ca1a80b5f94561c3b1d1d5e7b54c7c01b3bd97d4518967"
+    },
+    "inputs.nc": {
+     "bytes": 444135,
+     "sha256": "822514806ef2228ac7fa41d539da7ec1126962914525fe62bf172288dbc87b99"
+    },
+    "pyomo.lp": {
+     "bytes": 287738,
+     "sha256": "3cc098d7108a5f36599824a72b6a90a7f313d487d8979335c4d112000df5bd0f"
+    },
+    "results.nc": {
+     "bytes": 699840,
+     "sha256": "3d1d9b4b9429c9d30abc6f8d1dca1e9f62eaaf30734568951e763b3e89fc670b"
+    }
+   },
+   "objectives": {
+    "min_cost_optimisation": [
+     166579752.83704665,
+     166579752.83704665,
+     166579752.83704665,
+     166579752.83704665,
+     166579752.83704665,
+     166579752.83704665,
+     166579752.83704665,
+     166579752.83704665,
+     166579752.83704665,
+     166579752.83704665,
+     166579752.83704665,
+     166579752.83704665,
+     354805870.10360575,
+     354805870.10360575,
+     354805870.10360575,
+     354805870.10360575,
+     354805870.10360575,
+     354805870.10360575,
+     354805870.10360575,
+     354805870.10360575,
+     354805870.10360575,
+     354805870.10360575,
+     354805870.10360575,
+     354805870.10360575,
+     577211792.380566,
+     577211792.380566,
+     577211792.380566,
+     577211792.380566,
+     577211792.380566,
+     577211792.380566,
+     577211792.380566,
+     577211792.380566,
+     577211792.380566,
+     577211792.380566,
+     577211792.380566,
+     577211792.380566,
+     577211789.7761995,
+     577211789.7761995,
+     577211789.7761995,
+     577211789.7761995,
+     577211789.7761995,
+     577211789.7761995,
+     577211789.7761995,
+     577211789.7761995,
+     577211789.7761995,
+     577211789.7761995,
+     577211789.7761995,
+     577211789.7761995,
+     567711232.5556543,
+     567711232.5556543,
+     567711232.5556543,
+     567711232.5556543,
+     567711232.5556543,
+     567711232.5556543,
+     567711232.5556543,
+     567711232.5556543,
+     567711232.5556543,
+     567711232.5556543,
+     567711232.5556543,
+     567711232.5556543,
+     604301697.266009,
+     604301697.266009,
+     604301697.266009,
+     604301697.266009,
+     604301697.266009,
+     604301697.266009,
+     604301697.266009,
+     604301697.266009,
+     604301697.266009,
+     604301697.266009,
+     604301697.266009,
+     604301697.266009,
+     715289831.4348092,
+     715289831.4348092,
+     715289831.4348092,
+     715289831.4348092,
+     715289831.4348092,
+     715289831.4348092,
+     715289831.4348092,
+     715289831.4348092,
+     715289831.4348092,
+     715289831.4348092,
+     715289831.4348092,
+     715289831.4348092,
+     954556452.7008177,
+     954556452.7008177,
+     954556452.7008177,
+     954556452.7008177,
+     954556452.7008177,
+     954556452.7008177,
+     954556452.7008177,
+     954556452.7008177,
+     954556452.7008177,
+     954556452.7008177,
+     954556452.7008177,
+     954556452.7008177,
+     1268288389.1468532,
+     1268288389.1468532,
+     1268288389.1468532,
+     1268288389.1468532,
+     1268288389.1468532,
+     1268288389.1468532,
+     1268288389.1468532,
+     1268288389.1468532,
+     1268288389.1468532,
+     1268288389.1468532,
+     1268288389.1468532,
+     1268288389.1468532,
+     1222458490.2279227,
+     1222458490.2279227,
+     1222458490.2279227,
+     1222458490.2279227,
+     1222458490.2279227,
+     1222458490.2279227,
+     1222458490.2279227,
+     1222458490.2279227,
+     1222458490.2279227,
+     1222458490.2279227,
+     1222458490.2279227,
+     1222458490.2279227,
+     1218945450.0832655,
+     1218945450.0832655,
+     1218945450.0832655,
+     1218945450.0832655,
+     1218945450.0832655,
+     1218945450.0832655,
+     1218945450.0832655,
+     1218945450.0832655,
+     1218945450.0832655,
+     1218945450.0832655,
+     1218945450.0832655,
+     1218945450.0832655,
+     1008753711.9573686,
+     1008753711.9573686,
+     1008753711.9573686,
+     1008753711.9573686,
+     1008753711.9573686,
+     1008753711.9573686,
+     1008753711.9573686,
+     1008753711.9573686,
+     1008753711.9573686,
+     1008753711.9573686,
+     1008753711.9573686,
+     1008753711.9573686,
+     751810347.0053508,
+     751810347.0053508,
+     751810347.0053508,
+     751810347.0053508,
+     751810347.0053508,
+     751810347.0053508,
+     751810347.0053508,
+     751810347.0053508,
+     751810347.0053508,
+     751810347.0053508,
+     751810347.0053508,
+     751810347.0053508,
+     560911851.7805988,
+     560911851.7805988,
+     560911851.7805988,
+     560911851.7805988,
+     560911851.7805988,
+     560911851.7805988,
+     560911851.7805988,
+     560911851.7805988,
+     560911851.7805988,
+     560911851.7805988,
+     560911851.7805988,
+     560911851.7805988,
+     222924251.04462746,
+     222924251.04462746,
+     222924251.04462746,
+     222924251.04462746,
+     222924251.04462746,
+     222924251.04462746,
+     222924251.04462746,
+     222924251.04462746,
+     222924251.04462746,
+     222924251.04462746,
+     222924251.04462746,
+     222924251.04462746,
+     479663016.17475134,
+     479663016.17475134,
+     479663016.17475134,
+     479663016.17475134,
+     479663016.17475134,
+     479663016.17475134,
+     479663016.17475134,
+     479663016.17475134,
+     479663016.17475134,
+     479663016.17475134,
+     479663016.17475134,
+     479663016.17475134,
+     819960028.0598145,
+     819960028.0598145,
+     819960028.0598145,
+     819960028.0598145,
+     819960028.0598145,
+     819960028.0598145,
+     819960028.0598145,
+     819960028.0598145,
+     819960028.0598145,
+     819960028.0598145,
+     819960028.0598145,
+     819960028.0598145,
+     819959882.864386,
+     819959882.864386,
+     819959882.864386,
+     819959882.864386,
+     819959882.864386,
+     819959882.864386,
+     819959882.864386,
+     819959882.864386,
+     819959882.864386,
+     819959882.864386,
+     819959882.864386,
+     819959882.864386,
+     750579615.2613183,
+     750579615.2613183,
+     750579615.2613183,
+     750579615.2613183,
+     750579615.2613183,
+     750579615.2613183,
+     750579615.2613183,
+     750579615.2613183,
+     750579615.2613183,
+     750579615.2613183,
+     750579615.2613183,
+     750579615.2613183,
+     464765826.0729763,
+     464765826.0729763,
+     464765826.0729763,
+     464765826.0729763,
+     464765826.0729763,
+     464765826.0729763,
+     464765826.0729763,
+     464765826.0729763,
+     464765826.0729763,
+     464765826.0729763,
+     464765826.0729763,
+     464765826.0729763
+    ]
+   },
+   "termination_condition": "optimal",
+   "versions": {
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "highs": "1.15.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyomo": "6.10.1",
+    "pyparsing": "3.3.2",
+    "python": "3.14.7",
+    "xarray": "2026.9.0"
+   }
+  }
+ },
+ "math_lp": {
+  "annual_capacity_factor": {
+   "files": {
+    "highs.lp": {
+     "bytes": 259,
+     "sha256": "993392d0f64f403bd5c201c2898ba793f02cfdf7f2e343be8e8eb60285b494f8"
+    },
+    "inputs.nc": {
+     "bytes": 232381,
+     "sha256": "77d4cf9325be261aec5c9a5be85dfb641e921e968d73e96773c164f9565da07b"
+    },
+    "pyomo.lp": {
+     "bytes": 1844,
+     "sha256": "46758d8ee5f2a141c3d32359e48efac87927160eff26c8f5810201e6724f8df5"
+    },
+    "reference.lp": {
+     "bytes": 1832,
+     "sha256": "783c77a24e25efa83581c11bb39f20b15a9467711975046781f3183e1b71435d"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "annual_energy_balance_global_multi_tech": {
+   "files": {
+    "highs.lp": {
+     "bytes": 237,
+     "sha256": "2346a32f9c12f2aa67d463bdc3c23c9a45bdbe5ebdbdfa85e7a63591a78d717a"
+    },
+    "inputs.nc": {
+     "bytes": 225577,
+     "sha256": "a7795cca1e0ef52781b53c08210d1d2febf41f7f1514721b8b42886a2ec74b5c"
+    },
+    "pyomo.lp": {
+     "bytes": 1524,
+     "sha256": "f98cec080d6640ff795f8e87afb37da04c9467c920ad13a09dc7c39cbdc5d63c"
+    },
+    "reference.lp": {
+     "bytes": 1506,
+     "sha256": "af777381d2a9e4cd65fffdeb0feb8d9ccdbb128eb9115da9553c601e0701bc15"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_and_supply_plus,two_hours"
+  },
+  "annual_energy_balance_global_per_tech": {
+   "files": {
+    "highs.lp": {
+     "bytes": 167,
+     "sha256": "c72c9a10c5a3c9462550650c39f1a2998dae28c632fd00b1a55e24c85eb632b4"
+    },
+    "inputs.nc": {
+     "bytes": 206673,
+     "sha256": "b7e1ea37f5cc0825ea2166ef315bd446329a05a046af1b7eafec53cc00340a59"
+    },
+    "pyomo.lp": {
+     "bytes": 880,
+     "sha256": "266625b57507d12b3b90b77cdb5652a1d00880f83cae4ba310d62d4c887abf3e"
+    },
+    "reference.lp": {
+     "bytes": 872,
+     "sha256": "9749fdc14e6d89b777d48b10eda11278a9600137eff3a2216890edc09dc208a9"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "annual_energy_balance_per_tech_and_node": {
+   "files": {
+    "highs.lp": {
+     "bytes": 179,
+     "sha256": "f2be7f7423a753b5102f613405df69c4627477ea975ce3151c0f1a27cfb11df4"
+    },
+    "inputs.nc": {
+     "bytes": 208105,
+     "sha256": "30dafdfa155bb0ce4180e876a2b0c9a150dc8287ea2b164094846fd984511283"
+    },
+    "pyomo.lp": {
+     "bytes": 974,
+     "sha256": "e7db4f4162873b8fa8903aa52ecbf2b9de0970a84bf6b5d956c8e29240aa05f2"
+    },
+    "reference.lp": {
+     "bytes": 966,
+     "sha256": "8b1b634bb8910805fd641d080d2bbecdd9ffe35301fdc510cce03b73777bebcf"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "annual_energy_balance_total_sink_availability": {
+   "files": {
+    "highs.lp": {
+     "bytes": 167,
+     "sha256": "3023c849877a9e537c227fa919298b511658b9575c3a1ad07d803de47a373fe1"
+    },
+    "inputs.nc": {
+     "bytes": 207462,
+     "sha256": "ed399840f89b1bef6906f22280d4f4fa806a3d9641d9cbaa9b0f67f4f535f416"
+    },
+    "pyomo.lp": {
+     "bytes": 880,
+     "sha256": "016d498d28ad9494f5be59ff88fc895382163ae635821f67c87e287ce3ee1d3e"
+    },
+    "reference.lp": {
+     "bytes": 872,
+     "sha256": "e0ca09db44eaf5f5402f758856940d7aa58352990a64c2ea0f712de30f98438e"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours,demand_elec_max"
+  },
+  "annual_energy_balance_total_source_availability": {
+   "files": {
+    "highs.lp": {
+     "bytes": 209,
+     "sha256": "9352c27fce42ac9f6481bccceb3afbe22927f3db45d42fe4b90165cc1d6def34"
+    },
+    "inputs.nc": {
+     "bytes": 228776,
+     "sha256": "d6be441e44026360bf8c67c0f57e04b33376bb05e1b3ae41b9f320d5d244a930"
+    },
+    "pyomo.lp": {
+     "bytes": 802,
+     "sha256": "780d22a1db7682496a60a32c85d51ed5f9348e573ac1d120ab0752b69735f710"
+    },
+    "reference.lp": {
+     "bytes": 794,
+     "sha256": "01153cc9af8217943b37c9c6b435b2dbd0aeb3e6c2412a123f472adc2e59a180"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_and_supply_plus,two_hours"
+  },
+  "area_use_capacity_per_loc": {
+   "files": {
+    "highs.lp": {
+     "bytes": 195,
+     "sha256": "54a8eb3ec3c1c2a041f7bd9e78e8f8fd61f4652d8d997bcc962692d9fa172160"
+    },
+    "inputs.nc": {
+     "bytes": 234703,
+     "sha256": "4677b237775ad5bb5019fda7562eeb65d6ccd16f432db3afe8c9d11feb7c775c"
+    },
+    "pyomo.lp": {
+     "bytes": 399,
+     "sha256": "d2e4c7372447f81aea8135607c02d1d2528fc5c6ff4244080b2c8fad7fd1f4b9"
+    },
+    "reference.lp": {
+     "bytes": 399,
+     "sha256": "d2e4c7372447f81aea8135607c02d1d2528fc5c6ff4244080b2c8fad7fd1f4b9"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_and_supply_plus,two_hours"
+  },
+  "area_use_minimum": {
+   "files": {
+    "highs.lp": {
+     "bytes": 163,
+     "sha256": "7301cf3fb34483bc306bc7195774667d4db6d4fc7aad399810194c23bdb0cd78"
+    },
+    "inputs.nc": {
+     "bytes": 251572,
+     "sha256": "88fabd25eaf6bed0f8db16ce7cd624328f3bbffd6d0f83c0203b20d2f0215703"
+    },
+    "pyomo.lp": {
+     "bytes": 472,
+     "sha256": "a59452b93a48b14b8d5975e5dfdd65bd65eb6bdcc9d0abeba015823a8f2e8270"
+    },
+    "reference.lp": {
+     "bytes": 468,
+     "sha256": "8e845e4b9aaa90ce3d999fecfa32e3cada4a5ccd3143fe5482200d7f09140857"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours,investment_costs"
+  },
+  "area_use_minimum_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 131,
+     "sha256": "468c04adcb6b8bd87b22ca223ed720ef4c5085ac1a4ef0ad4536bd0a24e793af"
+    },
+    "inputs.nc": {
+     "bytes": 228685,
+     "sha256": "90ba008429ce210679500d02ab8014a31bbacb24335f9e733aacd76f59537b0f"
+    },
+    "pyomo.lp": {
+     "bytes": 479,
+     "sha256": "2f78f323e57c0cfca2baf9ca38760437e42a4860c8058aa96507bbe2680e0d36"
+    },
+    "reference.lp": {
+     "bytes": 477,
+     "sha256": "f3ebf88e7ea6b87663ab40156bf2eb42d4b259419dcfc2620a06395671a8b899"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "area_use_per_flow_capacity": {
+   "files": {
+    "highs.lp": {
+     "bytes": 152,
+     "sha256": "9261168976bdfcac2d7692d5684d60be61be2c32c3b7ad115149c61d7baa3706"
+    },
+    "inputs.nc": {
+     "bytes": 208007,
+     "sha256": "43de59c543daaf4872c3b26c87f651374e65cb0feca4cbdbc3f973e46877cbfc"
+    },
+    "pyomo.lp": {
+     "bytes": 457,
+     "sha256": "7143c98c323ec0c2e132700d3617afc92025b1fe731723016d0f0b3b7c521d37"
+    },
+    "reference.lp": {
+     "bytes": 457,
+     "sha256": "7143c98c323ec0c2e132700d3617afc92025b1fe731723016d0f0b3b7c521d37"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "async_flow_in_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 224,
+     "sha256": "74e35dcc88b4e482cf02dbb7aa94aa3c032099e65763c538df4695859c4cb61e"
+    },
+    "inputs.nc": {
+     "bytes": 215992,
+     "sha256": "c23af7eea8add7e31b31baff0ccbd86195933663e67d4c39fa7405c6ccf4371b"
+    },
+    "pyomo.lp": {
+     "bytes": 1123,
+     "sha256": "e9d59a434838428b4a4b1e8a2479c18a97f6304a95fde9ae26c19c99b0c7ff88"
+    },
+    "reference.lp": {
+     "bytes": 1111,
+     "sha256": "c1274ab2895e740f1408b75ae44cf460d92378bb3b60646d1c279aea840739d1"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "conversion_and_conversion_plus,two_hours"
+  },
+  "async_flow_out_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 232,
+     "sha256": "a78ac6f6a1559735bf69188c7f4c2350fd537989e7bc6686fd23d2f0d8151ee1"
+    },
+    "inputs.nc": {
+     "bytes": 215633,
+     "sha256": "f6a10af85aa3684c3b1f3cb3ed81a2051ebd3200172f3e0383491034b102a6bf"
+    },
+    "pyomo.lp": {
+     "bytes": 1473,
+     "sha256": "726fb77b7c1dba5ba3b693d63bedc011792ade5414a517407236fb323df364c2"
+    },
+    "reference.lp": {
+     "bytes": 1457,
+     "sha256": "412e5339c3bf51ccbe05f2ba88542b9ddb7a87384fa9fd0378b333711f680916"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "conversion_and_conversion_plus,two_hours"
+  },
+  "available_flow_cap_binary": {
+   "files": {
+    "highs.lp": {
+     "bytes": 167,
+     "sha256": "2d076c3a9a55c30dca44f41fffb30277ce4c89f58d47f3a52d9429c655a1489e"
+    },
+    "inputs.nc": {
+     "bytes": 218034,
+     "sha256": "e3f5d407839efd032653891e4ed8c9a017201ae8d765e20053e1685b959d3c01"
+    },
+    "pyomo.lp": {
+     "bytes": 1172,
+     "sha256": "975a2494fdc3e21b1252a27c5a9167cf62306564e3ff6421be771872d10b34bd"
+    },
+    "reference.lp": {
+     "bytes": 1164,
+     "sha256": "71fa2dd86ab82563aeb9765fd440fc7f1f2c88350cf6ae04eca0e901ff3b9961"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "available_flow_cap_continuous": {
+   "files": {
+    "highs.lp": {
+     "bytes": 163,
+     "sha256": "c5d17e13f0d9508217c8f2fe6cd8184b406ec57d522ea220cc3caac2c9969b1a"
+    },
+    "inputs.nc": {
+     "bytes": 218112,
+     "sha256": "49b2da13a9c38e6ce4c93c6730291d5ff0280b2c12a3ce72a23e1eaa24a025fd"
+    },
+    "pyomo.lp": {
+     "bytes": 910,
+     "sha256": "b3f0115827df216c5c758ff14ebd6aa178a2c7e36a164d792f0b692a4e29f76a"
+    },
+    "reference.lp": {
+     "bytes": 904,
+     "sha256": "5125d432feb5e170fb242fce8a0ed873d1c0f43e623a4a5870dfb4ffe975f0a1"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "available_flow_cap_max_binary_continuous_switch": {
+   "files": {
+    "highs.lp": {
+     "bytes": 193,
+     "sha256": "83720133a2a2f1053da7ef29164bbe5f3e4e70504b8155a7e9ebda991125e083"
+    },
+    "inputs.nc": {
+     "bytes": 220090,
+     "sha256": "b2af96e934812008e795c28027ba5769c49edf3a5c5453062e36851d4cc086ea"
+    },
+    "pyomo.lp": {
+     "bytes": 1632,
+     "sha256": "370d4a49e370caecf9187126f005e8b323da6ebe46de404f21678e99cb8ec835"
+    },
+    "reference.lp": {
+     "bytes": 1622,
+     "sha256": "a80b81ca9408f919f63fb477c18fdaa9cdb6d8edb33def7514f47085a0afac7d"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "balance_conversion": {
+   "files": {
+    "highs.lp": {
+     "bytes": 327,
+     "sha256": "4eba0b016e29a2f3846f5021a0a76fcc108edcf757e771b89ef4b7ace79b1877"
+    },
+    "inputs.nc": {
+     "bytes": 204848,
+     "sha256": "306891aa178cb2633fb6b3ba178dbab30ff8c64f4b1e204fb851c100374eb914"
+    },
+    "pyomo.lp": {
+     "bytes": 1712,
+     "sha256": "b81677df96838578899b93be60154ca290fa0acc64a3a71f4d2fdb725b194aae"
+    },
+    "reference.lp": {
+     "bytes": 1704,
+     "sha256": "d1d70c2dfb1906ab4c516d29c7aa56ea58f35ec6e9b2459417be8fe5fe3a76f9"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_conversion,two_hours"
+  },
+  "balance_demand": {
+   "files": {
+    "highs.lp": {
+     "bytes": 199,
+     "sha256": "30eb5dde0321a172243ad6e2c6d5f8b7457c5b58561af4991dca054783a2db8b"
+    },
+    "inputs.nc": {
+     "bytes": 205578,
+     "sha256": "4c0d257f1995061d7659db05354e0029fb8af1e75124a13ccd5d3e01c86ace8e"
+    },
+    "pyomo.lp": {
+     "bytes": 1164,
+     "sha256": "dc8bd6986a4dcbc91ba7fa0deeb8b14f34d38cf6601952c72ec27f01b7ba6c29"
+    },
+    "reference.lp": {
+     "bytes": 1156,
+     "sha256": "1fc00a87f01d3edc0e22d327f28a8d1e878ccd5f6fbd3aa908928e032e862907"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours,demand_elec_max"
+  },
+  "balance_demand_min_use": {
+   "files": {
+    "highs.lp": {
+     "bytes": 199,
+     "sha256": "92565adfa0d0981874aa2a4c94b0047b1842373d68e5da649b9d678d3194caab"
+    },
+    "inputs.nc": {
+     "bytes": 205419,
+     "sha256": "db4f4257d9d441ce4a5ed89e0374379e2708a86f4d495476bcec49c2f620443e"
+    },
+    "pyomo.lp": {
+     "bytes": 1196,
+     "sha256": "856a9806b7d03c2c916e102253b9413af603f02e226f78a0a3993065f69eb6f6"
+    },
+    "reference.lp": {
+     "bytes": 1188,
+     "sha256": "670c2e267867c90ec9d4480acd221351e6418aa0155bbf78a1aa00d38595eca9"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "balance_demand_sink_unit_per_area": {
+   "files": {
+    "highs.lp": {
+     "bytes": 234,
+     "sha256": "61206bab66ef56518ef10b6e18d1b75b7776762c9e27a5b927450343b162dc35"
+    },
+    "inputs.nc": {
+     "bytes": 217518,
+     "sha256": "fb5d264733a0bef4f085b494f098cbfbfa0313b7a4437060d9d7feaaf9ba1378"
+    },
+    "pyomo.lp": {
+     "bytes": 1462,
+     "sha256": "f82235e5ccfe6c4b6055fc133ff0bfab94a6f6f0b1c700be2c21dffcc41129ed"
+    },
+    "reference.lp": {
+     "bytes": 1454,
+     "sha256": "05caa0f869cb54f5cfc8bcc4807dcb801a9ccf36a6bbd97683890fe88b49579a"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "balance_demand_sink_unit_per_cap": {
+   "files": {
+    "highs.lp": {
+     "bytes": 219,
+     "sha256": "7652a1b288bc594dc7dbbcf4ec7143bfa15009983b059f83bd8e4817b3ffe02d"
+    },
+    "inputs.nc": {
+     "bytes": 211578,
+     "sha256": "fa288efa602303ad452d3144755965dbf54edcbad7d69a56d8180875a4403ff7"
+    },
+    "pyomo.lp": {
+     "bytes": 1540,
+     "sha256": "d6ca32efaf66339b12b9bf4acba6e167e2dafa16c4e520ff1f2e50c1fc71b837"
+    },
+    "reference.lp": {
+     "bytes": 1532,
+     "sha256": "465fde2be14cd81ace3ca262ba66b3d317b63924e9432eec989a91f98a465b0f"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "balance_demand_sink_use_equals": {
+   "files": {
+    "highs.lp": {
+     "bytes": 195,
+     "sha256": "0d93d893845897d943eb3593b8c4d270dd2ebcb6a4d14fa2aa45bd24aa1fc357"
+    },
+    "inputs.nc": {
+     "bytes": 203664,
+     "sha256": "dcaa569b2244af06198b7c83b54511a0fc3032e7c5c9e368cbc0df79ac5a29a0"
+    },
+    "pyomo.lp": {
+     "bytes": 1160,
+     "sha256": "5911afb0e217dc8adf2c9c3d1c7da4a9c911bb9393385d56c574edf4f33f19c0"
+    },
+    "reference.lp": {
+     "bytes": 1152,
+     "sha256": "80bc6c8469bd2345704de5aa7b35e486754790d382a514aae167cad1186fae8c"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "balance_storage": {
+   "files": {
+    "highs.lp": {
+     "bytes": 383,
+     "sha256": "039a9a7750d3cbd16a75639771964b62f5490486b3a4664b346e649d09eb674c"
+    },
+    "inputs.nc": {
+     "bytes": 223820,
+     "sha256": "f9b4d4d32f2d29c548d7e31271f9440ea628db883a4bb2caee9a8a25350335ed"
+    },
+    "pyomo.lp": {
+     "bytes": 2456,
+     "sha256": "a9eae855ea889bc69ec5dac7c8b477a9cf00675a1a1bd73164bf5bbe3bd2cd10"
+    },
+    "reference.lp": {
+     "bytes": 2432,
+     "sha256": "9ea5e12d99771de75a86b049e60c72f5318a26698ae93879209249258fa97634"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_storage,two_hours"
+  },
+  "balance_storage_inter": {
+   "files": {
+    "highs.lp": {
+     "bytes": 729,
+     "sha256": "76d79897af755d0281002d38634b00b7c7b1e6169c696ef37fe76b3e287f8caa"
+    },
+    "inputs.nc": {
+     "bytes": 259008,
+     "sha256": "af0f71785df90a3c0d706048051457ffea1d6f2fb4c4927434a3d5e6ef22ff40"
+    },
+    "pyomo.lp": {
+     "bytes": 4133,
+     "sha256": "3abb07d618339cf030344c090c32ac0f1bc40d37a0dd28d280130318ada34078"
+    },
+    "reference.lp": {
+     "bytes": 4113,
+     "sha256": "db1a64fd991eb0bbdf00bcf93be0f0c40a850e2dc5ce50ea5610fa6dd54e5325"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "default",
+   "scenario": "simple_storage,inter_cluster_storage"
+  },
+  "balance_storage_with_inter_cluster": {
+   "files": {
+    "highs.lp": {
+     "bytes": 473,
+     "sha256": "b9ed7dcc17f12644e41bd08e91f4289215fcb41f6a02eacc9b3b8a50f6856035"
+    },
+    "inputs.nc": {
+     "bytes": 259949,
+     "sha256": "9da6bc5fb4f566a8f6ddc0fb4f826a12a453b52ff8621e3f6431b3ea260ff7e7"
+    },
+    "pyomo.lp": {
+     "bytes": 2280,
+     "sha256": "3eac652921ab96122e1ce054baa8d387ac011314b831a04f71b8381cf9b8bba7"
+    },
+    "reference.lp": {
+     "bytes": 2264,
+     "sha256": "eb58fcf01be601dfbdae7a9d2d5e401bd70f991de158ff0467bb090f1d314cac"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "default",
+   "scenario": "simple_storage,inter_cluster_storage"
+  },
+  "balance_supply_min_use": {
+   "files": {
+    "highs.lp": {
+     "bytes": 185,
+     "sha256": "8714d9a454294aa54a313c7ace4ef964c83cd2f80f41772c8846b9c08f2e7b84"
+    },
+    "inputs.nc": {
+     "bytes": 232083,
+     "sha256": "1f3a867024d790c5db1bfa709cf17a736de244b3ed02c7925025607eb2584ca4"
+    },
+    "pyomo.lp": {
+     "bytes": 600,
+     "sha256": "756aa897ad889ac97b21b3ae4a225dd645b8c39f765ebf2565f2b9e83157061b"
+    },
+    "reference.lp": {
+     "bytes": 596,
+     "sha256": "5023d1a028a6afa052001ca73c971b4fcfb99d62a86f80d0cd56913c8469ec2f"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,resample_two_days"
+  },
+  "balance_supply_no_storage": {
+   "files": {
+    "highs.lp": {
+     "bytes": 283,
+     "sha256": "72979c868b7bb926c13416e5008bb8bd778a8ee2a2a0099ac1352d90c6daeaf0"
+    },
+    "inputs.nc": {
+     "bytes": 203582,
+     "sha256": "8bb123a9a7cda05c14412ac01385e84f1edfff8b3d72f0dd7fd3c7b23815e1fd"
+    },
+    "pyomo.lp": {
+     "bytes": 1852,
+     "sha256": "f8f397bf8e1d6b6a96a6d4b8c9d699d2ce486a3ae5020900ed4029d366e5e097"
+    },
+    "reference.lp": {
+     "bytes": 1836,
+     "sha256": "e26348fa40cc093c28d981b13335d978e6902b161008a9ed35009f70f8082064"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "balance_supply_with_storage": {
+   "files": {
+    "highs.lp": {
+     "bytes": 381,
+     "sha256": "9103f83cb35395895b8fe6d0f139f717e33cd9d688888c2e27f850f4cc0e5015"
+    },
+    "inputs.nc": {
+     "bytes": 229571,
+     "sha256": "a4720db6432fae7464c9cf7c015a6e5d56d52fcdf1827b0da390b16705fcc996"
+    },
+    "pyomo.lp": {
+     "bytes": 2672,
+     "sha256": "a726c5aeb4fe1a26983f3c8481bac6f6c03e96f6e080d9369b5a6024c870e171"
+    },
+    "reference.lp": {
+     "bytes": 2648,
+     "sha256": "82fe6813a5ef8804ac589b3a09f2ba12a54210941b87263b1469738745c2c2a1"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,two_hours"
+  },
+  "balance_supply_with_storage_cyclic": {
+   "files": {
+    "highs.lp": {
+     "bytes": 371,
+     "sha256": "1784b432446442c5f54d91e962343d0ca6d1f8ce434fe3bc6a99aa81f1d75c6a"
+    },
+    "inputs.nc": {
+     "bytes": 227079,
+     "sha256": "bac9f25c8fb26543af63cb3283157ae4dd5f4973b6b267fed6b9752af886cd86"
+    },
+    "pyomo.lp": {
+     "bytes": 2608,
+     "sha256": "581609e8d2b41f253e90ab26eb00af8b0c96a7751305ba7ef7c9c8d54ecc5fa8"
+    },
+    "reference.lp": {
+     "bytes": 2584,
+     "sha256": "40a93a493f07a00844ab94b8197620cd3a3f607ad2fe557f7acc340f2923e01f"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,two_hours"
+  },
+  "balance_supply_with_storage_inter_cluster_override": {
+   "files": {
+    "highs.lp": {
+     "bytes": 461,
+     "sha256": "b0e62c209975789ad086547b9e04326f1b4a014b41b42124798770d231bb52b6"
+    },
+    "inputs.nc": {
+     "bytes": 261561,
+     "sha256": "427d8c0b23026dd90272036685f6a94c824c96dbc49a8f65b83f0b0d7b2f0a68"
+    },
+    "pyomo.lp": {
+     "bytes": 2420,
+     "sha256": "c5eece5540fe2dec2d8015bc2e20bc281372f3932bbf5904a05e23df8bf98fbe"
+    },
+    "reference.lp": {
+     "bytes": 2400,
+     "sha256": "1688cccf108e7f09a9d6fa5b7d90ce6ec92e5d05d70704abcc3846b1093c7aad"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "default",
+   "scenario": "simple_supply_plus,inter_cluster_storage"
+  },
+  "balance_transmission": {
+   "files": {
+    "highs.lp": {
+     "bytes": 295,
+     "sha256": "9ef60cafefa480d2cf86ddce7288f29ffc92bf2216525c5b22302ccf69e01ef8"
+    },
+    "inputs.nc": {
+     "bytes": 205117,
+     "sha256": "0c8f0f36d262ec4cfea3415723b72467d1152ee27c129452c8f5ee2a9e67f8a0"
+    },
+    "pyomo.lp": {
+     "bytes": 2404,
+     "sha256": "43cb1d2a41064089274ddbfcd65dd9d0a7d2ca0d6853a32db67de7b5db267c9e"
+    },
+    "reference.lp": {
+     "bytes": 2380,
+     "sha256": "6db43e542c5dae8ed0355667a691305797b426d0c4df1652b42e1e3e4597a3bb"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_conversion,two_hours"
+  },
+  "chp_backpressure_and_boiler": {
+   "files": {
+    "highs.lp": {
+     "bytes": 249,
+     "sha256": "e10e617ffd0f3253dec3882faafb7f17ee0379ee3f6b275687c2d837fa247dd1"
+    },
+    "inputs.nc": {
+     "bytes": 209931,
+     "sha256": "97fe741461677b0bf6975b36546af0324b7ef4b6520861922767952793c8f1cc"
+    },
+    "pyomo.lp": {
+     "bytes": 1598,
+     "sha256": "109b000af344c3333ff97c79884cd7c1134ed83368da047fe1fef9238c3f9b68"
+    },
+    "reference.lp": {
+     "bytes": 1586,
+     "sha256": "d550cd794253b491e987236a113aa0b033602ed6836eff87ebb81671dfdb5e2b"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_chp,two_hours"
+  },
+  "chp_backpressure_line_equals": {
+   "files": {
+    "highs.lp": {
+     "bytes": 227,
+     "sha256": "b5e4f4565a03e565dd55b5afe7e3db790fd35fd360c2f254b96d2e54935ffeff"
+    },
+    "inputs.nc": {
+     "bytes": 203085,
+     "sha256": "dcf364d4b06ae46bce5ebff261d37d298ed757cbf981811d6a4ff68efc4cb072"
+    },
+    "pyomo.lp": {
+     "bytes": 1464,
+     "sha256": "5bb6700996c84a1e5c62c134b3439f46846e7729779ea79a88f01ec25272f509"
+    },
+    "reference.lp": {
+     "bytes": 1456,
+     "sha256": "0ea89f00102182a7577d065e7809dfa8862036a8455d7516122698d3fdb630f6"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_chp,two_hours"
+  },
+  "chp_extraction": {
+   "files": {
+    "highs.lp": {
+     "bytes": 217,
+     "sha256": "71b74894c4eccef5953216b461c72c7f0c76be1e8fa5635fa3e335ebe494b54f"
+    },
+    "inputs.nc": {
+     "bytes": 209210,
+     "sha256": "cf2eb5cd2a23868561ea9b61547e1b7782fbd7932cb92aca73d4a3bde294a5cd"
+    },
+    "pyomo.lp": {
+     "bytes": 1556,
+     "sha256": "1388fe82e08cc4483bfc1b299c082b6ce39df7e0ab73c9630d6d3a32d5a0293a"
+    },
+    "reference.lp": {
+     "bytes": 1544,
+     "sha256": "8757cbdaf9ca327bd64e05780c8f540822d198968cdb9578c7bfaadcf78618c8"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_chp,two_hours"
+  },
+  "cost": {
+   "files": {
+    "highs.lp": {
+     "bytes": 206,
+     "sha256": "35cbe3d37ce0f6e21b10e55eff161bc84ca5b1bb779ee37fbbbb41cd80ed2707"
+    },
+    "inputs.nc": {
+     "bytes": 225107,
+     "sha256": "76eca57cac2431ae3080c10bf607cdbc57c8761f09304c90c33e926ca90a8a91"
+    },
+    "pyomo.lp": {
+     "bytes": 1124,
+     "sha256": "75edacf0fb3f6fbffff6a7aa0b272d367af59bf8f658bf6dd036af8e39838d86"
+    },
+    "reference.lp": {
+     "bytes": 1116,
+     "sha256": "d6863b0cb642ab1351520258abafee065180e04bf8d67bc7a228050389928b02"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "cost_investment": {
+   "files": {
+    "highs.lp": {
+     "bytes": 208,
+     "sha256": "de26a39b3db5c08f293292483fa7e1070d26bc1f1baab07c007dd9dbfebb1538"
+    },
+    "inputs.nc": {
+     "bytes": 254935,
+     "sha256": "266d3424b2eafa787fe9e3239cafc123daee5668b171a5264481c10886f93c6d"
+    },
+    "pyomo.lp": {
+     "bytes": 1080,
+     "sha256": "3abdcb3bc4db7dba50953884f2ded2eb2a402c7706cd6c1ab68ec126b81d655c"
+    },
+    "reference.lp": {
+     "bytes": 1080,
+     "sha256": "3abdcb3bc4db7dba50953884f2ded2eb2a402c7706cd6c1ab68ec126b81d655c"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,two_hours"
+  },
+  "cost_investment_annualised": {
+   "files": {
+    "highs.lp": {
+     "bytes": 172,
+     "sha256": "814379972973043232fc943dc6d83804aae248eb1e54716dd92867f19ccc7493"
+    },
+    "inputs.nc": {
+     "bytes": 221204,
+     "sha256": "6a6d0189a39c817f06cceebab753050b804c68f5046bdaf6ea2fcece7c345910"
+    },
+    "pyomo.lp": {
+     "bytes": 460,
+     "sha256": "2cbd5598d36653c69050238722c92ba1dad84a09dda899ac8562edf2aeb1439f"
+    },
+    "reference.lp": {
+     "bytes": 460,
+     "sha256": "2cbd5598d36653c69050238722c92ba1dad84a09dda899ac8562edf2aeb1439f"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "cost_investment_annualised_depreciation_rate": {
+   "files": {
+    "highs.lp": {
+     "bytes": 172,
+     "sha256": "3ba2e5fd6d98c0dbb9083829ac62baf82ad33d6d76b3a9e357cb2c59fbed249b"
+    },
+    "inputs.nc": {
+     "bytes": 216247,
+     "sha256": "f7fa4b1572571a83e04abe76ec601769f514b51d2b3c82dcf220d2c2df304238"
+    },
+    "pyomo.lp": {
+     "bytes": 458,
+     "sha256": "a5731dcc4434f29b4953ae6be805a56da544ec8d7ab77e0f1c639cebe770c2f8"
+    },
+    "reference.lp": {
+     "bytes": 458,
+     "sha256": "a5731dcc4434f29b4953ae6be805a56da544ec8d7ab77e0f1c639cebe770c2f8"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "cost_investment_annualised_no_interest_rate": {
+   "files": {
+    "highs.lp": {
+     "bytes": 172,
+     "sha256": "fb9c4e696e18aad3573a74aefe958423e47185db7e86c5f10c18413ec4bd4cf8"
+    },
+    "inputs.nc": {
+     "bytes": 215756,
+     "sha256": "a0f5cf54aeef4919461c6ca2defbcdbc25e32ed8d9fdc4ed7c1673a77cb5dbab"
+    },
+    "pyomo.lp": {
+     "bytes": 458,
+     "sha256": "b1367387cc6a59c8009b0b4887facfda8ef703539d2d69a4ce45c9364dc085ae"
+    },
+    "reference.lp": {
+     "bytes": 458,
+     "sha256": "b1367387cc6a59c8009b0b4887facfda8ef703539d2d69a4ce45c9364dc085ae"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "cost_investment_area_use": {
+   "files": {
+    "highs.lp": {
+     "bytes": 142,
+     "sha256": "aa83351f5bd65104706dd8aa158c3ccd35b86a69b95861714edc42e9279a869a"
+    },
+    "inputs.nc": {
+     "bytes": 215826,
+     "sha256": "2bf516898ba55576ae970132e3f854cf58f244140cf0dd23460ca81d0d8095f7"
+    },
+    "pyomo.lp": {
+     "bytes": 374,
+     "sha256": "6db93c0e804bf9f6e1e649c1e87efefd836bd762842b190d8ca19248918d747f"
+    },
+    "reference.lp": {
+     "bytes": 374,
+     "sha256": "6db93c0e804bf9f6e1e649c1e87efefd836bd762842b190d8ca19248918d747f"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "cost_investment_flow_cap": {
+   "files": {
+    "highs.lp": {
+     "bytes": 198,
+     "sha256": "23976d5d2a7d5910cf75b2cea2819307ff577363e05af13a56ad9dddb2b5543f"
+    },
+    "inputs.nc": {
+     "bytes": 216269,
+     "sha256": "1de37d99f28634cf9dff60d3c51807efa67bd8d5091ef97a738a793aa4ecb1d5"
+    },
+    "pyomo.lp": {
+     "bytes": 692,
+     "sha256": "0092c4392e1731b61a99254358c9c802348767f09d2a715ea7904537101d8d61"
+    },
+    "reference.lp": {
+     "bytes": 692,
+     "sha256": "0092c4392e1731b61a99254358c9c802348767f09d2a715ea7904537101d8d61"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_conversion,two_hours"
+  },
+  "cost_investment_milp_override": {
+   "files": {
+    "highs.lp": {
+     "bytes": 118,
+     "sha256": "d1621d755176b6eb3e8645fc1a20b9da395389d1ff61f5d120481efb4f5d0144"
+    },
+    "inputs.nc": {
+     "bytes": 230063,
+     "sha256": "fe9f86c25a708c6bc23fdc2691cc37d06f5533c6c638c1ad41b8218f17ba0cdb"
+    },
+    "pyomo.lp": {
+     "bytes": 470,
+     "sha256": "12488db02fa1a9a3f1f9cc56fa20a4a3bbaa0ba8d2f16aba396180c0db389f30"
+    },
+    "reference.lp": {
+     "bytes": 468,
+     "sha256": "1ba6d3617a52c2c69107e626869aed73ffd6061a74c2a26c3526dbecb0b06735"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "cost_investment_purchase": {
+   "files": {
+    "highs.lp": {
+     "bytes": 116,
+     "sha256": "f9dd131c2b289c28ffa563cd96fc72438c6a6e1f60baac65543929f5c50dde3e"
+    },
+    "inputs.nc": {
+     "bytes": 231425,
+     "sha256": "99c7b94593e15c261b392507fde90fcaa9c42893ad3b88f9f4af605cf89cbd99"
+    },
+    "pyomo.lp": {
+     "bytes": 339,
+     "sha256": "77d220b8cd76a51502d89c0f17dc46262b5b7ccf1c4064cf6937c4643e6a42b1"
+    },
+    "reference.lp": {
+     "bytes": 339,
+     "sha256": "77d220b8cd76a51502d89c0f17dc46262b5b7ccf1c4064cf6937c4643e6a42b1"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "cost_investment_purchase_transmission": {
+   "files": {
+    "highs.lp": {
+     "bytes": 165,
+     "sha256": "79c90fdca965c4e46f58c3d882423522c25b400b7ab3a2e31647c69abe090955"
+    },
+    "inputs.nc": {
+     "bytes": 235833,
+     "sha256": "6dbdbfd2243e1571c328af95be88dec6801ed568a5e101be0c56df398519e4f7"
+    },
+    "pyomo.lp": {
+     "bytes": 522,
+     "sha256": "246c58d7d3a4c19358037d6139679c57f2835d47c75061987744de053decf2a3"
+    },
+    "reference.lp": {
+     "bytes": 522,
+     "sha256": "246c58d7d3a4c19358037d6139679c57f2835d47c75061987744de053decf2a3"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "cost_investment_source_cap": {
+   "files": {
+    "highs.lp": {
+     "bytes": 162,
+     "sha256": "91d455426c9c62bc602ce59d5bca9aff1b742d65092c530dea805efad9077b02"
+    },
+    "inputs.nc": {
+     "bytes": 230783,
+     "sha256": "dce1f2ee9714e58918de1a1529e6aaeb4b5d4a3675db0b0994f0e4d138f8f665"
+    },
+    "pyomo.lp": {
+     "bytes": 380,
+     "sha256": "44ae944d19941a10125459eca3a6a61bee28114845e4d7e27367cdc7ddb7fe9f"
+    },
+    "reference.lp": {
+     "bytes": 380,
+     "sha256": "44ae944d19941a10125459eca3a6a61bee28114845e4d7e27367cdc7ddb7fe9f"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,two_hours"
+  },
+  "cost_investment_storage_cap": {
+   "files": {
+    "highs.lp": {
+     "bytes": 182,
+     "sha256": "85832e5f0ce413460638f5d19a3c355e8d239c00b3dda0031e2565dfd3785594"
+    },
+    "inputs.nc": {
+     "bytes": 224522,
+     "sha256": "f2e1268382248503081be3e5fe9f1e7c3203d82d283e143a80654e6268d9bcf5"
+    },
+    "pyomo.lp": {
+     "bytes": 368,
+     "sha256": "30fec9d1876aee01021ac8336989e3fe3a97d728a6efb83ce3669359e6a5d65b"
+    },
+    "reference.lp": {
+     "bytes": 368,
+     "sha256": "30fec9d1876aee01021ac8336989e3fe3a97d728a6efb83ce3669359e6a5d65b"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_storage,two_hours"
+  },
+  "cost_operation_fixed": {
+   "files": {
+    "highs.lp": {
+     "bytes": 170,
+     "sha256": "20178522a46dab90cef90b1f903a48f2b4c9b4fb5ff29324c08998b0c5a84864"
+    },
+    "inputs.nc": {
+     "bytes": 216211,
+     "sha256": "8623d6061270fc1f9ecd557d9e6773d93f9bb9bf2822f0a89826ecbfcdda5153"
+    },
+    "pyomo.lp": {
+     "bytes": 454,
+     "sha256": "9345921de31a497aa619689f3510350ac50ef192c3dcf11e66b6eac341071f7b"
+    },
+    "reference.lp": {
+     "bytes": 454,
+     "sha256": "9345921de31a497aa619689f3510350ac50ef192c3dcf11e66b6eac341071f7b"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "cost_operation_variable": {
+   "files": {
+    "highs.lp": {
+     "bytes": 230,
+     "sha256": "8e74b0e9d78030e08e38da4785e73368a692a473b26da11b2d3051cb72bcd26f"
+    },
+    "inputs.nc": {
+     "bytes": 220277,
+     "sha256": "f522d36aea5d8addb88c2358f8db1d1ffefae3a2cd1081d3d81eaacc3737c272"
+    },
+    "pyomo.lp": {
+     "bytes": 2306,
+     "sha256": "38d3c80c35f8371f421242561f57fc236b2a6bb48fc67b6560ff8198a1b889ef"
+    },
+    "reference.lp": {
+     "bytes": 2278,
+     "sha256": "dc20120d709dc77d46fd210da4365cd7a9e91085fd4c0a74f698df2f5f0322f9"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "conversion_and_conversion_plus,var_costs,two_hours"
+  },
+  "cost_operation_variable_with_export": {
+   "files": {
+    "highs.lp": {
+     "bytes": 258,
+     "sha256": "ae4f7182efdb606fe075abdc36e3e92cc94a9d9d7e79a702248d66bfbf9f05ca"
+    },
+    "inputs.nc": {
+     "bytes": 226593,
+     "sha256": "6c26171e36786d8a6b635220071f1c699f3f5aae06cc2e864be816d7510d0ac1"
+    },
+    "pyomo.lp": {
+     "bytes": 2986,
+     "sha256": "d4c13bc26b5a4f3915a9793b7883c58a7e2d865942c8724c13e73df94401c6c4"
+    },
+    "reference.lp": {
+     "bytes": 2958,
+     "sha256": "5a8cb73252b246400a23fc0fdfe8085bca449a52caecc9500b812953436af130"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "conversion_and_conversion_plus,var_costs,two_hours"
+  },
+  "demand_share_equals_per_tech": {
+   "files": {
+    "highs.lp": {
+     "bytes": 211,
+     "sha256": "6fe0a2fbc546a2d7c0a2da65fb69ad5213f99d31895e02f9c95afa41b9e8076a"
+    },
+    "inputs.nc": {
+     "bytes": 209881,
+     "sha256": "92de615a2aba7e9de03ddb0c6f76a6f29898e82007d81cce4c928a77f02986c9"
+    },
+    "pyomo.lp": {
+     "bytes": 1608,
+     "sha256": "bc1ee86d6e5e47ddbbb81cf21cd8afa895ff3113ec1ff6be58decf8f2351a63c"
+    },
+    "reference.lp": {
+     "bytes": 1592,
+     "sha256": "a3e56a96dcf3404c3df22b3b342848abbb1b43dcb8f479cad16c5f2708da1b74"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "demand_share_per_timestep_decision_main": {
+   "files": {
+    "highs.lp": {
+     "bytes": 343,
+     "sha256": "2250ef72f9ed16c936d44a43d56b91b60abdf113991493a3f6fdeea1be7955d0"
+    },
+    "inputs.nc": {
+     "bytes": 205626,
+     "sha256": "a886e82ed201f2da77512764c6f97597bda237ff315a109aa070abff5c2972b9"
+    },
+    "pyomo.lp": {
+     "bytes": 2790,
+     "sha256": "3e1d712bd2d77c4349e7073d10c551fab5e88d2a1cc2e84db6f8ef5e2aa0e5a1"
+    },
+    "reference.lp": {
+     "bytes": 2778,
+     "sha256": "9bac2657fee95f6ce18e581796e63ac85c61e1bfffc667bf6c4a4395ae436beb"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "conversion_and_conversion_plus,two_hours"
+  },
+  "demand_share_per_timestep_decision_sum": {
+   "files": {
+    "highs.lp": {
+     "bytes": 171,
+     "sha256": "aa0654a91003756dc49081db66869727b229cd072463f858d7d8cf2e496ea500"
+    },
+    "inputs.nc": {
+     "bytes": 204308,
+     "sha256": "6247878bce7ed010ba444c5c906697beab0b68e640c5ccaf027046dedf470bf0"
+    },
+    "pyomo.lp": {
+     "bytes": 770,
+     "sha256": "1d6f87392f4aa76039e09c34e0898f60b4caff5c61551635f90036f4ff549c8e"
+    },
+    "reference.lp": {
+     "bytes": 766,
+     "sha256": "d6af61db93c316842eca1062bef3c966342f100b8960075ddb7227ebdaadca66"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "conversion_and_conversion_plus,two_hours"
+  },
+  "demand_share_per_timestep_equals_per_tech": {
+   "files": {
+    "highs.lp": {
+     "bytes": 231,
+     "sha256": "98055bb8f6fd8a708339946669d794a7830c29d1cfdb040ac13c882c790ba992"
+    },
+    "inputs.nc": {
+     "bytes": 210053,
+     "sha256": "915f2e812015fe63b2392c44771a9f466f0c950659a6a61586e692917b617d99"
+    },
+    "pyomo.lp": {
+     "bytes": 1884,
+     "sha256": "b9c89ec71a22b45e3034f000b03a87b387535954a46bac28c8f23c7934f63264"
+    },
+    "reference.lp": {
+     "bytes": 1868,
+     "sha256": "54a8fa1091dd2490dc11c4e977afbc50d6153938d7e1efd3785bd54a2265c4de"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "downtime_period": {
+   "files": {
+    "highs.lp": {
+     "bytes": 144,
+     "sha256": "8f457efe4609ad87110972f0bce2d09e08dbf7398112958f4a7cf08dd8bb1c79"
+    },
+    "inputs.nc": {
+     "bytes": 218399,
+     "sha256": "98ac16802a1325b6e79fd880cf0a6b128c5b26425e46889e0d72799e8f4c25a4"
+    },
+    "pyomo.lp": {
+     "bytes": 382,
+     "sha256": "b8fa406517791e950a5d96e833383b672c34959411a64e5490611a87ef20e311"
+    },
+    "reference.lp": {
+     "bytes": 380,
+     "sha256": "94943b3753b4d3de5e2b93a14589184ee3df4fe80b6dd5b94f98121708ef417a"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "downtime_period_decision": {
+   "files": {
+    "highs.lp": {
+     "bytes": 130,
+     "sha256": "97315f93bb38a8fb2de7c2d05d8dd88dfbf8e8dc23afc0902476e9f4164c85c7"
+    },
+    "inputs.nc": {
+     "bytes": 223202,
+     "sha256": "f20df4cc4d039340d211d2f0b0238d89dcb1704e9302d219df7d0d2f330ff7cb"
+    },
+    "pyomo.lp": {
+     "bytes": 663,
+     "sha256": "163c3482d12efbcd379c8510a6a6c7694c609fa0b8767180e512dd7ec87bbf86"
+    },
+    "reference.lp": {
+     "bytes": 659,
+     "sha256": "b3274691b619f76fafb03e2097d76273cfc8556a4fd0629f3de444e2eb6e9ba7"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "export_balance": {
+   "files": {
+    "highs.lp": {
+     "bytes": 247,
+     "sha256": "a8d142339681db39fc306f40301e1d2d23da2913bb21f5a766dd927509000183"
+    },
+    "inputs.nc": {
+     "bytes": 208637,
+     "sha256": "369f3b09007a922054076d9087861009d8051a8a72183fa6d83df21e74499be7"
+    },
+    "pyomo.lp": {
+     "bytes": 1854,
+     "sha256": "7224a6762b14902358ed35b655173aebfb63c8b5a9c6f6484f3ba60064eefbd3"
+    },
+    "reference.lp": {
+     "bytes": 1846,
+     "sha256": "849b4d3c084c3e0962c001c5d45d0b1076c89e52101dc98c8d0d98216c390c88"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "flow_capacity_max_purchase_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 141,
+     "sha256": "a47667fc23976188d85c8a7fed80cb29a858f452e8a5066222a5b15f1b4481db"
+    },
+    "inputs.nc": {
+     "bytes": 224162,
+     "sha256": "a8843760d162b5caf40d41f03e9da366355c396ca3c2ff166899601fbb711f34"
+    },
+    "pyomo.lp": {
+     "bytes": 536,
+     "sha256": "cc979bbd754e1b55eb247ab02f980439dd5e10f04da38cd359af5ff0db39f885"
+    },
+    "reference.lp": {
+     "bytes": 534,
+     "sha256": "0aaae201332e93a28a731e78403f2bcc18734774c87c281ed211cce7a2681432"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "flow_capacity_max_purchase_milp_no_max": {
+   "files": {
+    "highs.lp": {
+     "bytes": 131,
+     "sha256": "e65c1f4a2d1007d7b7a2a2d4de8d714e7d8e08a22ce95a65d2d103a5ea35db0d"
+    },
+    "inputs.nc": {
+     "bytes": 218428,
+     "sha256": "8c9afd0d806e488ee588d083e4d4bd45812a26a06c299c370063081b48a788ae"
+    },
+    "pyomo.lp": {
+     "bytes": 536,
+     "sha256": "d564b97b10fc1417f8084945636a28be09b6d5cc5d926c3f09bce7aecfa5d347"
+    },
+    "reference.lp": {
+     "bytes": 534,
+     "sha256": "c8a864c5dc9e0cfb518b9240b3ca88d383c3f3dea3b838a0c6412a71a6daeaa3"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "flow_capacity_minimum": {
+   "files": {
+    "highs.lp": {
+     "bytes": 145,
+     "sha256": "4dd4afa0e39954ffb7641f16b492523c5e7951d7ddd706fbc10a7f8fe920715b"
+    },
+    "inputs.nc": {
+     "bytes": 225394,
+     "sha256": "a59c56f08308dbdf63e206657b76fda4dc722b01cfb3e2d8d4273757e75c7b55"
+    },
+    "pyomo.lp": {
+     "bytes": 349,
+     "sha256": "8bc17621588488659ca56e2230229f7a169ff804e6f07af90bee6ffe477a0def"
+    },
+    "reference.lp": {
+     "bytes": 347,
+     "sha256": "0894a6103a1a35aeba6d57d7cfb6c4df07894388d9f9de1955fb8cfea3af9ea6"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "flow_capacity_minimum_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 129,
+     "sha256": "9b602a2f54b19486dc43289cf97667d3074fd3afb3b374b382174de947cd89f4"
+    },
+    "inputs.nc": {
+     "bytes": 224708,
+     "sha256": "0fb536ab9daf5c7937021486218b875d483dc1a3b6e4cee2fd8be247d4e1271d"
+    },
+    "pyomo.lp": {
+     "bytes": 524,
+     "sha256": "df5c5afc94b927e0d83bec0606e545d37e28614bc43d323b9deb66cb1acdda86"
+    },
+    "reference.lp": {
+     "bytes": 522,
+     "sha256": "26a446000b738d331383015aa40ce552a6a2c08a6242c09d8368ae655e181ec7"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "flow_capacity_per_storage_capacity_max": {
+   "files": {
+    "highs.lp": {
+     "bytes": 219,
+     "sha256": "70d60c5dd260e206c9d0382c688ea24acfbe80df18f62c07dc83f64e95a88b0d"
+    },
+    "inputs.nc": {
+     "bytes": 217890,
+     "sha256": "098030c413c9df4a9320adea611c0f187f7935bfe438ab83af5e4d8a62e52859"
+    },
+    "pyomo.lp": {
+     "bytes": 776,
+     "sha256": "a084cf595e09132cdf58e46e6cd84bc83815540b4d77239a52188ed6a4ea0d43"
+    },
+    "reference.lp": {
+     "bytes": 776,
+     "sha256": "a084cf595e09132cdf58e46e6cd84bc83815540b4d77239a52188ed6a4ea0d43"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_storage,two_hours"
+  },
+  "flow_capacity_per_storage_capacity_min": {
+   "files": {
+    "highs.lp": {
+     "bytes": 195,
+     "sha256": "8ee703f14774f1ab64c78ffd2bc4eee06d83b73cfcd953a95b43002e13bd2bf9"
+    },
+    "inputs.nc": {
+     "bytes": 222814,
+     "sha256": "1550b1d3e8145ae3304cf9a6af95871a2c54d5ca3f8f4fc18ad2a5b24e6e35e2"
+    },
+    "pyomo.lp": {
+     "bytes": 456,
+     "sha256": "d0cf6fa19e7bc7fd77dbf76cd8b999cbaa00fc3739d40e592dd890d2d13bdf31"
+    },
+    "reference.lp": {
+     "bytes": 456,
+     "sha256": "d0cf6fa19e7bc7fd77dbf76cd8b999cbaa00fc3739d40e592dd890d2d13bdf31"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_storage,two_hours"
+  },
+  "flow_capacity_systemwide_max": {
+   "files": {
+    "highs.lp": {
+     "bytes": 151,
+     "sha256": "ad3054ecb3a99d876102523b2ed7f9763ee6a1a6db7d91208c8ac2d1790ee567"
+    },
+    "inputs.nc": {
+     "bytes": 207085,
+     "sha256": "92ca1138ebe3c8132e6a072747d19fd211d1b2931e569fe1e4b2560733d94942"
+    },
+    "pyomo.lp": {
+     "bytes": 482,
+     "sha256": "f4105ceee9b4d4fb4582a68220b675b62321f723870745d7feaa341a4003cb0d"
+    },
+    "reference.lp": {
+     "bytes": 482,
+     "sha256": "f4105ceee9b4d4fb4582a68220b675b62321f723870745d7feaa341a4003cb0d"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "flow_capacity_systemwide_min": {
+   "files": {
+    "highs.lp": {
+     "bytes": 150,
+     "sha256": "f06c4b25bb6c6afd5cf94ad2217baa6917beef3bdda8c75335c9bb6b7bc7a507"
+    },
+    "inputs.nc": {
+     "bytes": 207041,
+     "sha256": "d601efa9e2c721da5be21769e3822ea0a2d692f84ef7ff6840ef01ab912692de"
+    },
+    "pyomo.lp": {
+     "bytes": 481,
+     "sha256": "bdfcd964bf5e11b52ce087f6baae4c4218d986defccee96f3b3cd97983b20695"
+    },
+    "reference.lp": {
+     "bytes": 481,
+     "sha256": "bdfcd964bf5e11b52ce087f6baae4c4218d986defccee96f3b3cd97983b20695"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "flow_capacity_systemwide_min_milp_override": {
+   "files": {
+    "highs.lp": {
+     "bytes": 175,
+     "sha256": "457b24b3f689c7f535e7916b15531cbb2b4c638d2f8d74d4b0233c98acacaedb"
+    },
+    "inputs.nc": {
+     "bytes": 227950,
+     "sha256": "55d5a114f841ee817421018090e74330204b00db50fb6872162772cc6a3341f4"
+    },
+    "pyomo.lp": {
+     "bytes": 658,
+     "sha256": "b33105be88532db356f6409bfe2d8629e34fae06f51100ebb551dae7c31c615d"
+    },
+    "reference.lp": {
+     "bytes": 654,
+     "sha256": "507271fe769ea7549d08ffe1ed8415e5e436fa259213342004f0b33312db3116"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "flow_capacity_units_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 128,
+     "sha256": "33abaaaa31bb4e7fa17d13a5e8a9710d53224a5f3d896285764393a040e67706"
+    },
+    "inputs.nc": {
+     "bytes": 218233,
+     "sha256": "22749b5a07809177ad0d50c386ba22ee15eda353dd846b6596b8abc6d5c0b2eb"
+    },
+    "pyomo.lp": {
+     "bytes": 526,
+     "sha256": "a83fb670edd8fa5cc712356157406b97f618b468be0f43649330a23b0c9b7ab2"
+    },
+    "reference.lp": {
+     "bytes": 524,
+     "sha256": "7f96ccd2276e9de93dfa86d87e1f9338654e2f790483559ae1dde3b4dcf8ceec"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "flow_in_max": {
+   "files": {
+    "highs.lp": {
+     "bytes": 669,
+     "sha256": "29fbc6b79de0a0421b3cfb145bb34335fddfec475d1a162067b606eaa558b052"
+    },
+    "inputs.nc": {
+     "bytes": 203317,
+     "sha256": "c8b64c9368ce8961e71fc1e8b9fba6ff081c505a60a364c7c25ad3ae09f4a16b"
+    },
+    "pyomo.lp": {
+     "bytes": 6772,
+     "sha256": "ee1f99787731b3b5639435812aebe2e1b10be1e1862821c558c16801f61f45fe"
+    },
+    "reference.lp": {
+     "bytes": 6732,
+     "sha256": "f5e9ac5725d6b77d31dc4315ad490f34f6c185e5a120b49607fe32f4f28e0f2f"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_conversion,two_hours"
+  },
+  "flow_in_max_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 189,
+     "sha256": "25f02bb80e4f5cccda9d3a50001987b006d3994065f6193656c0212d9c177176"
+    },
+    "inputs.nc": {
+     "bytes": 223598,
+     "sha256": "89bb390b6603459648d9be6548c9c6aab51ad4e9808c8f401c434763cc3cbeb9"
+    },
+    "pyomo.lp": {
+     "bytes": 1050,
+     "sha256": "55da812a62cd94b895a4c65b7ac97984f22c74d88acf4ef787b1f1791d7f245f"
+    },
+    "reference.lp": {
+     "bytes": 1042,
+     "sha256": "4372a344055cc6a8fc1bc17dd8672e1d98a919f2e940dd34f0944c44a48f4a04"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "conversion_milp,two_hours"
+  },
+  "flow_in_max_milp_override": {
+   "files": {
+    "highs.lp": {
+     "bytes": 707,
+     "sha256": "b94b7738855a61828c4413d1f8ffe2668e63a4f4d70c1682325960c25246fc42"
+    },
+    "inputs.nc": {
+     "bytes": 221595,
+     "sha256": "5dd5a63c91b1ed1f04f82c969bfdb5c83a8204de9d2bf8df3bbb56036af3931f"
+    },
+    "pyomo.lp": {
+     "bytes": 6772,
+     "sha256": "f67add835291acc81695fc79e7d3fe6d1efbffd25a4c7aa76fb0e294d0432b5b"
+    },
+    "reference.lp": {
+     "bytes": 6712,
+     "sha256": "a403f397c2a15d138695cfaa80617f469a17021160a27225cc15685b49095495"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_conversion,two_hours"
+  },
+  "flow_out_max": {
+   "files": {
+    "highs.lp": {
+     "bytes": 415,
+     "sha256": "227d973f75282a9b165a2aa64730dbe08685cc467794b17dd7296a6ce48deb68"
+    },
+    "inputs.nc": {
+     "bytes": 203092,
+     "sha256": "1c11ee0a24547118e3de8f512d9ac5bd0ae424e3fe0c0576ebe6dde613f96ee7"
+    },
+    "pyomo.lp": {
+     "bytes": 4304,
+     "sha256": "a8456a7323a47a839bd8aa2927f12ace1ac74c64ac6e207ec6cef07fd8f7c52c"
+    },
+    "reference.lp": {
+     "bytes": 4268,
+     "sha256": "e7a09d957da5fefa5664dd473791efb925b271048bfbe13b0afa910f935fb098"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "flow_out_max_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 155,
+     "sha256": "6e59b82f3968ebb44572074048b12b505ac383b03ca00212cd1359e7aa48f79b"
+    },
+    "inputs.nc": {
+     "bytes": 217765,
+     "sha256": "8b3325a43488c109c6594a944f7d2dd55ae3cdf12e5f1fdbc83b79ede7f0269b"
+    },
+    "pyomo.lp": {
+     "bytes": 1116,
+     "sha256": "f9ff250f2bd5d95e18e2a61ad2bd091a457f1cce469b2f4768a1cc7b4f3ed6e9"
+    },
+    "reference.lp": {
+     "bytes": 1108,
+     "sha256": "24c2a21cfb39dd48fb3b8dfa72f82ba9d74c28962aca8c7e053ce3fa68818599"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "flow_out_max_milp_override": {
+   "files": {
+    "highs.lp": {
+     "bytes": 687,
+     "sha256": "59c4fd2dcb1b5f9b3bb75b9e74b8f6b086556d46695f06667d5397879121b434"
+    },
+    "inputs.nc": {
+     "bytes": 223070,
+     "sha256": "b360904fa7e693d3cc4e790ece6128e4cf23184fe04c8684152c6e27ed6acbf1"
+    },
+    "pyomo.lp": {
+     "bytes": 6814,
+     "sha256": "1953b26d31f0716ffd2fc8aa65003430aaf845fa5ecd2222e9db1c3f3ea54d72"
+    },
+    "reference.lp": {
+     "bytes": 6754,
+     "sha256": "c35c4f243e94978895dbea2d4121fcb65bbf17be270f4ffd53db4e18ac026bd3"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_conversion,two_hours"
+  },
+  "flow_out_min": {
+   "files": {
+    "highs.lp": {
+     "bytes": 179,
+     "sha256": "33017026f9c6e5de6d916f2b3c4966b9149db630714e43cfef6b6bd528631a83"
+    },
+    "inputs.nc": {
+     "bytes": 208111,
+     "sha256": "99a70bf11bac52b933c67ce28eeafd3deba8e93429bd2d3be11ed9990cd964b5"
+    },
+    "pyomo.lp": {
+     "bytes": 840,
+     "sha256": "568842d9b6c7f2add0a484dad02259acf146bff8057a8d5fd2305d1d96593da7"
+    },
+    "reference.lp": {
+     "bytes": 836,
+     "sha256": "678b475043910dce0d3e654b4c4e67e1720ac1fa084891f1c2f9b4db432e1200"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "flow_out_min_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 153,
+     "sha256": "cf0422ad58111029fa74b4add9fc619e33cd72b9d35f4dce2a57006257e7866d"
+    },
+    "inputs.nc": {
+     "bytes": 224632,
+     "sha256": "328b9aaf6ca97305b086232a215b7f34c3f6b77100d4fb1ee0f6afebb87693fb"
+    },
+    "pyomo.lp": {
+     "bytes": 1114,
+     "sha256": "a802b94ef9107372bbc1c86e35266d111e70b3dcfeafa49c4c5b37188f9d06f0"
+    },
+    "reference.lp": {
+     "bytes": 1106,
+     "sha256": "b85b584f67771c57361f06a663d3ab1e7849f3fd29e0366d9476518b4f880370"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "flow_out_min_milp_available_flow_cap": {
+   "files": {
+    "highs.lp": {
+     "bytes": 153,
+     "sha256": "ccfb16452b863ade1b12dd0b755dcd4dc2748be48e256a89f01a6519d330fb2c"
+    },
+    "inputs.nc": {
+     "bytes": 224711,
+     "sha256": "67c63713503091a4e5ba7e6e1a03d32567299ed73fdf1b3b790bc8232d38dc4d"
+    },
+    "pyomo.lp": {
+     "bytes": 1114,
+     "sha256": "0f0052507b41da903e29007548a91dbac87ea5b12ad5a081a8ee764f134ab4f4"
+    },
+    "reference.lp": {
+     "bytes": 1106,
+     "sha256": "a846b270f0a9e68ab1398becf9f5def1bd4feb6260727f341b203042dcf0eb80"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "flow_out_min_milp_override": {
+   "files": {
+    "highs.lp": {
+     "bytes": 369,
+     "sha256": "c44dcd9338c970f2a9c941dbc11cff9d53fa3c70ebcda354b016cc7302e5c540"
+    },
+    "inputs.nc": {
+     "bytes": 227540,
+     "sha256": "bd719f73139f5278de16a64963e4905925b5dbd92651f4e1ed8d481dace7eca1"
+    },
+    "pyomo.lp": {
+     "bytes": 2050,
+     "sha256": "6e22bbfbb05277ee8f2da292aff28e296e4fab8ee4fa81f4736f8f0830115ed9"
+    },
+    "reference.lp": {
+     "bytes": 2034,
+     "sha256": "4e53b3ed20bce856fd37c5e767e9a88f1927fb4b126f04f8b02aa42c1528b4d6"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_conversion,two_hours"
+  },
+  "force_zero_area_use": {
+   "files": {
+    "highs.lp": {
+     "bytes": 154,
+     "sha256": "04f95d0a7dbbec4d455b167138919c807c26ce28b7d25164bf91d035d7760d2d"
+    },
+    "inputs.nc": {
+     "bytes": 207737,
+     "sha256": "8d0735b225c64804fea216189529664019d0c763bcf3cf32e73b737987459d57"
+    },
+    "pyomo.lp": {
+     "bytes": 307,
+     "sha256": "d39240a3c15e035cdad21a5f0dbf38806a882a56af110f6a2cf52aa0ac66a715"
+    },
+    "reference.lp": {
+     "bytes": 307,
+     "sha256": "d39240a3c15e035cdad21a5f0dbf38806a882a56af110f6a2cf52aa0ac66a715"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "fuel_dist_base": {
+   "files": {
+    "highs.lp": {
+     "bytes": 547,
+     "sha256": "3256b6f637cdaa425cba39f2dc80fe4befa86b69277b802886a21ae11de23f46"
+    },
+    "inputs.nc": {
+     "bytes": 212615,
+     "sha256": "25ec8d7328cbd72fde91f3ee06040b738b3a082d886f1f9162d27f986e9f0a2c"
+    },
+    "pyomo.lp": {
+     "bytes": 6166,
+     "sha256": "a9f2ba969a54a1372d812fc2d6cdb07285cb6c2332f6e61b9cf262eac7058e0a"
+    },
+    "reference.lp": {
+     "bytes": 6166,
+     "sha256": "a9f2ba969a54a1372d812fc2d6cdb07285cb6c2332f6e61b9cf262eac7058e0a"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "fuel_distribution,two_hours"
+  },
+  "fuel_dist_cost": {
+   "files": {
+    "highs.lp": {
+     "bytes": 204,
+     "sha256": "350121f4b38175518fbdc2462d6d8b58a98c3f3f73f0ef10180710b2e15e2356"
+    },
+    "inputs.nc": {
+     "bytes": 216710,
+     "sha256": "b080a6c6dd6ac2269d30e5c5bac7eb076c47126e872a2c05a6b83e02589e5616"
+    },
+    "pyomo.lp": {
+     "bytes": 1301,
+     "sha256": "04a766b6f30d458377320686caf24d5883cdd6e48b8cc2b3b4d5fe8420cc2e31"
+    },
+    "reference.lp": {
+     "bytes": 1293,
+     "sha256": "2e56e24bb98cdf72f7b90d6aa756b6715e23e936ecc0f1c2691527604f7491a1"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "fuel_distribution,two_hours"
+  },
+  "fuel_dist_nodal": {
+   "files": {
+    "highs.lp": {
+     "bytes": 223,
+     "sha256": "9770366fe5626a2cbf53660e522c8d53a39b9d221cb8511c058fdb0bea990319"
+    },
+    "inputs.nc": {
+     "bytes": 220498,
+     "sha256": "40327743f96aaee379586dd3678a2eb670ad3fb194809bb1034d942f5655cb88"
+    },
+    "pyomo.lp": {
+     "bytes": 976,
+     "sha256": "215b552dbd634d619f6f5cf157622f16c641ef8f4c00855c5d8576f4a1d1c971"
+    },
+    "reference.lp": {
+     "bytes": 976,
+     "sha256": "215b552dbd634d619f6f5cf157622f16c641ef8f4c00855c5d8576f4a1d1c971"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "fuel_distribution,two_hours"
+  },
+  "max_time_varying_flow_cap": {
+   "files": {
+    "highs.lp": {
+     "bytes": 231,
+     "sha256": "f83c6402341cc5669c2b14696649f1e992be0f5eee0d1bf88e600563999b0bbe"
+    },
+    "inputs.nc": {
+     "bytes": 206706,
+     "sha256": "a1c1162fc7b9c62da69ad5928ff52dfaa889795440b574e71a01bd6a960b65f0"
+    },
+    "pyomo.lp": {
+     "bytes": 1596,
+     "sha256": "ff131fd8bd3f231b96e151eb9c71f4f16f1282d29cd9f4389a7eaccf2027274e"
+    },
+    "reference.lp": {
+     "bytes": 1584,
+     "sha256": "e9d87c4c1b3d13bf57f6b554e646a79a80e51a0871e4d027bf41557a061bd253"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "min_cost_optimisation": {
+   "files": {
+    "highs.lp": {
+     "bytes": 576,
+     "sha256": "928ee5c401bb51bc5482e0d33bc5349e91f0de66201618c5a1dcd814128292ae"
+    },
+    "inputs.nc": {
+     "bytes": 224888,
+     "sha256": "6b114a2fd7c4f0e566034b61811ea852f6053e853db603cc69989c00b117c1f0"
+    },
+    "pyomo.lp": {
+     "bytes": 3235,
+     "sha256": "faba8fed2cbaed3855dfe6c3ab3dc2499267871bcc9f05d58c9602e7fde32367"
+    },
+    "reference.lp": {
+     "bytes": 3203,
+     "sha256": "6bedb9b26d0e71fd9fe835127e907ec8e664405c990bec3c28c9f1cbd2bd186d"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours,investment_costs"
+  },
+  "min_cost_optimisation_weighted": {
+   "files": {
+    "highs.lp": {
+     "bytes": 330,
+     "sha256": "31dea0804bc2c7c8d1b81200657ebb7e1b615f674f35805988263695ca23b8c1"
+    },
+    "inputs.nc": {
+     "bytes": 231894,
+     "sha256": "920550b05607d6aacfbe9c51d55d1afb8c6f54dce7e4fde3c77683933bb0ae41"
+    },
+    "pyomo.lp": {
+     "bytes": 2341,
+     "sha256": "611b244010db0135a641a56240f6be52fef0e558af2d00be889874eaebedb9d7"
+    },
+    "reference.lp": {
+     "bytes": 2325,
+     "sha256": "805abf044b75314b01d26b8dd4cad669ec22a2d0c8c56790892f651e1d6cbb6e"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours,weighted_costs"
+  },
+  "monthly_peak_flow_charge": {
+   "files": {
+    "highs.lp": {
+     "bytes": 262,
+     "sha256": "f550ed9276f63e73e22f2228bb48ea702230183bf51b7a301c195b6ca1f82afb"
+    },
+    "inputs.nc": {
+     "bytes": 214468,
+     "sha256": "b89bd63d10e75988cf6547fe49ab99b0836d5e012d6fa074083bad0200e9466f"
+    },
+    "pyomo.lp": {
+     "bytes": 1723,
+     "sha256": "2f13ce54f0c4a62f2eb86787d593251bea6bd3566fb7d86065b26f4cd789de87"
+    },
+    "reference.lp": {
+     "bytes": 1723,
+     "sha256": "2f13ce54f0c4a62f2eb86787d593251bea6bd3566fb7d86065b26f4cd789de87"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "default",
+   "scenario": "simple_supply"
+  },
+  "net_annual_import_share_max": {
+   "files": {
+    "highs.lp": {
+     "bytes": 384,
+     "sha256": "edca58a9ce929f097fc2894310dbf01549438d85dc7e548b53f40a6000ee4530"
+    },
+    "inputs.nc": {
+     "bytes": 202970,
+     "sha256": "c1eca7c1a3498b742cf4ce2d47e0073bb886205b056f31f840161af3a48cb4ba"
+    },
+    "pyomo.lp": {
+     "bytes": 4262,
+     "sha256": "2096c889d50ef74cde2f8ca8472a1d2060ff2def2149c6e8b085df8ff652db23"
+    },
+    "reference.lp": {
+     "bytes": 4214,
+     "sha256": "9978ed97010c06a2477249771af150c1ac112368d135a8092e49540ea16db298"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "net_annual_import_share_max_node_group": {
+   "files": {
+    "highs.lp": {
+     "bytes": 288,
+     "sha256": "3a1faaad9582c892cffaff922cf40663fb68654dc1dd595e2102970671342878"
+    },
+    "inputs.nc": {
+     "bytes": 203369,
+     "sha256": "cf66459721ad06f96bddc074619cfe49c72c8b85d73a144addbba10e15139384"
+    },
+    "pyomo.lp": {
+     "bytes": 2296,
+     "sha256": "f5d4f7a230236f36a93f28412b9622ff4633eab69c2795c206176d33086d7dd6"
+    },
+    "reference.lp": {
+     "bytes": 2268,
+     "sha256": "6c01d303883619034fad361489274654fad460f3c0eb62829e4435abc1f51e68"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "net_import_share_max": {
+   "files": {
+    "highs.lp": {
+     "bytes": 417,
+     "sha256": "c1a7fc9d07c1f1c98f34eaf82de04a7e46007d085b10cbbe6fec6482bb184cab"
+    },
+    "inputs.nc": {
+     "bytes": 202874,
+     "sha256": "c0ff1e7bac6526a57657173df6f837a94eca406a0ad48aabc86b2c02d722f041"
+    },
+    "pyomo.lp": {
+     "bytes": 4502,
+     "sha256": "f83bacaddb05b44e44b28eedecb31a732fa4a4ac914c75676d790a1d35649a36"
+    },
+    "reference.lp": {
+     "bytes": 4454,
+     "sha256": "109611f9c052eb50a7db91fa1039c2aee50d541d174e5adb2b984b02e9831e43"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "piecewise_cost_investment": {
+   "files": {
+    "highs.lp": {
+     "bytes": 206,
+     "sha256": "3d7dfe70e5e17816e69c60d558e1c31d0a33c290eb80c86cbd3e84818e4447f0"
+    },
+    "inputs.nc": {
+     "bytes": 258980,
+     "sha256": "668c85d7e43fe105d4dfb83ef4012c9f5be264fc73719d0c15ebca11dfaf4e59"
+    },
+    "pyomo.lp": {
+     "bytes": 1216,
+     "sha256": "3341d99a7b730d4eccdc5c2c405253e21d40ab10a37d5748ca7359fce460c090"
+    },
+    "reference.lp": {
+     "bytes": 1216,
+     "sha256": "3341d99a7b730d4eccdc5c2c405253e21d40ab10a37d5748ca7359fce460c090"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "default",
+   "scenario": "supply_purchase,two_hours"
+  },
+  "piecewise_efficiency": {
+   "files": {
+    "highs.lp": {
+     "bytes": 313,
+     "sha256": "7b4467654e24985301d65421cdf783788aefe114a9fcd6d9a0a2c350e99e6a90"
+    },
+    "inputs.nc": {
+     "bytes": 232520,
+     "sha256": "c4279e8748d5af2d1db1eeece99c2a5710d2342684051072d0327e1b676542b8"
+    },
+    "pyomo.lp": {
+     "bytes": 2302,
+     "sha256": "4ccc44a9c745a3e73610cfb91710f1c8350f7eddfb54bf1ece47c87db2fdb9ad"
+    },
+    "reference.lp": {
+     "bytes": 2302,
+     "sha256": "4ccc44a9c745a3e73610cfb91710f1c8350f7eddfb54bf1ece47c87db2fdb9ad"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "default",
+   "scenario": "conversion_milp,two_hours"
+  },
+  "ramping_carrier_in_and_out": {
+   "files": {
+    "highs.lp": {
+     "bytes": 317,
+     "sha256": "b2ee84435b4497aaecb75f2f46f7f8f8120bfc6a940eda93c1de4473de695598"
+    },
+    "inputs.nc": {
+     "bytes": 206390,
+     "sha256": "04e44dd97dfd9829b29dd6766b01dd1c177a88412a736d06e85c6ab32837b350"
+    },
+    "pyomo.lp": {
+     "bytes": 2677,
+     "sha256": "2d492c3a261e0545b15e2dfb09f5fc3b17f7921ce4c6f578e06b46465538e96f"
+    },
+    "reference.lp": {
+     "bytes": 2665,
+     "sha256": "adc48b6464769a38a54d3cebb0866fa92f764edd3b5981178c383202000b8049"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "conversion_and_conversion_plus,two_hours"
+  },
+  "ramping_carrier_in_only": {
+   "files": {
+    "highs.lp": {
+     "bytes": 303,
+     "sha256": "1ae0af2f2a7dd9a66741317d2b6104045eae86aca0045b29a5301c3693d51b59"
+    },
+    "inputs.nc": {
+     "bytes": 211746,
+     "sha256": "2b4242b7c49bc1b560deaa8babe31e2047633a68717fe3fe147dd56246adb77a"
+    },
+    "pyomo.lp": {
+     "bytes": 1663,
+     "sha256": "213f9ee480191b27e45b4f462b5c0f5073964ad779040af1db231d8aef4f28a3"
+    },
+    "reference.lp": {
+     "bytes": 1655,
+     "sha256": "2e95cda089b7c0110faf91494d89e0e154c4066cd49354533ceb8d02b2e37edd"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_conversion,two_hours"
+  },
+  "ramping_down": {
+   "files": {
+    "highs.lp": {
+     "bytes": 160,
+     "sha256": "c8821417781a31e6bf76710e8d99777c23b7fb4efc83ab6d4d441416d63dc5cb"
+    },
+    "inputs.nc": {
+     "bytes": 210427,
+     "sha256": "c0d3c2b99c30892d93728b78cbc362f992f6897a012a16558c6d1ab2466402eb"
+    },
+    "pyomo.lp": {
+     "bytes": 693,
+     "sha256": "e1b776cc8150f38c3ad49ad3eae3b1e28c0895a080cd3987042f33108a1d28eb"
+    },
+    "reference.lp": {
+     "bytes": 689,
+     "sha256": "9ff51572476745e97e947ab31aecff20ec338e1949542234333074ca1885018d"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "ramping_up": {
+   "files": {
+    "highs.lp": {
+     "bytes": 160,
+     "sha256": "1e62e7201b5379c2cdad61f94cff2c9e21c6161a237dc0beda6034b0c413d408"
+    },
+    "inputs.nc": {
+     "bytes": 210398,
+     "sha256": "80d66dfc1bbb3dabf5f79a9335d2b8e8631dbacaeaafc5376c7121aa52c3889e"
+    },
+    "pyomo.lp": {
+     "bytes": 691,
+     "sha256": "a948d4213966d0f377073e3cbd00e00da81d9d66c44f454cd9789ccc283d4873"
+    },
+    "reference.lp": {
+     "bytes": 687,
+     "sha256": "10fb42b0390e3ec6f7f3fda30e813dd8384e4a77c17e066d982cd1a67448ce9e"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "set_storage_initial": {
+   "files": {
+    "highs.lp": {
+     "bytes": 198,
+     "sha256": "277a9c53dcd211a8cd479d7535e93831c568a939eee033b5c83a446d2ba30441"
+    },
+    "inputs.nc": {
+     "bytes": 224696,
+     "sha256": "6b6e356b173ec7d41ecaaf5a62f607051621f33dedbd55b1842211ad26b52a28"
+    },
+    "pyomo.lp": {
+     "bytes": 434,
+     "sha256": "e636094bc8bec6e06221eaa916c2f0ebe94813a101274190ed9750bc0f010912"
+    },
+    "reference.lp": {
+     "bytes": 432,
+     "sha256": "380a74f2c3a453fcd7fde0ec3c0e88f5aff3a4d199729c28a0d53d5058563687"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_storage,two_hours"
+  },
+  "set_storage_initial_inter_cluster": {
+   "files": {
+    "highs.lp": {
+     "bytes": 331,
+     "sha256": "6bc5b95b68526c03d999f0024d7cccdfa12a7e379f6bf3442c76a43ab5fdd581"
+    },
+    "inputs.nc": {
+     "bytes": 261854,
+     "sha256": "6f405d70961bc77bd2c992659b9d475fad4f517cae6df942fd30aa2e1e9424d1"
+    },
+    "pyomo.lp": {
+     "bytes": 476,
+     "sha256": "6893301b6702f9b5cd1cebb1909c763da452bd2c0ad2f4e9613b95259bbe6e91"
+    },
+    "reference.lp": {
+     "bytes": 474,
+     "sha256": "61663cec4a638fe2f78de0918a864a6efe49fd8f2978a8aa58f95133bad759ba"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "default",
+   "scenario": "simple_storage,inter_cluster_storage"
+  },
+  "sos2_piecewise_cost_investment": {
+   "files": {
+    "inputs.nc": {
+     "bytes": 240664,
+     "sha256": "8635139199967028ff4a07556a3e3d5e455eda6bea54523784c9fad95be4acdf"
+    },
+    "pyomo.lp": {
+     "bytes": 2691,
+     "sha256": "03a39346959d2001da500ceddcdeaa1ea319b52e14939826130db7fd0e1acc12"
+    },
+    "reference.lp": {
+     "bytes": 2691,
+     "sha256": "03a39346959d2001da500ceddcdeaa1ea319b52e14939826130db7fd0e1acc12"
+    }
+   },
+   "highs_error": "NotImplementedError: Piecewise constraints are not yet implemented for the HiGHS backend.",
+   "highs_lp_names": null,
+   "scenario": "supply_purchase,two_hours"
+  },
+  "source_availability_supply": {
+   "files": {
+    "highs.lp": {
+     "bytes": 225,
+     "sha256": "d2fda6f2b4ac840f45928b3cbd583d6627d912a6bd5eefcf1ef836b9e64ef321"
+    },
+    "inputs.nc": {
+     "bytes": 226331,
+     "sha256": "baa369b2b1799012d59fc6f21d3b4b9e857a79bda08835f79ed8a98d9baca3d9"
+    },
+    "pyomo.lp": {
+     "bytes": 1084,
+     "sha256": "26dee1bc64809dc04ea0b248e0cd6e7659917815d5d1211b7b1615d0c9faef08"
+    },
+    "reference.lp": {
+     "bytes": 1076,
+     "sha256": "372b8f3f8e34ede887f5d33176e2130109f7d4e54fa92c2400a20d41aa1514b5"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,resample_two_days"
+  },
+  "source_availability_supply_source_unit_per_area": {
+   "files": {
+    "highs.lp": {
+     "bytes": 265,
+     "sha256": "2ced0ae475108769f853c58b19cb9e3e78c079c53b462542cf54795b3f7b5010"
+    },
+    "inputs.nc": {
+     "bytes": 232498,
+     "sha256": "7e5445e1b44e244bba469d648fa9473ae808f7f8a1ad3e4e4caff70347fd1968"
+    },
+    "pyomo.lp": {
+     "bytes": 1387,
+     "sha256": "7e32a8119110538bdeb54325d37f9d7c002f57a0725bce48d94749c252832cc5"
+    },
+    "reference.lp": {
+     "bytes": 1379,
+     "sha256": "08ba0ec1d27be3f8544b076f1b0fe59e0c1b8d2c456963b2943e31e037442833"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,resample_two_days"
+  },
+  "source_availability_supply_source_unit_per_cap": {
+   "files": {
+    "highs.lp": {
+     "bytes": 253,
+     "sha256": "fd08e999944cb8042180105e28ee7a69f24e7aedb354673113b2166a222173bd"
+    },
+    "inputs.nc": {
+     "bytes": 227398,
+     "sha256": "30b7cb100d05177abfd9fe4ca4ed9220a0d99461cc6b19f4bd1b6eb5a9ad4d56"
+    },
+    "pyomo.lp": {
+     "bytes": 1492,
+     "sha256": "59cd309092ed0ef082f825c84c3c07e6199ed1c227fed098457ece39ebee8d58"
+    },
+    "reference.lp": {
+     "bytes": 1484,
+     "sha256": "e564cf824b5826775229ed8fed5b49df8ba094a6c753177ba73208e4e99f9ad8"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,resample_two_days"
+  },
+  "source_availability_supply_source_use_equals": {
+   "files": {
+    "highs.lp": {
+     "bytes": 221,
+     "sha256": "d79c2f56024f55455c837bf9ac602ca261644d8117b5924a3ee4ea04468f9e88"
+    },
+    "inputs.nc": {
+     "bytes": 230478,
+     "sha256": "44229269242517ef38f6decdd23eca72c0a388cc9a7ccbe471fe7ac3be4cc14f"
+    },
+    "pyomo.lp": {
+     "bytes": 1080,
+     "sha256": "1554f3277fc7f93db05b430b3c13d5cf184284b4cf52336cd8404b7c469c0bfd"
+    },
+    "reference.lp": {
+     "bytes": 1072,
+     "sha256": "44a7cb5cd337fd9a602500ee57304eca3f75c8393324203bd98b947f725479e4"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,resample_two_days"
+  },
+  "source_capacity_equals_flow_capacity": {
+   "files": {
+    "highs.lp": {
+     "bytes": 172,
+     "sha256": "711ef414d5864220464ec82fd55e08921d2eae444659b167bad2c81937e8400c"
+    },
+    "inputs.nc": {
+     "bytes": 224184,
+     "sha256": "dac50af6ffd3ff3990f53ab71840366f700711819618e29da5c4ad5694dbb082"
+    },
+    "pyomo.lp": {
+     "bytes": 469,
+     "sha256": "108281a594d48c4de71465ab6ffe380be65ee470437d724882c689217147ad24"
+    },
+    "reference.lp": {
+     "bytes": 469,
+     "sha256": "108281a594d48c4de71465ab6ffe380be65ee470437d724882c689217147ad24"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,two_hours"
+  },
+  "source_capacity_minimum": {
+   "files": {
+    "highs.lp": {
+     "bytes": 187,
+     "sha256": "4bbc3ae648fece2ba6fe53dc78d9dc9c38ec818772aa7aed20946c681629b4cd"
+    },
+    "inputs.nc": {
+     "bytes": 246023,
+     "sha256": "5e8012072c42eefa7ad6057299632d3c19ae779ec3c8dc5b29e0bc327d8c42a3"
+    },
+    "pyomo.lp": {
+     "bytes": 496,
+     "sha256": "12ee89b97e86046053532c383079673fbe4fe0615b1054d7576d1ae8a9e4b5fd"
+    },
+    "reference.lp": {
+     "bytes": 492,
+     "sha256": "4d6ac44123d7259237dee2932e9c0bd02a3dcf58243e0c43c19055ac6e13f1fd"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,two_hours"
+  },
+  "source_capacity_minimum_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 224,
+     "sha256": "bd8ec969ee4f986e20045f50d5c88d380a0eaf0b6fd6aee281b89256b0b58b5f"
+    },
+    "inputs.nc": {
+     "bytes": 250031,
+     "sha256": "b2ee1907f761e3177e5d6e596252eddd0d5b0631f295bbfb0df414ea99f763e5"
+    },
+    "pyomo.lp": {
+     "bytes": 842,
+     "sha256": "e8071ac62122ec5794af1408184970aaa7631aebafaf5b009bd1aec078c6cb3b"
+    },
+    "reference.lp": {
+     "bytes": 838,
+     "sha256": "7248eccf24650e7650f0786e3d29614f3717834917173fb6dce5c975f46abb64"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,two_hours"
+  },
+  "source_max": {
+   "files": {
+    "highs.lp": {
+     "bytes": 253,
+     "sha256": "7c910487246ff891166bfe6eb4d776d67f8ebc4c46b002903b4bbe9750a619cc"
+    },
+    "inputs.nc": {
+     "bytes": 223597,
+     "sha256": "7931cbd943ecfe7ffa18beeb0af27c78062776ba310e653dda7176ef2b7aa08c"
+    },
+    "pyomo.lp": {
+     "bytes": 1334,
+     "sha256": "19640cb04cfef705537f90a6bfa4a15f15d0637b4ed012b8f733eb831843d221"
+    },
+    "reference.lp": {
+     "bytes": 1326,
+     "sha256": "d0c1edce5dc1394656174395d47d351addd0b10787f673bb732076730252259c"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_plus,resample_two_days"
+  },
+  "storage_capacity_max_purchase_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 144,
+     "sha256": "14c9af7202f8e8feb5502f380e53e0d4b02c45190f4b771b4e94d98cbacbf892"
+    },
+    "inputs.nc": {
+     "bytes": 224538,
+     "sha256": "d496b2c2a8c4e4671c019e17cba08bc1148c9b0b52c0a39d20689f21b970fc5e"
+    },
+    "pyomo.lp": {
+     "bytes": 506,
+     "sha256": "e1bfe35d10bbba81efb392c92530b0329bff785bac9abe8a1faff0faaf90a99a"
+    },
+    "reference.lp": {
+     "bytes": 504,
+     "sha256": "07dd84a3339d459dce40e6047995fbd93704d625d80b45d690e5143486add8c4"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "storage_capacity_minimum": {
+   "files": {
+    "highs.lp": {
+     "bytes": 146,
+     "sha256": "df9131bef1af9664a405bfa5c5bed7a23a71192992685d352a60cf3cdd74812f"
+    },
+    "inputs.nc": {
+     "bytes": 247820,
+     "sha256": "e7d813a4f9ee04697fc2c005040cbe44840ef13ec273f24410238595370a5269"
+    },
+    "pyomo.lp": {
+     "bytes": 319,
+     "sha256": "eef7a86c2b4e51add48c40340dc0f7f2ddef7e6402be3c5991f63e02289eccdd"
+    },
+    "reference.lp": {
+     "bytes": 317,
+     "sha256": "c7748cc60a1251926989769ff377295aa315df70d09bc8b2f3404b9c44f460c7"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours,investment_costs"
+  },
+  "storage_capacity_minimum_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 132,
+     "sha256": "3bc12d41ac4f8e191720f67d449ccb5ae727ed76334fae54e34ea219ea2dbd93"
+    },
+    "inputs.nc": {
+     "bytes": 224709,
+     "sha256": "1bb26f34da4b6f4398c24829117ebbd1c0149290c5d10dcac7a99624b7420123"
+    },
+    "pyomo.lp": {
+     "bytes": 494,
+     "sha256": "f24d7d64a42173eeee754d2200d56b9b0ce74098f45ff0b6fbd6955981e24cb1"
+    },
+    "reference.lp": {
+     "bytes": 492,
+     "sha256": "0e9d243fe2066f31f51f07483664937099197704260f27865c7315ee803585dc"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "storage_capacity_units_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 131,
+     "sha256": "d567e3484066604225aea32bff3dfcaed3a5639ed0a140735bab567bf11d062f"
+    },
+    "inputs.nc": {
+     "bytes": 224231,
+     "sha256": "e1a8af253495765027a8cddd6cd81a602ee9883aadcc39340d6223d96d9d55fc"
+    },
+    "pyomo.lp": {
+     "bytes": 496,
+     "sha256": "536848bd1963bdf043bc5f8d8fc432fe4dd99e9308c0d2940c2128829bd998fd"
+    },
+    "reference.lp": {
+     "bytes": 494,
+     "sha256": "7962b4607619ba9cc2b1955db4af0724b651e4a8221ed249aabd09e63932f204"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "storage_discharge_depth_limit": {
+   "files": {
+    "highs.lp": {
+     "bytes": 223,
+     "sha256": "14a83f0eabeb0c6c7c745c2af7294a46095fb3e1fbeaba5780865e410b7ddfb5"
+    },
+    "inputs.nc": {
+     "bytes": 222713,
+     "sha256": "374f679fd12b32fd78ed6f6558284ac991391098eda0c08732619d653b22267c"
+    },
+    "pyomo.lp": {
+     "bytes": 726,
+     "sha256": "fe7af9fc4b5075c23ca8f5b13311dcb712eb684517d551e867e9e5c6070ff1c4"
+    },
+    "reference.lp": {
+     "bytes": 722,
+     "sha256": "552db07e06e541b87a50d09bce0ce11e8f2e078e9fb4371fa594de1b723df649"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_storage,two_hours"
+  },
+  "storage_inter_max": {
+   "files": {
+    "highs.lp": {
+     "bytes": 609,
+     "sha256": "aa1ee4871bdd51cacce169d53242c1f4b84bed9778c033e73eeb84452f95958c"
+    },
+    "inputs.nc": {
+     "bytes": 253821,
+     "sha256": "7b8ced374857ba2a7ce52511273df8cba177817bf53860812ec7db157c8f2a78"
+    },
+    "pyomo.lp": {
+     "bytes": 3956,
+     "sha256": "e5bdba7c64edf6f2c0173466545450deca4b77ef5d7060cd9fea164591ae80d2"
+    },
+    "reference.lp": {
+     "bytes": 3936,
+     "sha256": "eca30a8c77170bf59c600517ec6c37aa24892077df9a6f0e6165d7c689c7f2f3"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "default",
+   "scenario": "simple_storage,inter_cluster_storage"
+  },
+  "storage_inter_min": {
+   "files": {
+    "highs.lp": {
+     "bytes": 699,
+     "sha256": "0992a33b0e93e4c78e0715f1ad699f0d227883363bbb7d249999a4b6ea1c469f"
+    },
+    "inputs.nc": {
+     "bytes": 253747,
+     "sha256": "1982934cc2f888e9a33d402154fafd32d78e4f98d676be08ffc5fbae89fd6c53"
+    },
+    "pyomo.lp": {
+     "bytes": 3580,
+     "sha256": "c9ecac8751830bb3a3992c7a4c6ed40a8324927cd165f7e0b20109d744c5c17f"
+    },
+    "reference.lp": {
+     "bytes": 3560,
+     "sha256": "67cfee3cf038eeb38a1ceed491cac091b99804c8898defef88e8612bfeab73e1"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "default",
+   "scenario": "simple_storage,inter_cluster_storage"
+  },
+  "storage_intra_max": {
+   "files": {
+    "highs.lp": {
+     "bytes": 389,
+     "sha256": "85fcbf94eb3e5afce48b3d2f4ddd7597550f5cb36a552b9c89f3fdef10ac0097"
+    },
+    "inputs.nc": {
+     "bytes": 253376,
+     "sha256": "52df8b5b58b4f924650004fb59f0a312eaed51e805094d0162e87d28b686bfe5"
+    },
+    "pyomo.lp": {
+     "bytes": 1520,
+     "sha256": "d3ac2675c655272a899ebb8c29727daa7ec90d4424fdc9c04b3234d5e74ad727"
+    },
+    "reference.lp": {
+     "bytes": 1520,
+     "sha256": "d3ac2675c655272a899ebb8c29727daa7ec90d4424fdc9c04b3234d5e74ad727"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "default",
+   "scenario": "simple_storage,inter_cluster_storage"
+  },
+  "storage_intra_min": {
+   "files": {
+    "highs.lp": {
+     "bytes": 389,
+     "sha256": "74474b8ee7ae4075e673294b266e77b2ade8b4000f2e36f0eaf83469673207e8"
+    },
+    "inputs.nc": {
+     "bytes": 253377,
+     "sha256": "58bc51f67ff8f820730288dbae4a5907c88493ab156ddd65b478e6f0334d7647"
+    },
+    "pyomo.lp": {
+     "bytes": 1520,
+     "sha256": "a73258aa899e3e096cbc68a1602337a001b6e4b3a836c4122bbdb6044fd44afa"
+    },
+    "reference.lp": {
+     "bytes": 1520,
+     "sha256": "a73258aa899e3e096cbc68a1602337a001b6e4b3a836c4122bbdb6044fd44afa"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "default",
+   "scenario": "simple_storage,inter_cluster_storage"
+  },
+  "storage_max": {
+   "files": {
+    "highs.lp": {
+     "bytes": 269,
+     "sha256": "db3982497765adfe91b0137ffa318b8d8b4006dad06163610cd1335cd1600622"
+    },
+    "inputs.nc": {
+     "bytes": 216764,
+     "sha256": "de14b2fc25f540b39c9098654bf18ded9112586a55df2fde78338601d5fd6c16"
+    },
+    "pyomo.lp": {
+     "bytes": 1236,
+     "sha256": "0635db42547f4c17e92a30a45971101fd38b1b2ea61a369eab777d2bc6517de7"
+    },
+    "reference.lp": {
+     "bytes": 1224,
+     "sha256": "5511654811e01b23d74ce08879c720785065ec5bafb9c6d90abafaf837cc4833"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_storage,two_hours"
+  },
+  "storage_max_inter_cluster_override": {
+   "files": {
+    "highs.lp": {
+     "bytes": 289,
+     "sha256": "e183cc368faebd5f21a42c2e26a96ac4d1b7bcf94735c7ebd8d08934cb02ba35"
+    },
+    "inputs.nc": {
+     "bytes": 251588,
+     "sha256": "3fb58ea7bd8f5a1fa7b51e32d6dbfa396becc71893cd384603f01b0e5bfb181b"
+    },
+    "pyomo.lp": {
+     "bytes": 183,
+     "sha256": "7ebbc02a84980f26b4f47a387f845a4d25f88487b92e41733700faf6b3ae3b8f"
+    },
+    "reference.lp": {
+     "bytes": 183,
+     "sha256": "7ebbc02a84980f26b4f47a387f845a4d25f88487b92e41733700faf6b3ae3b8f"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "default",
+   "scenario": "simple_storage,inter_cluster_storage"
+  },
+  "supply_share_equals_per_tech": {
+   "files": {
+    "highs.lp": {
+     "bytes": 297,
+     "sha256": "e6fedfc974b1445c71ecf1cedf198ecc432aa7c46203dcb5ce156749aa36c880"
+    },
+    "inputs.nc": {
+     "bytes": 230166,
+     "sha256": "b45c15a3caad7634a77c9744a97282e8b9cf0352e76b209c99eb06518670a01b"
+    },
+    "pyomo.lp": {
+     "bytes": 2340,
+     "sha256": "76584f53cf296cd82c0fee2b07ff9a39673cf1e1231b39647d037a706bf4fd2e"
+    },
+    "reference.lp": {
+     "bytes": 2316,
+     "sha256": "378392814e230cb7cd8d3bfbfe8b2d210f3dfb980095a02520f7db2cee9b2771"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_and_supply_plus,two_hours"
+  },
+  "supply_share_per_timestep_equals_per_tech": {
+   "files": {
+    "highs.lp": {
+     "bytes": 317,
+     "sha256": "7ff8756e01bdf3b5440a116a0a655c5fcec0c15c6cea0f595fed4de81da3418f"
+    },
+    "inputs.nc": {
+     "bytes": 230352,
+     "sha256": "1130638ddf6bcace70d4e888d6e8420e34f56848046d5f18b34db11cfd56259e"
+    },
+    "pyomo.lp": {
+     "bytes": 2616,
+     "sha256": "5491747930a57a280f3b5bcff2df8741259d69264d92d17e5cf6878c8ff8c7d6"
+    },
+    "reference.lp": {
+     "bytes": 2592,
+     "sha256": "6916207fa324bf27067e7a6b60b8571d44c7a2b19b8d6dff22292ea6681bb7c5"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply_and_supply_plus,two_hours"
+  },
+  "symmetric_transmission": {
+   "files": {
+    "highs.lp": {
+     "bytes": 217,
+     "sha256": "d3aa49ba19a1714167f94d964da38d015c8962b1c13f01eb01119e14c3be2e18"
+    },
+    "inputs.nc": {
+     "bytes": 203651,
+     "sha256": "5ec1399a138233f08844d6b50e026dd938885512f08ca3c1689bd7eb5da7d6be"
+    },
+    "pyomo.lp": {
+     "bytes": 795,
+     "sha256": "4a579c85f5e6e4eecd574304da5a41bfe409eef3aaab838fb6131899b367f814"
+    },
+    "reference.lp": {
+     "bytes": 795,
+     "sha256": "4a579c85f5e6e4eecd574304da5a41bfe409eef3aaab838fb6131899b367f814"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_conversion,two_hours"
+  },
+  "system_balance": {
+   "files": {
+    "highs.lp": {
+     "bytes": 629,
+     "sha256": "9903efd285e64ce2c8e57c0992db0e7480c2ed2faeafa18f82a42287c7c445d2"
+    },
+    "inputs.nc": {
+     "bytes": 205524,
+     "sha256": "39d95f9ac421408bab606e30224c1284708cc0a266556b0f743b608c60fa7cc0"
+    },
+    "pyomo.lp": {
+     "bytes": 6692,
+     "sha256": "c47cba740ddfc73c0ab25351eda5fdac452f5ff43004fd55b6400b53a02057bf"
+    },
+    "reference.lp": {
+     "bytes": 6612,
+     "sha256": "bd4a7560d5d08dc6c0d57b16d3db6f92663faed665e77c385678a7ff86266485"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "system_balance_no_unmet": {
+   "files": {
+    "highs.lp": {
+     "bytes": 373,
+     "sha256": "403f77963d9e676ab365c92b01966d4fb0fd74604555fddfff5f1afe93cd5cb6"
+    },
+    "inputs.nc": {
+     "bytes": 203213,
+     "sha256": "0005314b37ede10f6370bc4bf38cce94f2e22a02629b6854bc5fa9aab66429d5"
+    },
+    "pyomo.lp": {
+     "bytes": 4596,
+     "sha256": "7c7554173dff31f6cf5d2f973406afc3ea3f8797df2add6f24cfc762d4112b2a"
+    },
+    "reference.lp": {
+     "bytes": 4461,
+     "sha256": "a4d9a695caf8899553e6765d06e4a85b6fa300e110bfc3c387fffb0b910c207a"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "simple_supply,two_hours"
+  },
+  "unit_capacity_max_systemwide_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 122,
+     "sha256": "ab98d72481361ef101de109ba9a65e119d9f24fe7f00749f0ed129dcb1f2d040"
+    },
+    "inputs.nc": {
+     "bytes": 222707,
+     "sha256": "015c4c0ec74aeb7de5f3a12ff2fdfbb9bc8bb441625172f52577a386965b9282"
+    },
+    "pyomo.lp": {
+     "bytes": 388,
+     "sha256": "1e008f8c76187202da07f100ee961302a6d658a812383b32f50e54f59374d4fc"
+    },
+    "reference.lp": {
+     "bytes": 388,
+     "sha256": "1e008f8c76187202da07f100ee961302a6d658a812383b32f50e54f59374d4fc"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "unit_capacity_min_systemwide_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 122,
+     "sha256": "4d4829fb1f3f323b1fe051db86723d76d684e80b52ea62d66640a397e33f8170"
+    },
+    "inputs.nc": {
+     "bytes": 228909,
+     "sha256": "42f003a1dfc9b8607c9b26df00446fa79beb4aa65c1c6b5dd931fe6cc7ef2e20"
+    },
+    "pyomo.lp": {
+     "bytes": 388,
+     "sha256": "53b71f61ce28fd2d856989f45534d4aad7a7fa0daec7043f36e41fe4697008e2"
+    },
+    "reference.lp": {
+     "bytes": 388,
+     "sha256": "53b71f61ce28fd2d856989f45534d4aad7a7fa0daec7043f36e41fe4697008e2"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  },
+  "unit_commitment_milp": {
+   "files": {
+    "highs.lp": {
+     "bytes": 153,
+     "sha256": "ef34ad7a5298399aa0f0f98b07a6906f1ffaff56cc9bafb31db37c3e349ad0e4"
+    },
+    "inputs.nc": {
+     "bytes": 218613,
+     "sha256": "6f2525db16e107c932cc67f8bb588a706f7b496b708408c0fafc68fb54c81d4e"
+    },
+    "pyomo.lp": {
+     "bytes": 984,
+     "sha256": "111b6ec72be93de0a2f28b248e43f14dc0e5ea78a84e1b01b6ebe626aa715785"
+    },
+    "reference.lp": {
+     "bytes": 980,
+     "sha256": "82d169d0c3ca6aa8379d493df46a5332b218993589899f64e89f12402cffdeb7"
+    }
+   },
+   "highs_error": null,
+   "highs_lp_names": "verbose",
+   "scenario": "supply_milp,two_hours"
+  }
+ },
+ "total_bytes": 102637030
+}

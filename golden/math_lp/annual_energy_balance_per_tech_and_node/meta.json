@@ -1,0 +1,39 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "annual_energy_balance_per_tech_and_node.lp",
+  "math_dict": {
+    "constraints": {
+      "annual_energy_balance_per_tech_and_node": {
+        "active": true,
+        "description": "Limit total technology annual energy production at each possible deployment site.\n",
+        "equations": [
+          {
+            "expression": "sum(flow_out, over=[carriers, timesteps]) <= annual_flow_max\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "annual_flow_max"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones3/barebones.yaml"
+    },
+    "nodes.a.techs.test_supply_elec.annual_flow_max": 10,
+    "nodes.b.techs.test_supply_elec.annual_flow_max": 20
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestAnnualEnergyBalance::test_annual_energy_balance_per_tech_and_node"
+}

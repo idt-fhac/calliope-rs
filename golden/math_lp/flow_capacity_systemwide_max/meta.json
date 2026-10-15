@@ -1,0 +1,73 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "flow_capacity_systemwide_max.lp",
+  "math_dict": {
+    "constraints": {
+      "flow_capacity_systemwide_max": {
+        "active": true,
+        "description": "Set an upper bound on flow capacity of a technology across all nodes in which the technology exists.",
+        "equations": [
+          {
+            "expression": "sum(flow_cap, over=nodes) <= flow_cap_max_systemwide",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "techs",
+          "carriers"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "any(flow_cap, over=nodes) AND flow_cap_max_systemwide"
+      }
+    },
+    "parameters": {
+      "flow_cap_max_systemwide": {
+        "active": true,
+        "default": Infinity,
+        "description": "Limits the sum of `flow_cap` over all nodes in the model to a maximum.",
+        "resample_method": "first",
+        "title": "System-wide maximum rated flow capacity.",
+        "unit": "power or $\\frac{\\text{power}}{\\text{unit}}$"
+      }
+    },
+    "variables": {
+      "flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": "flow_cap_max",
+          "min": "flow_cap_min"
+        },
+        "default": 0,
+        "description": "A technology's flow capacity, also known as its nominal or nameplate capacity.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "title": "Technology flow (a.k.a. nominal) capacity",
+        "unit": "power",
+        "where": "carrier_in OR carrier_out"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "techs": {
+      "test_supply_elec": {
+        "flow_cap_max_systemwide": 15
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[flow_capacity_systemwide_max]"
+}

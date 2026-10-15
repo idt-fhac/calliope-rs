@@ -1,0 +1,98 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "cost_investment_storage_cap.lp",
+  "math_dict": {
+    "global_expressions": {
+      "cost_investment_storage_cap": {
+        "active": true,
+        "default": 0,
+        "description": "The investment costs associated with the storage capacity of a technology.",
+        "equations": [
+          {
+            "expression": "cost_storage_cap * storage_cap",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "costs"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Storage capacity investment costs",
+        "unit": "cost",
+        "where": "cost_storage_cap AND storage_cap"
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_investment_storage_cap, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    },
+    "parameters": {
+      "storage_cap_max": {
+        "active": true,
+        "default": Infinity,
+        "description": "Limit upper bound of `storage_cap` decision variable.",
+        "resample_method": "first",
+        "title": "Maximum storage capacity.",
+        "unit": "energy."
+      },
+      "storage_cap_min": {
+        "active": true,
+        "default": 0,
+        "description": "Limit lower bound of `storage_cap` decision variable.",
+        "resample_method": "first",
+        "title": "Minimum storage capacity.",
+        "unit": "energy."
+      }
+    },
+    "variables": {
+      "storage_cap": {
+        "active": true,
+        "bounds": {
+          "max": "storage_cap_max",
+          "min": "storage_cap_min"
+        },
+        "default": 0,
+        "description": "The upper limit on a carrier that can be stored by a technology in any timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Stored carrier capacity",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "techs": {
+      "test_storage": {
+        "cost_storage_cap": {
+          "data": 50,
+          "dims": "costs",
+          "index": "monetary"
+        }
+      }
+    }
+  },
+  "scenario": "simple_storage,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[cost_investment_storage_cap]"
+}

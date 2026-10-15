@@ -1,0 +1,38 @@
+{
+  "fixture": {
+    "name": "national_scale_minimize_emissions",
+    "model": "src/calliope/example_models/national_scale/model.yaml",
+    "scenario": "minimize_emissions_costs",
+    "override_dict": {
+      "config.build.backend": "highs"
+    },
+    "math_dict": null,
+    "init_kwargs": {},
+    "solve_kwargs": {
+      "solver_options": {
+        "threads": 1,
+        "random_seed": 0
+      }
+    },
+    "backend": "highs",
+    "solver": "highs",
+    "numpy_seed": 0,
+    "notes": "stale upstream override; fails in preprocess (see bench/BUGS.md #12)"
+  },
+  "versions": {
+    "python": "3.14.7",
+    "calliope": "0.7.0",
+    "calliope_git": "088eb7e4",
+    "xarray": "2026.9.0",
+    "pandas": "3.0.6",
+    "numpy": "2.5.3",
+    "pyparsing": "3.3.2",
+    "pyomo": "6.10.1",
+    "highs": "1.15.1"
+  },
+  "errors": {},
+  "expected_error": {
+    "type": "ValidationError",
+    "message": "9 validation errors for CalliopeAttrs\ndefinition.data_definitions.objective_cost_weights.str\n  Input should be a valid string [type=string_type, input_value={'data': {'emissions': 1, 'monetary': 0}}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_type\ndefinition.data_definitions.objective_cost_weights.bool\n  Input should be a valid boolean [type=bool_type, input_value={'data': {'emissions': 1, 'monetary': 0}}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/bool_type\ndefinition.data_definitions.objective_cost_weights.int\n  Input should be a valid integer [type=int_type, input_value={'data': {'emissions': 1, 'monetary': 0}}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type\ndefinition.data_definitions.objective_cost_weights.float\n  Input should be a valid number [type=float_type, input_value={'data': {'emissions': 1, 'monetary': 0}}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/float_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.str\n  Input should be a valid string [type=string_type, input_value={'emissions': 1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.bool\n  Input should be a valid boolean [type=bool_type, input_value={'emissions': 1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/bool_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.int\n  Input should be a valid integer [type=int_type, input_value={'emissions': 1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.float\n  Input should be a valid number [type=float_type, input_value={'emissions': 1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/float_type\ndefinition.data_definitions.objective_cost_weights.IndexedData.data.list[nullable[union[str,bool,int,float]]]\n  Input should be a valid list [type=list_type, input_value={'emissions': 1, 'monetary': 0}, input_type=AttrDict]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+  }
+}

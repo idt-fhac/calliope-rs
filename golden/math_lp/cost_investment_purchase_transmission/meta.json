@@ -1,0 +1,104 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones1/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "cost_investment_purchase_transmission.lp",
+  "math_dict": {
+    "global_expressions": {
+      "cost_investment_purchase": {
+        "active": true,
+        "default": 0,
+        "description": "The investment costs associated with the binary purchase of a technology.",
+        "equations": [
+          {
+            "expression": "(cost_purchase + cost_purchase_per_distance * distance) * purchased_units * 0.5",
+            "where": "base_tech==transmission"
+          },
+          {
+            "expression": "cost_purchase * purchased_units",
+            "where": "NOT base_tech==transmission"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "costs"
+        ],
+        "order": -1,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Binary purchase investment costs",
+        "unit": "cost",
+        "where": "cost_purchase AND purchased_units"
+      }
+    },
+    "lookups": {
+      "cap_method": {
+        "active": true,
+        "default": "continuous",
+        "description": "One of 'continuous' (LP model) or 'integer' (integer/binary unit capacity).",
+        "dtype": "string",
+        "one_of": [
+          "continuous",
+          "integer"
+        ],
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": "Capacity method switch."
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_investment_purchase, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    },
+    "parameters": {
+      "cost_purchase": {
+        "active": true,
+        "default": 0,
+        "description": "Cost applied to the variable `purchased_units`. Requires the parameter `cap_method` to be `integer`.",
+        "resample_method": "first",
+        "title": "Purchase cost.",
+        "unit": "$\\frac{\\text{cost}}{\\text{unit}}$"
+      },
+      "cost_purchase_per_distance": {
+        "active": true,
+        "default": 0,
+        "description": "Cost applied if the binary variable `purchased` is 1 or per unit of the integer variable `units`. Requires the parameter `cap_method` to be `integer`.",
+        "resample_method": "first",
+        "title": "Purchase cost per unit distance for transmission techs.",
+        "unit": "$\\frac{\\text{cost}}{\\text{unit}\\times\\text{distance}}$"
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "techs": {
+      "test_link_a_b_elec": {
+        "cap_method": "integer",
+        "cost_purchase": {
+          "data": 500,
+          "dims": "costs",
+          "index": "monetary"
+        },
+        "cost_purchase_per_distance": {
+          "data": 10,
+          "dims": "costs",
+          "index": "monetary"
+        }
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestMILPMath::test_math[cost_investment_purchase_transmission]"
+}

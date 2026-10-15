@@ -1,0 +1,131 @@
+{
+  "args": [],
+  "highs_lp_names": "default",
+  "highs_verbose_error": "ValueError: invalid literal for int() with base 10: '_'",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones2/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "set_storage_initial_inter_cluster.lp",
+  "math_dict": {
+    "constraints": {
+      "set_storage_initial": {
+        "active": true,
+        "description": "Fix the relationship between carrier stored in a `storage` technology at the start and end of the whole model period.",
+        "equations": [
+          {
+            "expression": "storage_inter_cluster[datesteps=$final_step] * ((1 - storage_loss) ** 24) == storage_initial * storage_cap",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "slices": {
+          "final_step": [
+            {
+              "expression": "get_val_at_index(datesteps=-1)",
+              "where": "True"
+            }
+          ]
+        },
+        "sub_expressions": {},
+        "title": "",
+        "where": "storage AND storage_initial AND cyclic_storage==True"
+      }
+    },
+    "lookups": {
+      "cyclic_storage": {
+        "active": true,
+        "default": true,
+        "description": "If true, link storage levels in the last model timestep with the first model timestep. `inter_cluster_storage` custom math must be included if using time clustering and setting this to `true`.\n",
+        "dtype": "bool",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": "Cyclic storage switch."
+      }
+    },
+    "parameters": {
+      "storage_initial": {
+        "active": true,
+        "default": 0,
+        "description": "Set stored flow in device at the first timestep, as a fraction of total storage capacity.",
+        "resample_method": "first",
+        "title": "Initial storage level.",
+        "unit": "unitless."
+      },
+      "storage_loss": {
+        "active": true,
+        "default": 0,
+        "description": "Rate of storage loss per hour, used to calculate lost stored flow as `(1 - storage_loss)^hours_per_timestep`.",
+        "resample_method": "mean",
+        "title": "Storage loss rate",
+        "unit": "$\\frac{\\text{1}}{\\text{hour}}$"
+      }
+    },
+    "variables": {
+      "storage_cap": {
+        "active": true,
+        "bounds": {
+          "max": "storage_cap_max",
+          "min": "storage_cap_min"
+        },
+        "default": 0,
+        "description": "The upper limit on a carrier that can be stored by a technology in any timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Stored carrier capacity",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      },
+      "storage_inter_cluster": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The virtual carrier stored by any technology using storage between days of the entire timeseries. Only together with `storage` does this variable's values gain physical significance.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "datesteps"
+        ],
+        "title": "Virtual inter-cluster stored carrier",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_storage": {
+            "cyclic_storage": true,
+            "storage_initial": 0.5
+          }
+        }
+      },
+      "b": {
+        "techs": {
+          "test_storage": {
+            "cyclic_storage": false,
+            "storage_initial": 0.5
+          }
+        }
+      }
+    }
+  },
+  "scenario": "simple_storage,inter_cluster_storage",
+  "test": "tests/math/math_test.py::TestInterClusterStorageMath::test_math[set_storage_initial_inter_cluster]"
+}

@@ -1,0 +1,94 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones1/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "available_flow_cap_binary.lp",
+  "math_dict": {
+    "constraints": {
+      "available_flow_cap_binary": {
+        "active": true,
+        "description": "Limit flow capacity to zero if the technology is not operating in a given timestep.",
+        "equations": [
+          {
+            "expression": "available_flow_cap <= flow_cap_max * operating_units",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "available_flow_cap"
+      }
+    },
+    "variables": {
+      "available_flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "Flow capacity that will be set to zero if the technology is not operating in a given timestep and will be set to the value of the decision variable `flow_cap` otherwise. This is useful when you want to set a minimum flow capacity for any technology investment, but also want to allow the model to decide the capacity. It is expected to only be used when `purchased_units_max == 1`, i.e., the `purchased_units` decision variable is binary. If `purchased_units_max > 1`, you may get strange results and should instead use the less flexible `flow_cap_per_unit`.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Available carrier flow capacity",
+        "unit": "power",
+        "where": "flow_cap AND integer_dispatch==True AND flow_cap_max AND NOT flow_cap_per_unit"
+      },
+      "operating_units": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "Integer number of a technology that is operating in each timestep, for any technology set to require integer capacity purchasing.",
+        "domain": "integer",
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "title": "Number of operating units",
+        "unit": "integer",
+        "where": "integer_dispatch==True AND cap_method==integer"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_supply_elec": {
+            "flow_cap_per_unit": null
+          }
+        }
+      }
+    },
+    "techs": {
+      "test_supply_elec": {
+        "flow_cap_max": 50,
+        "integer_dispatch": true
+      }
+    }
+  },
+  "scenario": "supply_milp,two_hours",
+  "test": "tests/math/math_test.py::TestMILPMath::test_math[available_flow_cap_binary]"
+}

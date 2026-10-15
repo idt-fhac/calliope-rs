@@ -1,0 +1,72 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "net_annual_import_share_max.lp",
+  "math_dict": {
+    "constraints": {
+      "net_annual_import_share_max": {
+        "active": true,
+        "description": "Limit upper bound on annual electricity imports within nodes as a share of all electricity flows at each node.",
+        "equations": [
+          {
+            "expression": "net_import_share * sum(flow_out_transmission_techs[carriers=electricity], over=[techs, timesteps]) <= $total_energy_balance",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes"
+        ],
+        "slices": {},
+        "sub_expressions": {
+          "total_energy_balance": [
+            {
+              "expression": "sum(flow_out[carriers=electricity], over=[techs, timesteps]) - sum(flow_in[carriers=electricity], over=[techs, timesteps])",
+              "where": "True"
+            }
+          ]
+        },
+        "title": "",
+        "where": "any(flow_out_transmission_techs, over=techs)"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones14/barebones.yaml"
+    },
+    "data_definitions.net_import_share": 1.5,
+    "data_tables": {
+      "demand_heat": {
+        "add_dims": {
+          "inputs": "sink_use_equals",
+          "nodes": "c",
+          "techs": "test_demand_heat"
+        },
+        "columns": "nodes",
+        "drop": "nodes",
+        "rows": "timesteps",
+        "select": {
+          "nodes": "a"
+        },
+        "table": "data_tables/demand_heat.csv"
+      }
+    },
+    "techs": {
+      "links_a_c_elec": {
+        "link_from": "a",
+        "link_to": "c",
+        "template": "test_transmission_elec"
+      },
+      "links_a_c_heat": {
+        "link_from": "a",
+        "link_to": "c",
+        "template": "test_transmission_heat"
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestNetImportShare::test_net_annual_import_share_max"
+}

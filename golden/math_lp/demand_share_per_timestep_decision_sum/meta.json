@@ -1,0 +1,57 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "demand_share_per_timestep_decision_sum.lp",
+  "math_dict": {
+    "checks": {
+      "demand_share_is_fraction": {
+        "active": true,
+        "errors": "raise",
+        "message": "The demand share limit must be a fraction of demand, i.e. between 0 and 1.",
+        "where": "demand_share_limit > 1 OR demand_share_limit < 0"
+      }
+    },
+    "constraints": {
+      "demand_share_per_timestep_decision_sum": {
+        "active": true,
+        "description": "Limit the total share of demand that can be met by technologies controlled by the `demand_share_per_timestep_decision` variable.",
+        "equations": [
+          {
+            "expression": "sum(demand_share_per_timestep_decision, over=[techs]) == demand_share_limit\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "demand_share_per_timestep_decision AND demand_share_limit"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones8/barebones.yaml"
+    },
+    "data_definitions": {
+      "demand_share_carrier": "electricity",
+      "demand_share_limit": 0.5
+    },
+    "techs": {
+      "test_conversion_plus": {
+        "decide_demand_share": "test_demand_elec"
+      },
+      "test_supply_elec": {
+        "decide_demand_share": "test_demand_elec"
+      }
+    }
+  },
+  "scenario": "conversion_and_conversion_plus,two_hours",
+  "test": "tests/math/math_test.py::TestDemandSharePerTimestepDecision::test_demand_share_per_timestep_decision_sum"
+}

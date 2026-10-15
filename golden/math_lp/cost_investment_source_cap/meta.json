@@ -1,0 +1,98 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "cost_investment_source_cap.lp",
+  "math_dict": {
+    "global_expressions": {
+      "cost_investment_source_cap": {
+        "active": true,
+        "default": 0,
+        "description": "The investment costs associated with the source consumption capacity of a technology.",
+        "equations": [
+          {
+            "expression": "cost_source_cap * source_cap",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "costs"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Source flow capacity investment costs",
+        "unit": "cost",
+        "where": "cost_source_cap AND source_cap"
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_investment_source_cap, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    },
+    "parameters": {
+      "source_cap_max": {
+        "active": true,
+        "default": Infinity,
+        "description": "Upper limit on `source_cap` decision variable.",
+        "resample_method": "mean",
+        "title": "Maximum installed source consumption capacity.",
+        "unit": "power."
+      },
+      "source_cap_min": {
+        "active": true,
+        "default": 0,
+        "description": "Lower limit on `source_cap` decision variable.",
+        "resample_method": "mean",
+        "title": "Minimum installed source consumption capacity",
+        "unit": "power."
+      }
+    },
+    "variables": {
+      "source_cap": {
+        "active": true,
+        "bounds": {
+          "max": "source_cap_max",
+          "min": "source_cap_min"
+        },
+        "default": 0,
+        "description": "The upper limit on a flow that can be consumed from outside the system boundaries by a `supply` technology in each timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Source flow capacity",
+        "unit": "power",
+        "where": "base_tech==supply"
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "techs": {
+      "test_supply_plus": {
+        "cost_source_cap": {
+          "data": 30,
+          "dims": "costs",
+          "index": "monetary"
+        }
+      }
+    }
+  },
+  "scenario": "simple_supply_plus,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[cost_investment_source_cap]"
+}

@@ -1,0 +1,168 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "balance_supply_min_use.lp",
+  "math_dict": {
+    "constraints": {
+      "balance_supply_min_use": {
+        "active": true,
+        "description": "Set the lower bound on the quantity of its source a `supply` technology must use in each timestep.",
+        "equations": [
+          {
+            "expression": "source_use >= source_use_min * $source_scaler",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {
+          "source_scaler": [
+            {
+              "expression": "area_use",
+              "where": "source_unit==per_area"
+            },
+            {
+              "expression": "sum(where(flow_cap, carrier_out), over=carriers)",
+              "where": "source_unit==per_cap"
+            },
+            {
+              "expression": "1",
+              "where": "source_unit==absolute"
+            }
+          ]
+        },
+        "title": "",
+        "where": "source_use_min AND NOT source_use_equals AND base_tech==supply"
+      }
+    },
+    "lookups": {
+      "base_tech": {
+        "active": true,
+        "default": NaN,
+        "description": "Should be the name of one of the abstract base classes, from which some initial parameter defaults will be derived and with which certain base math will be triggered.",
+        "dtype": "string",
+        "one_of": [
+          "demand",
+          "supply",
+          "conversion",
+          "storage",
+          "transmission"
+        ],
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": "Abstract base technology name."
+      },
+      "source_unit": {
+        "active": true,
+        "default": "absolute",
+        "description": "Sets the unit of `Source` to either `absolute` (unit: `energy`), `per_area` (unit: `energy/area`), or `per_cap` (unit: `energy/power`). `per_area` uses the `area_use` decision variable to scale the source while `per_cap` uses the `flow_cap` decision variable.",
+        "dtype": "string",
+        "one_of": [
+          "absolute",
+          "per_area",
+          "per_cap"
+        ],
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": "Source unit"
+      }
+    },
+    "parameters": {
+      "source_use_equals": {
+        "active": true,
+        "default": NaN,
+        "description": "Required amount of carrier removal from the system (e.g., biofuel, coal, rainfall, wind flow). Unit dictated by `source_unit`.",
+        "resample_method": "sum",
+        "title": "Required sink use.",
+        "unit": "energy | $\\frac{\\text{energy}}{\\text{power}}$ | $\\frac{\\text{energy}}{\\text{area}}$"
+      },
+      "source_use_min": {
+        "active": true,
+        "default": 0,
+        "description": "Minimum source use to add a carrier from the system (e.g., biofuel, coal, rainfall, wind flow). Unit dictated by `source_unit`.",
+        "resample_method": "sum",
+        "title": "Minimum bound on source.",
+        "unit": "energy | $\\frac{\\text{energy}}{\\text{power}}$ | $\\frac{\\text{energy}}{\\text{area}}$"
+      }
+    },
+    "variables": {
+      "area_use": {
+        "active": true,
+        "bounds": {
+          "max": "area_use_max",
+          "min": "area_use_min"
+        },
+        "default": 0,
+        "description": "The area in space utilised directly (e.g., solar PV panels) or indirectly (e.g., biofuel crops) by a technology.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Area utilisation",
+        "unit": "area",
+        "where": "(area_use_min OR area_use_max OR area_use_per_flow_cap OR sink_unit==per_area OR source_unit==per_area)"
+      },
+      "flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": "flow_cap_max",
+          "min": "flow_cap_min"
+        },
+        "default": 0,
+        "description": "A technology's flow capacity, also known as its nominal or nameplate capacity.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "title": "Technology flow (a.k.a. nominal) capacity",
+        "unit": "power",
+        "where": "carrier_in OR carrier_out"
+      },
+      "source_use": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The carrier flow consumed from outside the system boundaries by a `supply` technology.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "title": "Source flow use",
+        "unit": "energy",
+        "where": "base_tech==supply"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_supply_plus": {
+            "source_use_min": 5
+          }
+        }
+      }
+    }
+  },
+  "scenario": "simple_supply_plus,resample_two_days",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[balance_supply_min_use]"
+}

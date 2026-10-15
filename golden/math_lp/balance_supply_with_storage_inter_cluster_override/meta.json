@@ -1,0 +1,86 @@
+{
+  "args": [],
+  "highs_lp_names": "default",
+  "highs_verbose_error": "ValueError: invalid literal for int() with base 10: '_'",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones2/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "balance_supply_with_storage_inter_cluster_override.lp",
+  "math_dict": {
+    "constraints": {
+      "balance_supply_with_storage": {
+        "active": true,
+        "description": "Fix the outflow of a `supply` technology to its consumption of the available source, with a storage buffer to temporally offset the outflow from source consumption.",
+        "equations": [
+          {
+            "expression": "storage == $storage_previous_step + source_use * source_eff - flow_out_inc_eff",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {
+          "storage_previous_step": [
+            {
+              "expression": "storage_initial * storage_cap",
+              "where": "timesteps==get_val_at_index(timesteps=0) AND NOT cyclic_storage==True"
+            },
+            {
+              "expression": "(1 - storage_loss) ** roll(timestep_resolution, timesteps=1) * roll(storage, timesteps=1)",
+              "where": "(\n  (timesteps==get_val_at_index(timesteps=0) AND cyclic_storage==True)\n  OR NOT timesteps==get_val_at_index(timesteps=0)\n) AND NOT lookup_cluster_last_timestep"
+            },
+            {
+              "expression": "0",
+              "where": "lookup_cluster_last_timestep AND NOT (timesteps==get_val_at_index(timesteps=0) AND NOT cyclic_storage==True)"
+            }
+          ]
+        },
+        "title": "",
+        "where": "carrier_out AND storage AND base_tech==supply"
+      }
+    },
+    "lookups": {
+      "lookup_cluster_last_timestep": {
+        "active": true,
+        "default": NaN,
+        "description": "The last timestep of each cluster.",
+        "dtype": "datetime",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": ""
+      }
+    },
+    "variables": {
+      "storage_cap": {
+        "active": true,
+        "bounds": {
+          "max": "storage_cap_max",
+          "min": "storage_cap_min"
+        },
+        "default": 0,
+        "description": "The upper limit on a carrier that can be stored by a technology in any timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Stored carrier capacity",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {},
+  "scenario": "simple_supply_plus,inter_cluster_storage",
+  "test": "tests/math/math_test.py::TestInterClusterStorageMath::test_math[balance_supply_with_storage]"
+}

@@ -1,0 +1,84 @@
+{
+  "args": [],
+  "highs_lp_names": "default",
+  "highs_verbose_error": "ValueError: invalid literal for int() with base 10: '_'",
+  "kwargs": {},
+  "lp_file": "piecewise_cost_investment.lp",
+  "math_dict": {
+    "constraints": {
+      "piecewise_costs": {
+        "active": true,
+        "description": "Limit the lower bound of piecewise investment costs to monotonically increasing values. Since the model is cost minimising, this is equivalent to forcing the investment cost to a specific point along the curve that is traced by the superposition of all pieces.\n",
+        "equations": [
+          {
+            "expression": "piecewise_cost_investment >= sum(cost_flow_cap_piecewise_slopes * flow_cap, over=carriers) + cost_flow_cap_piecewise_intercept * purchased_units\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "costs",
+          "pieces"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "piecewise_cost_investment"
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_investment, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones9/barebones.yaml"
+    },
+    "data_definitions": {
+      "cost_flow_cap_piecewise_intercept": {
+        "data": [
+          0,
+          -2,
+          -16
+        ],
+        "dims": "pieces",
+        "index": [
+          0,
+          1,
+          2
+        ]
+      },
+      "cost_flow_cap_piecewise_slopes": {
+        "data": [
+          5,
+          7,
+          14
+        ],
+        "dims": "pieces",
+        "index": [
+          0,
+          1,
+          2
+        ]
+      }
+    },
+    "techs.test_supply_elec.cost_interest_rate": {
+      "data": 0.1,
+      "dims": "costs",
+      "index": "monetary"
+    },
+    "techs.test_supply_elec.lifetime": 10
+  },
+  "scenario": "supply_purchase,two_hours",
+  "test": "tests/math/math_test.py::TestPiecewiseCosts::test_piecewise"
+}

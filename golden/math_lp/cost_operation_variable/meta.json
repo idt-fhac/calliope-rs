@@ -1,0 +1,142 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "cost_operation_variable.lp",
+  "math_dict": {
+    "global_expressions": {
+      "cost_operation_variable": {
+        "active": true,
+        "default": 0,
+        "description": "The operating costs per timestep of a technology.",
+        "equations": [
+          {
+            "expression": "timestep_weights * ($cost_export + $cost_flow_out + $cost_flow_in)",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "costs",
+          "timesteps"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {
+          "cost_export": [
+            {
+              "expression": "sum(cost_export * flow_export, over=carriers)",
+              "where": "True"
+            }
+          ],
+          "cost_flow_in": [
+            {
+              "expression": "cost_source_use * source_use",
+              "where": "base_tech==supply"
+            },
+            {
+              "expression": "sum(cost_flow_in * flow_in, over=carriers)",
+              "where": "NOT base_tech==supply"
+            }
+          ],
+          "cost_flow_out": [
+            {
+              "expression": "sum(cost_flow_out * flow_out, over=carriers)",
+              "where": "True"
+            }
+          ]
+        },
+        "title": "Variable operating costs",
+        "unit": "$\\frac{\\text{cost}}{\\text{hour}}$",
+        "where": "cost_export OR cost_flow_in OR cost_flow_out OR cost_source_use"
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_operation_variable, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    },
+    "parameters": {
+      "cost_flow_in": {
+        "active": true,
+        "default": 0,
+        "description": "Cost per unit of `flow_in` in each timestep.",
+        "resample_method": "mean",
+        "title": "Carrier inflow cost.",
+        "unit": "$\\frac{\\text{cost}}{\\text{energy}}$"
+      },
+      "cost_flow_out": {
+        "active": true,
+        "default": 0,
+        "description": "Cost per unit of `flow_out` in each timestep.",
+        "resample_method": "mean",
+        "title": "Carrier outflow cost",
+        "unit": "$\\frac{\\text{cost}}{\\text{energy}}$"
+      },
+      "cost_source_use": {
+        "active": true,
+        "default": 0,
+        "description": "Cost per unit of `source_use` in `supply` technologies.",
+        "resample_method": "mean",
+        "title": "Resource use cost.",
+        "unit": "$\\frac{\\text{cost}}{\\text{energy}}$"
+      },
+      "timestep_weights": {
+        "active": true,
+        "default": 1,
+        "description": "",
+        "resample_method": "mean",
+        "title": "Weight per timestep.",
+        "unit": "unitless."
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "techs": {
+      "simple_supply": {
+        "cost_source_use": 10
+      },
+      "test_conversion_plus": {
+        "cost_flow_in": {
+          "data": 4,
+          "dims": "costs",
+          "index": "monetary"
+        },
+        "cost_flow_out": {
+          "data": [
+            1,
+            2
+          ],
+          "dims": [
+            "carriers",
+            "costs"
+          ],
+          "index": [
+            [
+              "electricity",
+              "monetary"
+            ],
+            [
+              "heat",
+              "monetary"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "scenario": "conversion_and_conversion_plus,var_costs,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[cost_operation_variable]"
+}

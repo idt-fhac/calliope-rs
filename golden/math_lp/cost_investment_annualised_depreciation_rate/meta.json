@@ -1,0 +1,113 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "cost_investment_annualised_depreciation_rate.lp",
+  "math_dict": {
+    "global_expressions": {
+      "cost_investment_annualised": {
+        "active": true,
+        "default": 0,
+        "description": "An annuity factor has been applied to scale lifetime investment costs to annual values that can be directly compared to operation costs. If the modeling period is not equal to one full year, this will be scaled accordingly.",
+        "equations": [
+          {
+            "expression": "$annualisation_weight * $depreciation_rate * cost_investment",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "costs"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {
+          "annualisation_weight": [
+            {
+              "expression": "sum(timestep_resolution * timestep_weights, over=timesteps) / 8760",
+              "where": "True"
+            }
+          ],
+          "depreciation_rate": [
+            {
+              "expression": "cost_depreciation_rate",
+              "where": "cost_depreciation_rate"
+            },
+            {
+              "expression": "1 / lifetime",
+              "where": "NOT cost_depreciation_rate AND (NOT cost_interest_rate OR cost_interest_rate==0)"
+            },
+            {
+              "expression": "(cost_interest_rate * ((1 + cost_interest_rate) ** lifetime)) / (((1 + cost_interest_rate) ** lifetime) - 1)",
+              "where": "NOT cost_depreciation_rate AND cost_interest_rate>0"
+            }
+          ]
+        },
+        "title": "Equivalent annual investment costs",
+        "unit": "cost",
+        "where": "cost_investment"
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_investment_annualised, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    },
+    "parameters": {
+      "cost_depreciation_rate": {
+        "active": true,
+        "default": 1,
+        "description": "Applied to \"annualise\" investment costs so they are comparable to variable costs. If not provided, this will be calculated using technology `lifetime` and `cost_interest_rate`.",
+        "resample_method": "first",
+        "title": "Depreciation rate.",
+        "unit": "unitless."
+      }
+    },
+    "variables": {
+      "flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": "flow_cap_max",
+          "min": "flow_cap_min"
+        },
+        "default": 0,
+        "description": "A technology's flow capacity, also known as its nominal or nameplate capacity.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "title": "Technology flow (a.k.a. nominal) capacity",
+        "unit": "power",
+        "where": "carrier_in OR carrier_out"
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "techs": {
+      "test_supply_elec": {
+        "cost_depreciation_rate": 0.2,
+        "cost_flow_cap": {
+          "data": 10,
+          "dims": "costs",
+          "index": "monetary"
+        }
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[cost_investment_annualised_depreciation_rate]"
+}

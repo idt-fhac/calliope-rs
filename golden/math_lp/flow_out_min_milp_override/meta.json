@@ -1,0 +1,64 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones1/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "flow_out_min_milp_override.lp",
+  "math_dict": {
+    "constraints": {
+      "flow_out_min": {
+        "active": true,
+        "description": "Set the lower bound of a continuous technology's outflow.",
+        "equations": [
+          {
+            "expression": "flow_out >= flow_cap * timestep_resolution * flow_out_min_relative",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "flow_cap AND flow_out_min_relative AND NOT operating_units"
+      }
+    },
+    "parameters": {
+      "flow_out_min_relative": {
+        "active": true,
+        "default": 0,
+        "description": "Set to a value between 0 and 1 to force minimum `flow_out` as a fraction of the technology rated capacity. If non-zero and `cap_method` is `continuous`, this will force the technology to operate above its minimum value at every timestep.",
+        "resample_method": "mean",
+        "title": "Minimum outflow",
+        "unit": "unitless."
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_conversion": {
+            "cap_method": "integer"
+          }
+        }
+      }
+    },
+    "techs": {
+      "test_conversion": {
+        "flow_out_min_relative": 0.2
+      }
+    }
+  },
+  "scenario": "simple_conversion,two_hours",
+  "test": "tests/math/math_test.py::TestMILPMath::test_math[flow_out_min]"
+}

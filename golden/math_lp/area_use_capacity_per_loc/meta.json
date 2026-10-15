@@ -1,0 +1,79 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "area_use_capacity_per_loc.lp",
+  "math_dict": {
+    "constraints": {
+      "area_use_capacity_per_loc": {
+        "active": true,
+        "description": "Set an upper bound on the total area that all technologies with `area_use` can occupy at a given node.",
+        "equations": [
+          {
+            "expression": "sum(area_use, over=techs) <= available_area",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "area_use AND available_area"
+      }
+    },
+    "parameters": {
+      "available_area": {
+        "active": true,
+        "default": Infinity,
+        "description": "Available area for resource area use by all technologies at a node.",
+        "resample_method": "mean",
+        "title": "Available area",
+        "unit": "area."
+      }
+    },
+    "variables": {
+      "area_use": {
+        "active": true,
+        "bounds": {
+          "max": "area_use_max",
+          "min": "area_use_min"
+        },
+        "default": 0,
+        "description": "The area in space utilised directly (e.g., solar PV panels) or indirectly (e.g., biofuel crops) by a technology.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Area utilisation",
+        "unit": "area",
+        "where": "(area_use_min OR area_use_max OR area_use_per_flow_cap OR sink_unit==per_area OR source_unit==per_area)"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "available_area": 50,
+        "techs": {
+          "test_supply_elec": {
+            "area_use_per_flow_cap": 1.0
+          },
+          "test_supply_plus": {
+            "area_use_per_flow_cap": 2.0
+          }
+        }
+      }
+    }
+  },
+  "scenario": "simple_supply_and_supply_plus,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[area_use_capacity_per_loc]"
+}

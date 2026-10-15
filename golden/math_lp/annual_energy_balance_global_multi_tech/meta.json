@@ -1,0 +1,52 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "annual_energy_balance_global_multi_tech.lp",
+  "math_dict": {
+    "constraints": {
+      "annual_energy_balance_global_multi_tech": {
+        "active": true,
+        "description": "Limit total combined technology annual energy production across all possible deployment sites.\n",
+        "equations": [
+          {
+            "expression": "sum(flow_out[techs=$techs], over=[nodes, techs, carriers, timesteps]) <= annual_flow_max\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [],
+        "slices": {
+          "techs": [
+            {
+              "expression": "flow_max_group",
+              "where": "True"
+            }
+          ]
+        },
+        "sub_expressions": {},
+        "title": "",
+        "where": "annual_flow_max AND flow_max_group"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones3/barebones.yaml"
+    },
+    "data_definitions": {
+      "annual_flow_max": 10,
+      "flow_max_group": {
+        "data": true,
+        "dims": "techs",
+        "index": [
+          "test_supply_elec",
+          "test_supply_plus"
+        ]
+      }
+    }
+  },
+  "scenario": "simple_supply_and_supply_plus,two_hours",
+  "test": "tests/math/math_test.py::TestAnnualEnergyBalance::test_annual_energy_balance_global_multi_tech"
+}

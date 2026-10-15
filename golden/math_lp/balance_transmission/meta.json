@@ -1,0 +1,149 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "balance_transmission.lp",
+  "math_dict": {
+    "constraints": {
+      "balance_transmission": {
+        "active": true,
+        "description": "Fix the relationship between between carrier flowing into and out of a `transmission` link in each timestep.",
+        "equations": [
+          {
+            "expression": "sum(flow_out_inc_eff, over=[nodes, carriers]) == sum(flow_in_inc_eff, over=[nodes, carriers])",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "base_tech==transmission"
+      }
+    },
+    "global_expressions": {
+      "flow_in_inc_eff": {
+        "active": true,
+        "default": 0,
+        "description": "Inflows after taking efficiency losses into account.",
+        "equations": [
+          {
+            "expression": "flow_in * flow_in_eff * flow_in_eff_per_distance ** distance",
+            "where": "base_tech==transmission"
+          },
+          {
+            "expression": "flow_in * flow_in_eff",
+            "where": "NOT base_tech==transmission"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Carrier inflow including losses",
+        "unit": "energy",
+        "where": "flow_in"
+      },
+      "flow_out_inc_eff": {
+        "active": true,
+        "default": 0,
+        "description": "Outflows after taking efficiency losses into account.",
+        "equations": [
+          {
+            "expression": "flow_out / (\n  flow_out_eff * flow_out_parasitic_eff *\n  flow_out_eff_per_distance ** distance\n)",
+            "where": "base_tech==transmission"
+          },
+          {
+            "expression": "flow_out / (flow_out_eff * flow_out_parasitic_eff)",
+            "where": "NOT base_tech==transmission"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Carrier outflow including losses",
+        "unit": "energy",
+        "where": "flow_out"
+      }
+    },
+    "lookups": {
+      "latitude": {
+        "active": true,
+        "default": NaN,
+        "description": "",
+        "dtype": "float",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "mean",
+        "title": "Latitude (WGS84 / EPSG4326)."
+      },
+      "longitude": {
+        "active": true,
+        "default": NaN,
+        "description": "",
+        "dtype": "float",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "mean",
+        "title": "Longitude (WGS84 / EPSG4326)."
+      },
+      "one_way": {
+        "active": true,
+        "default": false,
+        "description": "Forces a transmission technology to only move flow in one direction on the link, i.e. from `from` to `to`.",
+        "dtype": "bool",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": "One way transmission."
+      }
+    },
+    "parameters": {
+      "flow_in_eff_per_distance": {
+        "active": true,
+        "default": 1.0,
+        "description": "Total link efficiency will be calculated as $\\text{flow\\_in\\_eff}\\times{}\\text{flow\\_in\\_eff\\_per\\_distance}^\\text{distance}$. Set as value between 1 (no loss) and 0 (all lost).",
+        "resample_method": "mean",
+        "title": "Inflow (i.e., export from node) efficiency per distance of transmission links.",
+        "unit": "$\\frac{\\text{1}}{\\text{distance}}$"
+      },
+      "flow_out_eff_per_distance": {
+        "active": true,
+        "default": 1.0,
+        "description": "Total link efficiency will be calculated as $\\text{flow\\_out\\_eff}\\times{}\\text{flow\\_out\\_eff\\_per\\_distance}^\\text{distance}$. Set as value between 1 (no loss) and 0 (all lost).",
+        "resample_method": "mean",
+        "title": "Outflow (i.e., import from node) efficiency per distance of transmission links.",
+        "unit": "$\\frac{\\text{1}}{\\text{distance}}$"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "techs": {
+      "test_link_a_b_elec": {
+        "one_way": true
+      }
+    }
+  },
+  "scenario": "simple_conversion,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[balance_transmission]"
+}

@@ -1,0 +1,100 @@
+{
+  "args": [],
+  "highs_lp_names": "default",
+  "highs_verbose_error": "ValueError: invalid literal for int() with base 10: '_'",
+  "kwargs": {},
+  "lp_file": "monthly_peak_flow_charge.lp",
+  "math_dict": {
+    "constraints": {
+      "set_peak_month_flow": {
+        "active": true,
+        "description": "Set `flow_peak_month` as the peak outflow across all timesteps in each month",
+        "equations": [
+          {
+            "expression": "flow_out <= flow_peak_month",
+            "where": "monthly_peak_mode AND lookup_month"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps",
+          "months"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "flow_peak_month"
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_operation_fixed, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones15/barebones.yaml"
+    },
+    "config.init.subset.timesteps": [
+      "2005-01-01 00:00:00",
+      "2005-01-01 03:00:00"
+    ],
+    "data_definitions": {
+      "cost_month_peak": {
+        "data": 15,
+        "dims": "costs",
+        "index": "monetary"
+      },
+      "lookup_month": {
+        "data": true,
+        "dims": [
+          "months",
+          "timesteps"
+        ],
+        "index": [
+          [
+            1,
+            "2005-01-01 00:00"
+          ],
+          [
+            1,
+            "2005-01-01 01:00"
+          ],
+          [
+            2,
+            "2005-01-01 02:00"
+          ],
+          [
+            2,
+            "2005-01-01 03:00"
+          ]
+        ]
+      },
+      "monthly_peak_mode": {
+        "data": true,
+        "dims": [
+          "nodes",
+          "techs"
+        ],
+        "index": [
+          [
+            "a",
+            "test_supply_elec"
+          ]
+        ]
+      }
+    }
+  },
+  "scenario": "simple_supply",
+  "test": "tests/math/math_test.py::TestPeakMonthCost::test_net_import_share_max"
+}

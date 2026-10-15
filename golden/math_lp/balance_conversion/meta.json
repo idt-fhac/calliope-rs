@@ -1,0 +1,140 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "balance_conversion.lp",
+  "math_dict": {
+    "constraints": {
+      "balance_conversion": {
+        "active": true,
+        "description": "Fix the relationship between a `conversion` technology's outflow and consumption.",
+        "equations": [
+          {
+            "expression": "sum(flow_out_inc_eff, over=carriers) == sum(flow_in_inc_eff, over=carriers)",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "base_tech==conversion AND NOT include_storage==true"
+      }
+    },
+    "global_expressions": {
+      "flow_in_inc_eff": {
+        "active": true,
+        "default": 0,
+        "description": "Inflows after taking efficiency losses into account.",
+        "equations": [
+          {
+            "expression": "flow_in * flow_in_eff * flow_in_eff_per_distance ** distance",
+            "where": "base_tech==transmission"
+          },
+          {
+            "expression": "flow_in * flow_in_eff",
+            "where": "NOT base_tech==transmission"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Carrier inflow including losses",
+        "unit": "energy",
+        "where": "flow_in"
+      },
+      "flow_out_inc_eff": {
+        "active": true,
+        "default": 0,
+        "description": "Outflows after taking efficiency losses into account.",
+        "equations": [
+          {
+            "expression": "flow_out / (\n  flow_out_eff * flow_out_parasitic_eff *\n  flow_out_eff_per_distance ** distance\n)",
+            "where": "base_tech==transmission"
+          },
+          {
+            "expression": "flow_out / (flow_out_eff * flow_out_parasitic_eff)",
+            "where": "NOT base_tech==transmission"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Carrier outflow including losses",
+        "unit": "energy",
+        "where": "flow_out"
+      }
+    },
+    "lookups": {
+      "base_tech": {
+        "active": true,
+        "default": NaN,
+        "description": "Should be the name of one of the abstract base classes, from which some initial parameter defaults will be derived and with which certain base math will be triggered.",
+        "dtype": "string",
+        "one_of": [
+          "demand",
+          "supply",
+          "conversion",
+          "storage",
+          "transmission"
+        ],
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": "Abstract base technology name."
+      },
+      "include_storage": {
+        "active": true,
+        "default": false,
+        "description": "When true, math will be triggered to allow discontinuous carrier inflow and outflows across timesteps.",
+        "dtype": "bool",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": "Storage method switch."
+      }
+    },
+    "parameters": {
+      "flow_in_eff": {
+        "active": true,
+        "default": 1.0,
+        "description": "Conversion efficiency from `source`/`flow_in` (tech dependent) into the technology. Set as value between 1 (no loss) and 0 (all lost).",
+        "resample_method": "mean",
+        "title": "Inflow efficiency",
+        "unit": "unitless."
+      },
+      "flow_out_eff": {
+        "active": true,
+        "default": 1.0,
+        "description": "Conversion efficiency from the technology to `sink`/`flow_out` (tech dependent). Set as value between 1 (no loss) and 0 (all lost).",
+        "resample_method": "mean",
+        "title": "Outflow efficiency",
+        "unit": "unitless."
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {},
+  "scenario": "simple_conversion,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[balance_conversion]"
+}

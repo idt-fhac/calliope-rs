@@ -1,0 +1,15 @@
+\ File written by HiGHS .lp file handler
+min
+ obj:  +2
+st
+ r0: -1 c2 +3 c10 <= -0
+ r1: -1 c3 +3 c11 <= -0
+bounds
+ c9 <= 1
+bin
+ c9
+gen
+ c10
+ c11
+semi
+end

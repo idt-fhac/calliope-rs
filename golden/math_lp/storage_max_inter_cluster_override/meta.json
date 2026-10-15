@@ -1,0 +1,39 @@
+{
+  "args": [],
+  "highs_lp_names": "default",
+  "highs_verbose_error": "ValueError: invalid literal for int() with base 10: '_'",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones2/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "storage_max_inter_cluster_override.lp",
+  "math_dict": {
+    "constraints": {
+      "storage_max": {
+        "active": false,
+        "description": "Set the upper bound of the amount of carrier a technology can store.",
+        "equations": [
+          {
+            "expression": "storage <= storage_cap",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "storage"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {},
+  "scenario": "simple_storage,inter_cluster_storage",
+  "test": "tests/math/math_test.py::TestInterClusterStorageMath::test_math[storage_max]"
+}

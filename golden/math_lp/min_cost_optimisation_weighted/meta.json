@@ -1,0 +1,40 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "min_cost_optimisation_weighted.lp",
+  "math_dict": {
+    "objectives": {
+      "min_cost_optimisation": {
+        "active": true,
+        "description": "Minimise the total cost of installing and operating all technologies in the system. If multiple cost classes are present (e.g., monetary and co2 emissions), the weighted sum of total costs is minimised. Cost class weights can be defined in the indexed parameter `objective_cost_weights`.",
+        "equations": [
+          {
+            "expression": "sum(\n  sum(cost, over=[nodes, techs])\n  * objective_cost_weights,\n  over=costs\n) + $unmet_demand",
+            "where": "True"
+          }
+        ],
+        "sense": "minimise",
+        "slices": {},
+        "sub_expressions": {
+          "unmet_demand": [
+            {
+              "expression": "sum(\n  sum(unmet_demand - unused_supply, over=[carriers, nodes])\n  * timestep_weights,\n  over=timesteps\n) * bigM",
+              "where": "True"
+            }
+          ]
+        },
+        "title": ""
+      }
+    }
+  },
+  "objective": "min_cost_optimisation",
+  "override_dict": {},
+  "scenario": "simple_supply,two_hours,weighted_costs",
+  "test": "tests/math/math_test.py::TestBaseMath::test_min_cost_optimisation_weighted"
+}

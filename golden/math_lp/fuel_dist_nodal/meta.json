@@ -1,0 +1,92 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "fuel_dist_nodal.lp",
+  "math_dict": {
+    "constraints": {
+      "restrict_nodal_exports": {
+        "active": true,
+        "description": "Ensure all fuel distribution in the system balances to zero. I.e., all regional fuel exports must equal regional fuel imports. Setting this constraint to an inequality would allow for net imports/exports from/to the system.\n",
+        "equations": [
+          {
+            "expression": "-1 * fuel_distributor <= fuel_export_max",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "fuel_distributor AND fuel_export_max"
+      },
+      "restrict_nodal_imports": {
+        "active": true,
+        "description": "Ensure all fuel distribution in the system balances to zero. I.e., all regional fuel exports must equal regional fuel imports. Setting this constraint to an inequality would allow for net imports/exports from/to the system.\n",
+        "equations": [
+          {
+            "expression": "fuel_distributor <= fuel_import_max",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "fuel_distributor AND fuel_import_max"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones12/barebones.yaml"
+    },
+    "data_definitions": {
+      "allow_fuel_distribution": {
+        "data": true,
+        "dims": "carriers",
+        "index": [
+          "coal"
+        ]
+      },
+      "fuel_export_max": {
+        "data": 3,
+        "dims": [
+          "carriers",
+          "nodes"
+        ],
+        "index": [
+          [
+            "coal",
+            "a"
+          ]
+        ]
+      },
+      "fuel_import_max": {
+        "data": 5,
+        "dims": [
+          "carriers",
+          "nodes"
+        ],
+        "index": [
+          [
+            "coal",
+            "b"
+          ]
+        ]
+      }
+    }
+  },
+  "scenario": "fuel_distribution,two_hours",
+  "test": "tests/math/math_test.py::TestFuelDist::test_fuel_distribution_nodal_limits"
+}

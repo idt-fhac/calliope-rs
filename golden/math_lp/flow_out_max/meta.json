@@ -1,0 +1,108 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "flow_out_max.lp",
+  "math_dict": {
+    "constraints": {
+      "flow_out_max": {
+        "active": true,
+        "description": "Set the upper bound of a technology's outflow.",
+        "equations": [
+          {
+            "expression": "flow_out <= flow_cap * timestep_resolution * flow_out_parasitic_eff",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "carrier_out"
+      }
+    },
+    "lookups": {
+      "carrier_out": {
+        "active": true,
+        "default": false,
+        "description": "Carrier(s) produced by this technology. Only `transmission`, `conversion`, `storage`, and `supply` technologies can define this parameter",
+        "dtype": "bool",
+        "one_of": null,
+        "pivot_values_to_dim": "carriers",
+        "resample_method": "first",
+        "title": ""
+      }
+    },
+    "parameters": {
+      "flow_out_parasitic_eff": {
+        "active": true,
+        "default": 1.0,
+        "description": "Additional losses as flow gets transferred from the plant to the carrier, e.g. due to plant parasitic consumption. Set as value between 1 (no loss) and 0 (all lost).",
+        "resample_method": "mean",
+        "title": "Plant parasitic efficiency",
+        "unit": "unitless."
+      },
+      "timestep_resolution": {
+        "active": true,
+        "default": 1,
+        "description": "",
+        "resample_method": "sum",
+        "title": "Resolution per timestep.",
+        "unit": "hours."
+      }
+    },
+    "variables": {
+      "flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": "flow_cap_max",
+          "min": "flow_cap_min"
+        },
+        "default": 0,
+        "description": "A technology's flow capacity, also known as its nominal or nameplate capacity.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "title": "Technology flow (a.k.a. nominal) capacity",
+        "unit": "power",
+        "where": "carrier_in OR carrier_out"
+      },
+      "flow_out": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The outflow of a technology per timestep, also known as the flow discharged (from `storage` technologies) or the flow received (by `transmission` technologies) on a link.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Carrier outflow",
+        "unit": "energy",
+        "where": "carrier_out AND not (one_way AND map_dim(nodes, link_from)==True)"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {},
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[flow_out_max]"
+}

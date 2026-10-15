@@ -1,0 +1,41 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "annual_energy_balance_total_source_availability.lp",
+  "math_dict": {
+    "constraints": {
+      "annual_energy_balance_total_source_availability": {
+        "active": true,
+        "description": "Limit total flow into the system from a particular source.",
+        "equations": [
+          {
+            "expression": "sum(source_use, over=[nodes, timesteps]) <= annual_source_max\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "techs"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "source_use AND annual_source_max"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones3/barebones.yaml"
+    },
+    "techs": {
+      "test_supply_plus": {
+        "annual_source_max": 10
+      }
+    }
+  },
+  "scenario": "simple_supply_and_supply_plus,two_hours",
+  "test": "tests/math/math_test.py::TestAnnualEnergyBalance::test_annual_energy_balance_total_source_availability"
+}

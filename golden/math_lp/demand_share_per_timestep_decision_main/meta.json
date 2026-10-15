@@ -1,0 +1,83 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "demand_share_per_timestep_decision_main.lp",
+  "math_dict": {
+    "constraints": {
+      "demand_share_per_timestep_decision_main_max": {
+        "active": true,
+        "description": "Limit the upper bound of a technology's outflow to the share of demand that the model has decided it will meet.",
+        "equations": [
+          {
+            "expression": "flow_out[carriers=$carrier] <= (1 + demand_share_relaxation) * select_from_lookup_arrays(sink_use_equals, techs=decide_demand_share) * demand_share_per_timestep_decision\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {
+          "carrier": [
+            {
+              "expression": "demand_share_carrier",
+              "where": "True"
+            }
+          ]
+        },
+        "sub_expressions": {},
+        "title": "",
+        "where": "demand_share_per_timestep_decision"
+      },
+      "demand_share_per_timestep_decision_main_min": {
+        "active": true,
+        "description": "Limit the lower bound of a technology's outflow to the share of demand that the model has decided it will meet.",
+        "equations": [
+          {
+            "expression": "flow_out[carriers=$carrier] >= (1 - demand_share_relaxation) * select_from_lookup_arrays(sink_use_equals, techs=decide_demand_share) * demand_share_per_timestep_decision\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {
+          "carrier": [
+            {
+              "expression": "demand_share_carrier",
+              "where": "True"
+            }
+          ]
+        },
+        "sub_expressions": {},
+        "title": "",
+        "where": "demand_share_per_timestep_decision"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones8/barebones.yaml"
+    },
+    "data_definitions": {
+      "demand_share_carrier": "electricity",
+      "demand_share_relaxation": 0.01
+    },
+    "techs": {
+      "test_conversion_plus": {
+        "decide_demand_share": "test_demand_elec"
+      },
+      "test_supply_elec": {
+        "decide_demand_share": "test_demand_elec"
+      }
+    }
+  },
+  "scenario": "conversion_and_conversion_plus,two_hours",
+  "test": "tests/math/math_test.py::TestDemandSharePerTimestepDecision::test_demand_share_per_timestep_decision_main"
+}

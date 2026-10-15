@@ -1,0 +1,38 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "downtime_period_decision.lp",
+  "math_dict": {
+    "constraints": {
+      "downtime_period_decision": {
+        "active": true,
+        "description": "Force operation to zero in an integer number of timesteps, for technologies with integer decision variables activated.\n",
+        "equations": [
+          {
+            "expression": "sum(operating_units * timestep_weights, over=timesteps) <= uptime_limit\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "operating_units AND uptime_limit"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones13/barebones.yaml"
+    },
+    "techs.test_supply_elec.uptime_limit": 1
+  },
+  "scenario": "supply_milp,two_hours",
+  "test": "tests/math/math_test.py::TestUptimeDowntime::test_downtime_decision"
+}

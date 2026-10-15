@@ -1,0 +1,62 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "fuel_dist_cost.lp",
+  "math_dict": {
+    "objectives": {
+      "min_cost_optimisation": {
+        "active": true,
+        "description": "Minimise the total cost of installing and operating all technologies in the system. If multiple cost classes are present (e.g., monetary and co2 emissions), the weighted sum of total costs is minimised. Cost class weights can be defined in the indexed parameter `objective_cost_weights`.",
+        "equations": [
+          {
+            "expression": "sum(\n  (\n    sum(cost, over=[nodes, techs]) +\n    sum(cost_var_fuel_distribution, over=[nodes, carriers, timesteps])\n  ) *\n  objective_cost_weights,\n  over=costs\n) + $unmet_demand",
+            "where": "True"
+          }
+        ],
+        "sense": "minimise",
+        "slices": {},
+        "sub_expressions": {
+          "unmet_demand": [
+            {
+              "expression": "sum(\n  sum(unmet_demand - unused_supply, over=[carriers, nodes])\n  * timestep_weights,\n  over=timesteps\n) * bigM",
+              "where": "True"
+            }
+          ]
+        },
+        "title": ""
+      }
+    }
+  },
+  "objective": "min_cost_optimisation",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones12/barebones.yaml"
+    },
+    "data_definitions": {
+      "allow_fuel_distribution": {
+        "data": true,
+        "dims": "carriers",
+        "index": [
+          "coal"
+        ]
+      },
+      "cost_fuel_distribution": {
+        "data": 5,
+        "dims": [
+          "carriers",
+          "costs"
+        ],
+        "index": [
+          [
+            "coal",
+            "monetary"
+          ]
+        ]
+      }
+    }
+  },
+  "scenario": "fuel_distribution,two_hours",
+  "test": "tests/math/math_test.py::TestFuelDist::test_fuel_distribution_costs"
+}

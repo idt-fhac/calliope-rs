@@ -1,0 +1,95 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "flow_capacity_per_storage_capacity_max.lp",
+  "math_dict": {
+    "constraints": {
+      "flow_capacity_per_storage_capacity_max": {
+        "active": true,
+        "description": "Set the upper bound of storage flow capacity relative to its storage capacity.",
+        "equations": [
+          {
+            "expression": "flow_cap <= storage_cap * flow_cap_per_storage_cap_max",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "flow_cap AND storage_cap AND flow_cap_per_storage_cap_max"
+      }
+    },
+    "parameters": {
+      "flow_cap_per_storage_cap_max": {
+        "active": true,
+        "default": Infinity,
+        "description": "ratio of maximum charge/discharge (kW) for a given storage capacity (kWh).",
+        "resample_method": "first",
+        "title": "Maximum flow capacity per storage capacity",
+        "unit": "$\\text{hour}^{-1}$"
+      }
+    },
+    "variables": {
+      "flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": "flow_cap_max",
+          "min": "flow_cap_min"
+        },
+        "default": 0,
+        "description": "A technology's flow capacity, also known as its nominal or nameplate capacity.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "title": "Technology flow (a.k.a. nominal) capacity",
+        "unit": "power",
+        "where": "carrier_in OR carrier_out"
+      },
+      "storage_cap": {
+        "active": true,
+        "bounds": {
+          "max": "storage_cap_max",
+          "min": "storage_cap_min"
+        },
+        "default": 0,
+        "description": "The upper limit on a carrier that can be stored by a technology in any timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Stored carrier capacity",
+        "unit": "energy",
+        "where": "include_storage==True OR base_tech==storage"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_storage": {
+            "flow_cap_per_storage_cap_max": 2.0
+          }
+        }
+      }
+    }
+  },
+  "scenario": "simple_storage,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[flow_capacity_per_storage_capacity_max]"
+}

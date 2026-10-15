@@ -1,0 +1,83 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "chp_extraction.lp",
+  "math_dict": {
+    "constraints": {
+      "balance_conversion": {
+        "active": true,
+        "description": "Fix the relationship between a `conversion` technology's outflow and consumption.",
+        "equations": [
+          {
+            "expression": "sum(flow_out_inc_eff, over=carriers) == sum(flow_in_inc_eff, over=carriers)",
+            "where": "NOT turbine_type"
+          },
+          {
+            "expression": "flow_out_inc_eff[carriers=electricity] == sum(flow_in_inc_eff, over=carriers)",
+            "where": "turbine_type==backpressure AND NOT boiler_eff"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "base_tech==conversion AND NOT include_storage==true"
+      },
+      "chp_backpressure_line_min": {
+        "active": true,
+        "description": "Set the backpressure line as a lower bound for electricity generation in combined heat and power plants with extraction turbines. `power_to_heat_ratio` is also referred to as the `backpressure ratio` or simply `cb`.\n",
+        "equations": [
+          {
+            "expression": "flow_out[carriers=electricity] >= flow_out[carriers=heat] * power_to_heat_ratio\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "turbine_type==extraction"
+      },
+      "chp_extraction_line": {
+        "active": true,
+        "description": "Set the extraction line for combined heat and power plants with extraction turbines. `power_loss_factor` is also referred to as simply `cv`.\n",
+        "equations": [
+          {
+            "expression": "flow_out[carriers=electricity] <= (sum(flow_in_inc_eff, over=carriers) * flow_out_eff[carriers=electricity])\n   - (flow_out[carriers=heat] * power_loss_factor)\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "turbine_type==extraction"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones5/barebones.yaml"
+    },
+    "techs.test_chp.power_loss_factor": 0.1,
+    "techs.test_chp.power_to_heat_ratio": 2,
+    "techs.test_chp.turbine_type": "extraction"
+  },
+  "scenario": "simple_chp,two_hours",
+  "test": "tests/math/math_test.py::TestCHPHTP::test_chp_extraction"
+}

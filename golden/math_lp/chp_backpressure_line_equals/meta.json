@@ -1,0 +1,63 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "chp_backpressure_line_equals.lp",
+  "math_dict": {
+    "constraints": {
+      "balance_conversion": {
+        "active": true,
+        "description": "Fix the relationship between a `conversion` technology's outflow and consumption.",
+        "equations": [
+          {
+            "expression": "sum(flow_out_inc_eff, over=carriers) == sum(flow_in_inc_eff, over=carriers)",
+            "where": "NOT turbine_type"
+          },
+          {
+            "expression": "flow_out_inc_eff[carriers=electricity] == sum(flow_in_inc_eff, over=carriers)",
+            "where": "turbine_type==backpressure AND NOT boiler_eff"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "base_tech==conversion AND NOT include_storage==true"
+      },
+      "chp_backpressure_line_equals": {
+        "active": true,
+        "description": "Fix the backpressure line for combined heat and power plants without extraction turbines. `power_to_heat_ratio` is also referred to as the `backpressure ratio` or simply `cb`.\n",
+        "equations": [
+          {
+            "expression": "flow_out[carriers=electricity] == flow_out[carriers=heat] * power_to_heat_ratio\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "turbine_type==backpressure AND NOT boiler_eff"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones5/barebones.yaml"
+    },
+    "techs.test_chp.power_to_heat_ratio": 1.25,
+    "techs.test_chp.turbine_type": "backpressure"
+  },
+  "scenario": "simple_chp,two_hours",
+  "test": "tests/math/math_test.py::TestCHPHTP::test_chp_backpressure_no_boiler"
+}

@@ -1,0 +1,139 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "cost_investment_flow_cap.lp",
+  "math_dict": {
+    "global_expressions": {
+      "cost_investment_flow_cap": {
+        "active": true,
+        "default": 0,
+        "description": "The investment costs associated with the nominal/rated capacity of a technology.",
+        "equations": [
+          {
+            "expression": "$cost_sum * flow_cap",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "costs"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {
+          "cost_sum": [
+            {
+              "expression": "(cost_flow_cap + cost_flow_cap_per_distance * distance) * 0.5",
+              "where": "base_tech==transmission"
+            },
+            {
+              "expression": "cost_flow_cap",
+              "where": "NOT base_tech==transmission"
+            }
+          ]
+        },
+        "title": "Flow capacity investment costs",
+        "unit": "cost",
+        "where": "flow_cap AND (cost_flow_cap OR cost_flow_cap_per_distance)"
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_investment_flow_cap, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    },
+    "parameters": {
+      "cost_flow_cap": {
+        "active": true,
+        "default": 0,
+        "description": "Cost per unit of the decision variable `flow_cap`.",
+        "resample_method": "first",
+        "title": "Cost of flow capacity.",
+        "unit": "$\\frac{\\text{cost}}{\\text{power}}$"
+      },
+      "cost_flow_cap_per_distance": {
+        "active": true,
+        "default": 0,
+        "description": "Cost per unit of the decision variable `flow_cap` and per unit distance of a transmission link. Applied to transmission links only.",
+        "resample_method": "first",
+        "title": "Cost of flow capacity, per unit distance",
+        "unit": "$\\frac{\\text{cost}}{\\text{power}\\times\\text{distance}}$"
+      },
+      "distance": {
+        "active": true,
+        "default": 1.0,
+        "description": "Used for `..._per_distance` constraints. If not defined, it will be automatically derived from latitude/longitude of nodes in a link.",
+        "resample_method": "mean",
+        "title": "Distance spanned by link.",
+        "unit": "distance."
+      },
+      "flow_cap_max": {
+        "active": true,
+        "default": Infinity,
+        "description": "Limits `flow_cap` to a maximum.",
+        "resample_method": "first",
+        "title": "Maximum rated flow capacity.",
+        "unit": "power."
+      },
+      "flow_cap_min": {
+        "active": true,
+        "default": 0,
+        "description": "Limits `flow_cap` to a minimum.",
+        "resample_method": "first",
+        "title": "Minimum rated flow capacity.",
+        "unit": "power or $\\frac{\\text{power}}{\\text{unit}}$"
+      }
+    },
+    "variables": {
+      "flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": "flow_cap_max",
+          "min": "flow_cap_min"
+        },
+        "default": 0,
+        "description": "A technology's flow capacity, also known as its nominal or nameplate capacity.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "title": "Technology flow (a.k.a. nominal) capacity",
+        "unit": "power",
+        "where": "carrier_in OR carrier_out"
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "techs": {
+      "test_link_a_b_elec": {
+        "cost_flow_cap": {
+          "data": 10,
+          "dims": "costs",
+          "index": "monetary"
+        },
+        "cost_flow_cap_per_distance": 5
+      },
+      "test_supply_elec": {
+        "cost_flow_cap": 4
+      }
+    }
+  },
+  "scenario": "simple_conversion,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[cost_investment_flow_cap]"
+}

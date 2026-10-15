@@ -1,0 +1,83 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "chp_backpressure_and_boiler.lp",
+  "math_dict": {
+    "constraints": {
+      "balance_conversion": {
+        "active": true,
+        "description": "Fix the relationship between a `conversion` technology's outflow and consumption.",
+        "equations": [
+          {
+            "expression": "sum(flow_out_inc_eff, over=carriers) == sum(flow_in_inc_eff, over=carriers)",
+            "where": "NOT turbine_type"
+          },
+          {
+            "expression": "flow_out_inc_eff[carriers=electricity] == sum(flow_in_inc_eff, over=carriers)",
+            "where": "turbine_type==backpressure AND NOT boiler_eff"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "base_tech==conversion AND NOT include_storage==true"
+      },
+      "chp_backpressure_line_max": {
+        "active": true,
+        "description": "Set the backpressure line as a lower bound for heat generation in combined heat and power plants without extraction turbines, but with the option to divert fuel to use in direct heat generation (e.g., via a boiler). `power_to_heat_ratio` is also referred to as the `backpressure ratio` or simply `cb`.\n",
+        "equations": [
+          {
+            "expression": "flow_out[carriers=electricity] <= flow_out[carriers=heat] * power_to_heat_ratio\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "turbine_type==backpressure AND boiler_eff"
+      },
+      "chp_divert_fuel_to_boiler": {
+        "active": true,
+        "description": "Divert fuel input from use in combined heat and power generation to be used in direct heat generation (e.g., via a boiler). `boiler_eff` is the boiler efficiency. `power_to_heat_ratio` is also referred to as the `backpressure ratio` or simply `cb`.\n",
+        "equations": [
+          {
+            "expression": "flow_out[carriers=heat] <= (sum(flow_in_inc_eff, over=carriers) * boiler_eff) - (\n      flow_out[carriers=electricity] * (\n        (boiler_eff / flow_out_eff[carriers=electricity])\n        - (1 / power_to_heat_ratio)\n      )\n    )",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "turbine_type==backpressure AND boiler_eff"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones5/barebones.yaml"
+    },
+    "techs.test_chp.boiler_eff": 0.8,
+    "techs.test_chp.power_to_heat_ratio": 1.5,
+    "techs.test_chp.turbine_type": "backpressure"
+  },
+  "scenario": "simple_chp,two_hours",
+  "test": "tests/math/math_test.py::TestCHPHTP::test_chp_backpressure_and_boiler"
+}

@@ -1,0 +1,162 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "ramping_up.lp",
+  "math_dict": {
+    "constraints": {
+      "ramping_up": {
+        "active": true,
+        "description": "Set the upper bound on a technology's ability to ramp outflow up beyond a certain percentage compared to the previous timestep.",
+        "equations": [
+          {
+            "expression": "$flow - roll($flow, timesteps=1) <= flow_ramping * flow_cap",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {
+          "flow": [
+            {
+              "expression": "flow_out / timestep_resolution",
+              "where": "carrier_out AND NOT carrier_in"
+            },
+            {
+              "expression": "flow_in / timestep_resolution",
+              "where": "carrier_in AND NOT carrier_out"
+            },
+            {
+              "expression": "(flow_out - flow_in) / timestep_resolution",
+              "where": "carrier_in AND carrier_out"
+            }
+          ]
+        },
+        "title": "",
+        "where": "(carrier_in OR carrier_out) AND flow_ramping AND NOT timesteps==get_val_at_index(timesteps=0)"
+      }
+    },
+    "lookups": {
+      "carrier_in": {
+        "active": true,
+        "default": false,
+        "description": "Carrier(s) consumed by this technology. Only `transmission`, `conversion`, `storage`, and `demand` technologies can define this parameter",
+        "dtype": "bool",
+        "one_of": null,
+        "pivot_values_to_dim": "carriers",
+        "resample_method": "first",
+        "title": ""
+      },
+      "carrier_out": {
+        "active": true,
+        "default": false,
+        "description": "Carrier(s) produced by this technology. Only `transmission`, `conversion`, `storage`, and `supply` technologies can define this parameter",
+        "dtype": "bool",
+        "one_of": null,
+        "pivot_values_to_dim": "carriers",
+        "resample_method": "first",
+        "title": ""
+      }
+    },
+    "parameters": {
+      "flow_ramping": {
+        "active": true,
+        "default": 1.0,
+        "description": "limit maximum outflow / inflow / outflow - inflow (technology base class dependent) to a fraction of maximum capacity, which increases by that fraction at each timestep.",
+        "resample_method": "first",
+        "title": "Ramping rate",
+        "unit": "$\\frac{1}{\\text{hour}}$"
+      },
+      "timestep_resolution": {
+        "active": true,
+        "default": 1,
+        "description": "",
+        "resample_method": "sum",
+        "title": "Resolution per timestep.",
+        "unit": "hours."
+      }
+    },
+    "variables": {
+      "flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": "flow_cap_max",
+          "min": "flow_cap_min"
+        },
+        "default": 0,
+        "description": "A technology's flow capacity, also known as its nominal or nameplate capacity.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "title": "Technology flow (a.k.a. nominal) capacity",
+        "unit": "power",
+        "where": "carrier_in OR carrier_out"
+      },
+      "flow_in": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The inflow to a technology per timestep, also known as the flow consumed (by `storage` technologies) or the flow sent (by `transmission` technologies) on a link.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Carrier inflow",
+        "unit": "energy",
+        "where": "carrier_in AND not (one_way AND map_dim(nodes, link_to)==True)"
+      },
+      "flow_out": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The outflow of a technology per timestep, also known as the flow discharged (from `storage` technologies) or the flow received (by `transmission` technologies) on a link.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Carrier outflow",
+        "unit": "energy",
+        "where": "carrier_out AND not (one_way AND map_dim(nodes, link_from)==True)"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_supply_elec": {
+            "flow_ramping": 0.5
+          }
+        }
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[ramping_up]"
+}

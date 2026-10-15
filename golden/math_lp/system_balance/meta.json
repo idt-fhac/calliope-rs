@@ -1,0 +1,151 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "system_balance.lp",
+  "math_dict": {
+    "constraints": {
+      "system_balance": {
+        "active": true,
+        "description": "Set the global carrier balance of the optimisation problem by fixing the total production of a given carrier to equal the total consumption of that carrier at every node in every timestep.",
+        "equations": [
+          {
+            "expression": "sum(flow_out, over=techs) - sum(flow_in, over=techs) - sum(flow_export, over=techs) + (unmet_demand + unused_supply) == 0",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "any(carrier_in, over=techs) OR any(carrier_out, over=techs)"
+      }
+    },
+    "lookups": {
+      "active": {
+        "active": true,
+        "default": false,
+        "description": "Whether a technology is defined with particular carriers and at a particular node.",
+        "dtype": "bool",
+        "one_of": null,
+        "pivot_values_to_dim": null,
+        "resample_method": "first",
+        "title": ""
+      }
+    },
+    "variables": {
+      "flow_export": {
+        "active": true,
+        "bounds": {
+          "max": "export_max",
+          "min": "export_min"
+        },
+        "default": 0,
+        "description": "The flow of a carrier exported outside the system boundaries by a technology per timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Carrier export",
+        "unit": "energy",
+        "where": "carrier_export"
+      },
+      "flow_in": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The inflow to a technology per timestep, also known as the flow consumed (by `storage` technologies) or the flow sent (by `transmission` technologies) on a link.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Carrier inflow",
+        "unit": "energy",
+        "where": "carrier_in AND not (one_way AND map_dim(nodes, link_to)==True)"
+      },
+      "flow_out": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The outflow of a technology per timestep, also known as the flow discharged (from `storage` technologies) or the flow received (by `transmission` technologies) on a link.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Carrier outflow",
+        "unit": "energy",
+        "where": "carrier_out AND not (one_way AND map_dim(nodes, link_from)==True)"
+      },
+      "unmet_demand": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "Virtual source of carrier flow to ensure model feasibility. This should only be considered a debugging rather than a modelling tool as it may distort the model in other ways due to the large impact it has on the objective function value. When present in a model in which it has been requested, it indicates an inability for technologies in the model to reach a sufficient combined supply capacity to meet demand.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Unmet demand (load shedding)",
+        "unit": "energy",
+        "where": "config.ensure_feasibility==True AND (any(carrier_in, over=techs) OR any(carrier_out, over=techs))"
+      },
+      "unused_supply": {
+        "active": true,
+        "bounds": {
+          "max": 0,
+          "min": -Infinity
+        },
+        "default": 0,
+        "description": "Virtual sink of carrier flow to ensure model feasibility. This should only be considered a debugging rather than a modelling tool as it may distort the model in other ways due to the large impact it has on the objective function value. In model results, the negation of this variable is combined with `unmet_demand` and presented as only one variable: `unmet_demand`. When present in a model in which it has been requested, it indicates an inability for technologies in the model to reach a sufficient combined consumption capacity to meet required outflow (e.g. from renewables without the possibility of curtailment).",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Unused supply (curtailment)",
+        "unit": "energy",
+        "where": "config.ensure_feasibility==True AND (any(carrier_in, over=techs) OR any(carrier_out, over=techs))"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config": {
+      "build": {
+        "ensure_feasibility": true
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[system_balance]"
+}

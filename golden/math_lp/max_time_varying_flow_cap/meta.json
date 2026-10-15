@@ -1,0 +1,61 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "max_time_varying_flow_cap.lp",
+  "math_dict": {
+    "constraints": {
+      "max_time_varying_flow_cap": {
+        "active": true,
+        "description": "Limit flow out in each hour according to a time varying fractional limit that is multiplied by the technology flow cap. This represents, for instance, the impact of outdoor temperature on the maximum output of a technology relative to its rated max output.\n",
+        "equations": [
+          {
+            "expression": "flow_out <= flow_cap_max_relative_per_ts * flow_cap * flow_out_parasitic_eff\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "flow_out AND flow_cap_max_relative_per_ts"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones4/barebones.yaml"
+    },
+    "data_definitions": {
+      "flow_cap_max_relative_per_ts": {
+        "data": [
+          0.8,
+          0.5
+        ],
+        "dims": [
+          "techs",
+          "timesteps"
+        ],
+        "index": [
+          [
+            "test_supply_elec",
+            "2005-01-01 00:00"
+          ],
+          [
+            "test_supply_elec",
+            "2005-01-01 01:00"
+          ]
+        ]
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestMaxTimeVarying::test_max_time_varying_flow_cap"
+}

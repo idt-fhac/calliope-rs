@@ -1,0 +1,85 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "source_max.lp",
+  "math_dict": {
+    "constraints": {
+      "source_max": {
+        "active": true,
+        "description": "Set the upper bound of a `supply` technology's source consumption.",
+        "equations": [
+          {
+            "expression": "source_use <= timestep_resolution * source_cap",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "source_cap"
+      }
+    },
+    "parameters": {
+      "timestep_resolution": {
+        "active": true,
+        "default": 1,
+        "description": "",
+        "resample_method": "sum",
+        "title": "Resolution per timestep.",
+        "unit": "hours."
+      }
+    },
+    "variables": {
+      "source_cap": {
+        "active": true,
+        "bounds": {
+          "max": "source_cap_max",
+          "min": "source_cap_min"
+        },
+        "default": 0,
+        "description": "The upper limit on a flow that can be consumed from outside the system boundaries by a `supply` technology in each timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Source flow capacity",
+        "unit": "power",
+        "where": "base_tech==supply"
+      },
+      "source_use": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The carrier flow consumed from outside the system boundaries by a `supply` technology.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "title": "Source flow use",
+        "unit": "energy",
+        "where": "base_tech==supply"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {},
+  "scenario": "simple_supply_plus,resample_two_days",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[source_max]"
+}

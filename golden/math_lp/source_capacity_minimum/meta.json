@@ -1,0 +1,66 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones1/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "source_capacity_minimum.lp",
+  "math_dict": {
+    "constraints": {
+      "source_capacity_minimum": {
+        "active": true,
+        "description": "Set the lower bound on a technology's source capacity for any supply technology with a non-zero lower bound, with or without integer capacity purchasing.",
+        "equations": [
+          {
+            "expression": "source_cap >= source_cap_min",
+            "where": "NOT purchased_units"
+          },
+          {
+            "expression": "source_cap >= source_cap_min * purchased_units",
+            "where": "purchased_units"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "base_tech==supply AND source_cap_min"
+      }
+    },
+    "variables": {
+      "source_cap": {
+        "active": true,
+        "bounds": {
+          "max": "source_cap_max",
+          "min": 0
+        },
+        "default": 0,
+        "description": "The upper limit on a flow that can be consumed from outside the system boundaries by a `supply` technology in each timestep. Minimum is set to 0 and handled in a distinct constraint to handle the integer purchase variable.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Source flow capacity",
+        "unit": "power",
+        "where": "base_tech==supply"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "techs": {
+      "test_supply_plus": {
+        "source_cap_min": 30
+      }
+    }
+  },
+  "scenario": "simple_supply_plus,two_hours",
+  "test": "tests/math/math_test.py::TestMILPMath::test_math[source_capacity_minimum]"
+}

@@ -1,0 +1,41 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "annual_energy_balance_total_sink_availability.lp",
+  "math_dict": {
+    "constraints": {
+      "annual_energy_balance_total_sink_availability": {
+        "active": true,
+        "description": "Limit total flow out of the system into a sink that is not pinned by `sink_use_equals`.\n",
+        "equations": [
+          {
+            "expression": "sum(flow_in, over=[nodes, carriers, timesteps]) <= annual_sink_max\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "techs"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "base_tech==demand AND annual_sink_max"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones3/barebones.yaml"
+    },
+    "techs": {
+      "test_demand_elec": {
+        "annual_sink_max": 10
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours,demand_elec_max",
+  "test": "tests/math/math_test.py::TestAnnualEnergyBalance::test_annual_energy_balance_total_sink_availability"
+}

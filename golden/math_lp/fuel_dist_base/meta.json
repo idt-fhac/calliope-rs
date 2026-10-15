@@ -1,0 +1,65 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "fuel_dist_base.lp",
+  "math_dict": {
+    "constraints": {
+      "restrict_total_imports_and_exports": {
+        "active": true,
+        "description": "Ensure all fuel distribution in the system balances to zero. I.e., all regional fuel exports must equal regional fuel imports. Setting this constraint to an inequality would allow for net imports/exports from/to the system.\n",
+        "equations": [
+          {
+            "expression": "sum(fuel_distributor, over=nodes) == 0",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "fuel_distributor"
+      },
+      "system_balance": {
+        "active": true,
+        "description": "Set the global carrier balance of the optimisation problem by fixing the total production of a given carrier to equal the total consumption of that carrier at every node in every timestep.",
+        "equations": [
+          {
+            "expression": "sum(flow_out, over=techs) - sum(flow_in, over=techs) - sum(flow_export, over=techs) + (unmet_demand + unused_supply) + fuel_distributor == 0\n",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "any(carrier_in, over=techs) OR any(carrier_out, over=techs)"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones12/barebones.yaml"
+    },
+    "data_definitions": {
+      "allow_fuel_distribution": {
+        "data": true,
+        "dims": "carriers",
+        "index": [
+          "coal"
+        ]
+      }
+    }
+  },
+  "scenario": "fuel_distribution,two_hours",
+  "test": "tests/math/math_test.py::TestFuelDist::test_fuel_distribution"
+}

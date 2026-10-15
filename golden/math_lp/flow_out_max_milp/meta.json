@@ -1,0 +1,84 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones1/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "flow_out_max_milp.lp",
+  "math_dict": {
+    "constraints": {
+      "flow_out_max_milp": {
+        "active": true,
+        "description": "Set the upper bound of a technology's ability to produce carriers, for any technology using integer units to define its capacity.",
+        "equations": [
+          {
+            "expression": "flow_out <= operating_units * timestep_resolution * flow_cap_per_unit * flow_out_parasitic_eff",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "flow_out AND operating_units AND flow_cap_per_unit"
+      }
+    },
+    "variables": {
+      "flow_out": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The outflow of a technology per timestep, also known as the flow discharged (from `storage` technologies) or the flow received (by `transmission` technologies) on a link.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Carrier outflow",
+        "unit": "energy",
+        "where": "carrier_out AND not (one_way AND map_dim(nodes, link_from)==True)"
+      },
+      "operating_units": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "Integer number of a technology that is operating in each timestep, for any technology set to require integer capacity purchasing.",
+        "domain": "integer",
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "title": "Number of operating units",
+        "unit": "integer",
+        "where": "integer_dispatch==True AND cap_method==integer"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "techs": {
+      "test_supply_elec": {
+        "flow_cap_per_unit": 10
+      }
+    }
+  },
+  "scenario": "supply_milp,two_hours",
+  "test": "tests/math/math_test.py::TestMILPMath::test_math[flow_out_max_milp]"
+}

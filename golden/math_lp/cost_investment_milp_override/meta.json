@@ -1,0 +1,66 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones1/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "cost_investment_milp_override.lp",
+  "math_dict": {
+    "global_expressions": {
+      "cost_investment": {
+        "active": true,
+        "default": 0,
+        "description": "The installation costs of a technology, including those linked to the nameplate capacity, land use, storage size, and binary/integer unit purchase.",
+        "equations": [
+          {
+            "expression": "sum(cost_investment_flow_cap, over=carriers) + cost_investment_storage_cap + cost_investment_source_cap + cost_investment_area_use + cost_investment_purchase",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "costs"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Total investment costs",
+        "unit": "cost",
+        "where": "cost_investment_flow_cap OR cost_investment_storage_cap OR cost_investment_source_cap OR cost_investment_area_use OR cost_investment_purchase"
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost_investment, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "techs": {
+      "test_supply_elec": {
+        "cost_flow_cap": {
+          "data": 10,
+          "dims": "costs",
+          "index": "monetary"
+        },
+        "cost_purchase": {
+          "data": 1000,
+          "dims": "costs",
+          "index": "monetary"
+        }
+      }
+    }
+  },
+  "scenario": "supply_milp,two_hours",
+  "test": "tests/math/math_test.py::TestMILPMath::test_math[cost_investment]"
+}

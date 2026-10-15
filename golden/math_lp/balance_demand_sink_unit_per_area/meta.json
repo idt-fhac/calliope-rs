@@ -1,0 +1,140 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "balance_demand_sink_unit_per_area.lp",
+  "math_dict": {
+    "constraints": {
+      "balance_demand": {
+        "active": true,
+        "description": "Set the upper bound on, or a fixed total of, that a demand technology must dump to its sink in each timestep.",
+        "equations": [
+          {
+            "expression": "flow_in_inc_eff == sink_use_equals * $sink_scaler",
+            "where": "sink_use_equals"
+          },
+          {
+            "expression": "flow_in_inc_eff <= sink_use_max * $sink_scaler",
+            "where": "NOT sink_use_equals AND sink_use_max"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {
+          "sink_scaler": [
+            {
+              "expression": "area_use",
+              "where": "sink_unit==per_area"
+            },
+            {
+              "expression": "sum(where(flow_cap, carrier_in), over=carriers)",
+              "where": "sink_unit==per_cap"
+            },
+            {
+              "expression": "1",
+              "where": "sink_unit==absolute"
+            }
+          ]
+        },
+        "title": "",
+        "where": "carrier_in AND base_tech==demand"
+      }
+    },
+    "global_expressions": {
+      "flow_in_inc_eff": {
+        "active": true,
+        "default": 0,
+        "description": "Inflows after taking efficiency losses into account.",
+        "equations": [
+          {
+            "expression": "flow_in * flow_in_eff * flow_in_eff_per_distance ** distance",
+            "where": "base_tech==transmission"
+          },
+          {
+            "expression": "flow_in * flow_in_eff",
+            "where": "NOT base_tech==transmission"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Carrier inflow including losses",
+        "unit": "energy",
+        "where": "flow_in"
+      }
+    },
+    "variables": {
+      "area_use": {
+        "active": true,
+        "bounds": {
+          "max": "area_use_max",
+          "min": "area_use_min"
+        },
+        "default": 0,
+        "description": "The area in space utilised directly (e.g., solar PV panels) or indirectly (e.g., biofuel crops) by a technology.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs"
+        ],
+        "title": "Area utilisation",
+        "unit": "area",
+        "where": "(area_use_min OR area_use_max OR area_use_per_flow_cap OR sink_unit==per_area OR source_unit==per_area)"
+      },
+      "flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": "flow_cap_max",
+          "min": "flow_cap_min"
+        },
+        "default": 0,
+        "description": "A technology's flow capacity, also known as its nominal or nameplate capacity.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "title": "Technology flow (a.k.a. nominal) capacity",
+        "unit": "power",
+        "where": "carrier_in OR carrier_out"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "nodes": {
+      "a": {
+        "techs": {
+          "test_demand_elec": {
+            "area_use_max": 50,
+            "sink_use_max": 2.0
+          }
+        }
+      }
+    },
+    "techs": {
+      "test_demand_elec": {
+        "sink_unit": "per_area"
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[balance_demand_sink_unit_per_area]"
+}

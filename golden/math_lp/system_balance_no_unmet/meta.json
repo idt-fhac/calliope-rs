@@ -1,0 +1,103 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "system_balance_no_unmet.lp",
+  "math_dict": {
+    "constraints": {
+      "system_balance": {
+        "active": true,
+        "description": "Set the global carrier balance of the optimisation problem by fixing the total production of a given carrier to equal the total consumption of that carrier at every node in every timestep.",
+        "equations": [
+          {
+            "expression": "sum(flow_out, over=techs) - sum(flow_in, over=techs) - sum(flow_export, over=techs) + (unmet_demand + unused_supply) == 0",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "carriers",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "any(carrier_in, over=techs) OR any(carrier_out, over=techs)"
+      }
+    },
+    "variables": {
+      "flow_export": {
+        "active": true,
+        "bounds": {
+          "max": "export_max",
+          "min": "export_min"
+        },
+        "default": 0,
+        "description": "The flow of a carrier exported outside the system boundaries by a technology per timestep.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Carrier export",
+        "unit": "energy",
+        "where": "carrier_export"
+      },
+      "flow_in": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The inflow to a technology per timestep, also known as the flow consumed (by `storage` technologies) or the flow sent (by `transmission` technologies) on a link.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Carrier inflow",
+        "unit": "energy",
+        "where": "carrier_in AND not (one_way AND map_dim(nodes, link_to)==True)"
+      },
+      "flow_out": {
+        "active": true,
+        "bounds": {
+          "max": Infinity,
+          "min": 0
+        },
+        "default": 0,
+        "description": "The outflow of a technology per timestep, also known as the flow discharged (from `storage` technologies) or the flow received (by `transmission` technologies) on a link.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers",
+          "timesteps"
+        ],
+        "title": "Carrier outflow",
+        "unit": "energy",
+        "where": "carrier_out AND not (one_way AND map_dim(nodes, link_from)==True)"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config": {
+      "build": {
+        "ensure_feasibility": false
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[system_balance_no_unmet]"
+}

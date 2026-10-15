@@ -1,0 +1,55 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {},
+  "lp_file": "downtime_period.lp",
+  "math_dict": {
+    "constraints": {
+      "downtime_period": {
+        "active": true,
+        "description": "Force outflow to zero in pre-defined timesteps of technology downtime.\n",
+        "equations": [
+          {
+            "expression": "sum(flow_out, over=carriers) == 0",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "timesteps"
+        ],
+        "slices": {},
+        "sub_expressions": {},
+        "title": "",
+        "where": "downtime_periods"
+      }
+    }
+  },
+  "objective": "dummy_obj",
+  "override_dict": {
+    "config.init": {
+      "extra_math": [],
+      "math_paths.base": "/tmp/pytest-of-idt/pytest-26/barebones13/barebones.yaml"
+    },
+    "data_definitions": {
+      "downtime_periods": {
+        "data": true,
+        "dims": [
+          "techs",
+          "nodes",
+          "timesteps"
+        ],
+        "index": [
+          [
+            "test_supply_elec",
+            "a",
+            "2005-01-01 00:00"
+          ]
+        ]
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestUptimeDowntime::test_downtime"
+}

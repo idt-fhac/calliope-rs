@@ -1,0 +1,110 @@
+{
+  "args": [],
+  "highs_lp_names": "verbose",
+  "kwargs": {
+    "math_paths": {
+      "base": "/tmp/pytest-of-idt/pytest-26/barebones0/barebones.yaml"
+    },
+    "pre_validate_math_strings": false
+  },
+  "lp_file": "cost.lp",
+  "math_dict": {
+    "global_expressions": {
+      "cost": {
+        "active": true,
+        "default": 0,
+        "description": "The total annualised costs of a technology, including installation and operation costs.",
+        "equations": [
+          {
+            "expression": "cost_investment_annualised + sum(cost_operation_variable, over=timesteps) + cost_operation_fixed",
+            "where": "True"
+          }
+        ],
+        "foreach": [
+          "nodes",
+          "techs",
+          "costs"
+        ],
+        "order": 0,
+        "slices": {},
+        "sub_expressions": {},
+        "title": "Total costs",
+        "unit": "cost",
+        "where": "cost_investment_annualised OR cost_operation_variable OR cost_operation_fixed"
+      }
+    },
+    "objectives": {
+      "test_obj": {
+        "equations": [
+          {
+            "expression": "sum(cost, over=[nodes, techs, costs, carriers, timesteps])"
+          }
+        ],
+        "sense": "minimise"
+      }
+    },
+    "parameters": {
+      "cost_flow_out": {
+        "active": true,
+        "default": 0,
+        "description": "Cost per unit of `flow_out` in each timestep.",
+        "resample_method": "mean",
+        "title": "Carrier outflow cost",
+        "unit": "$\\frac{\\text{cost}}{\\text{energy}}$"
+      },
+      "cost_om_annual": {
+        "active": true,
+        "default": 0,
+        "description": "Annual costs applied per unit `flow_cap`. These costs are not subject to being recalculated relative to technology lifetime, only scaled to reflect the fraction of one year that the model represents (e.g., 7 days ~= 0.02 of a year).",
+        "resample_method": "first",
+        "title": "Annual O&M costs",
+        "unit": "$\\frac{\\text{cost}}{\\text{power}}$"
+      },
+      "lifetime": {
+        "active": true,
+        "default": Infinity,
+        "description": "Must be defined if fixed capital costs are defined. A reasonable value for many technologies is around 20-25 years.",
+        "resample_method": "mean",
+        "title": "Technology lifetime",
+        "unit": "years."
+      }
+    },
+    "variables": {
+      "flow_cap": {
+        "active": true,
+        "bounds": {
+          "max": "flow_cap_max",
+          "min": "flow_cap_min"
+        },
+        "default": 0,
+        "description": "A technology's flow capacity, also known as its nominal or nameplate capacity.",
+        "domain": "real",
+        "foreach": [
+          "nodes",
+          "techs",
+          "carriers"
+        ],
+        "title": "Technology flow (a.k.a. nominal) capacity",
+        "unit": "power",
+        "where": "carrier_in OR carrier_out"
+      }
+    }
+  },
+  "objective": "test_obj",
+  "override_dict": {
+    "techs": {
+      "test_supply_elec": {
+        "cost_flow_cap": {
+          "data": 10,
+          "dims": "costs",
+          "index": "monetary"
+        },
+        "cost_flow_out": 0.5,
+        "cost_om_annual": 50,
+        "lifetime": 25
+      }
+    }
+  },
+  "scenario": "simple_supply,two_hours",
+  "test": "tests/math/math_test.py::TestBaseMath::test_math[cost]"
+}
