@@ -182,3 +182,150 @@ fn comparison_detects_differences() {
         calliope_preprocess::xr::Data::Float(vec![1.0; d.vars["active"].data.len()]);
     assert!(!compare_datasets(&a, &d, 1e-12).is_empty());
 }
+
+/// Sets `math_paths.base` (where present) to `path`, at the top level and under
+/// `config.init`.
+fn redirect_base_math(tree: &mut AttrTree, path: &Path) {
+    let p = Node::new(Value::Str(path.display().to_string()));
+    for key in ["math_paths.base", "config.init.math_paths.base"] {
+        if tree.get_key_opt(key).is_some() {
+            tree.set_key(key, p.clone()).unwrap();
+        }
+    }
+}
+
+fn run_math_lp_fixture(root: &Path, dir: &Path) -> Result<Vec<String>, String> {
+    let meta: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(dir.join("meta.json"))
+            .unwrap()
+            .replace("-Infinity", "\"__-inf__\"")
+            .replace("Infinity", "\"__inf__\"")
+            .replace("NaN", "\"__nan__\""),
+    )
+    .unwrap();
+    // The barebones base math lived in a pytest tmp dir; its content is in the attrs.
+    let golden = dir.join("inputs.nc");
+    let attrs = calliope_io::read_group_attrs(&golden, "attrs").map_err(|e| e.to_string())?;
+    let math_yaml = &attrs
+        .iter()
+        .find(|(k, _)| k == "math")
+        .ok_or("no math attr")?
+        .1;
+    let math = calliope_yaml::read_yaml_str(math_yaml, false).map_err(|e| e.to_string())?;
+    let base = math
+        .get_key_opt("init.base")
+        .and_then(Node::as_map)
+        .ok_or("no init.base")?;
+    let tmp = tempfile::tempdir().unwrap();
+    let base_path = tmp.path().join("barebones.yaml");
+    std::fs::write(&base_path, calliope_yaml::to_yaml(base)).unwrap();
+
+    let mut opts = ReadOptions {
+        scenario: meta["scenario"].as_str().map(str::to_owned),
+        override_dict: meta
+            .get("override_dict")
+            .filter(|v| v.is_object())
+            .map(json_tree),
+        math_dict: None,
+        init_kwargs: json_tree(&meta["kwargs"]),
+    };
+    if let Some(o) = &mut opts.override_dict {
+        redirect_base_math(o, &base_path);
+    }
+    redirect_base_math(&mut opts.init_kwargs, &base_path);
+    if let Some(md) = meta.get("math_dict").filter(|v| v.is_object()) {
+        let mut m = AttrTree::new();
+        m.insert("custom_math", Node::from(json_tree(md)));
+        opts.math_dict = Some(m);
+        let mut extra: Vec<Node> = opts
+            .init_kwargs
+            .get("extra_math")
+            .and_then(Node::as_seq)
+            .map(<[Node]>::to_vec)
+            .unwrap_or_default();
+        extra.push(Node::new(Value::Str("custom_math".to_owned())));
+        opts.init_kwargs
+            .insert("extra_math", Node::new(Value::Seq(extra)));
+    }
+    let model = root.join("tests/common/test_model/model.yaml");
+    let m = read_yaml(&model, &opts).map_err(|e| format!("error: {e}"))?;
+    let mut expected = read_group(&golden, "inputs").map_err(|e| e.to_string())?;
+    // These goldens were saved after `Model.build()`, whose `_drop_undefined` call adds
+    // `__active` to `model.inputs` in place (a Python side effect, not an input).
+    expected.remove("__active");
+    let path = tmp.path().join("inputs.nc");
+    write_model_netcdf(&path, &m.inputs, &[]).map_err(|e| e.to_string())?;
+    let actual = read_group(&path, "inputs").map_err(|e| e.to_string())?;
+    // meta.json is written with sorted keys, which loses the order of `add_dims` (and so
+    // the dimension order of the table's arrays). Only for such overrides, a pure
+    // dimension-order difference is accepted.
+    let add_dims_in_override = serde_json::to_string(&meta["override_dict"])
+        .unwrap()
+        .contains("add_dims");
+    Ok(compare_datasets(&expected, &actual, 1e-12)
+        .into_iter()
+        .filter(|d| match d {
+            calliope_io::Diff::Dims {
+                expected, actual, ..
+            } if add_dims_in_override => {
+                let mut e = expected.clone();
+                let mut a = actual.clone();
+                e.sort();
+                a.sort();
+                e != a
+            }
+            _ => true,
+        })
+        .map(|d| d.to_string())
+        .collect())
+}
+
+/// The 122 `tests/math` fixtures (barebones math + custom math per component).
+#[test]
+fn golden_math_lp_inputs_match() {
+    let Some(root) = reference() else {
+        eprintln!("skipping: no Calliope reference checkout");
+        return;
+    };
+    let base = repo().join("golden/math_lp");
+    if !base.is_dir() {
+        return;
+    }
+    let filter = std::env::var("GOLDEN_FILTER").unwrap_or_default();
+    let mut dirs: Vec<PathBuf> = std::fs::read_dir(&base)
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .filter(|p| p.join("inputs.nc").is_file())
+        .filter(|p| p.to_string_lossy().contains(&filter))
+        .collect();
+    dirs.sort();
+    let mut failed = Vec::new();
+    for dir in &dirs {
+        let name = dir.file_name().unwrap().to_string_lossy().to_string();
+        match run_math_lp_fixture(&root, dir) {
+            Ok(d) if d.is_empty() => {}
+            Ok(d) => {
+                println!("DIFF  {name}: {} differences", d.len());
+                for x in d.iter().take(6) {
+                    println!("        {x}");
+                }
+                failed.push(name);
+            }
+            Err(e) => {
+                println!("FAIL  {name}: {e}");
+                failed.push(name);
+            }
+        }
+    }
+    println!(
+        "{} of {} math_lp fixtures match",
+        dirs.len() - failed.len(),
+        dirs.len()
+    );
+    assert!(
+        failed.is_empty(),
+        "{} of {} differ: {failed:?}",
+        failed.len(),
+        dirs.len()
+    );
+}
