@@ -1,0 +1,174 @@
+// Calliope math strings: `where` strings, equations, sub-expressions and slices.
+//
+// This mirrors the pyparsing grammar in `calliope.backend.where_parser` and
+// `calliope.backend.expression_parser`, rule by rule and with the same ordered choices
+// (pyparsing `MatchFirst` and PEG `|` both commit to the first alternative that matches).
+//
+// Python builds a new grammar for every string, with the model's component names baked in
+// as keywords. Here identifiers are parsed generically; `parse.rs` then resolves each one
+// against the names (dimension, input, result, generic string) and rejects what the
+// pyparsing grammar would not have matched. Comments name the pyparsing element each rule
+// stands for.
+
+// pyparsing skips this whitespace before every token, except inside `Combine`.
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
+
+// `Keyword.DEFAULT_KEYWORD_CHARS`
+kw_char = _{ ASCII_ALPHANUMERIC | "_" | "$" }
+
+// ---------------------------------------------------------------------------------------
+// Tokens (`setup_base_parser_elements`)
+
+// `Combine(Opt(Suppress(".")) + Keyword("inf", caseless=True))`
+inf = @{ "."? ~ ^"inf" ~ !kw_char }
+
+// `~inf_kw + Word(alphas, alphanums + "_")`
+ident = @{ !inf ~ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+
+// `pyparsing_common.number | inf_kw`: `sci_real | real | signed_integer`.
+digits   = _{ ASCII_DIGIT+ }
+exponent = _{ ("e" | "E") ~ ("+" | "-")? ~ digits }
+float    = @{ ("+" | "-")? ~ (digits ~ exponent | (digits ~ "." ~ ASCII_DIGIT* | "." ~ digits) ~ exponent?) }
+int      = @{ ("+" | "-")? ~ digits }
+number   = { float | int | inf }
+
+// `bool_parser`: caseless keywords.
+bool_true  = @{ ^"true" ~ !kw_char }
+bool_false = @{ ^"false" ~ !kw_char }
+boolean    = { bool_true | bool_false }
+
+kw_and = @{ ^"and" ~ !kw_char }
+kw_or  = @{ ^"or" ~ !kw_char }
+kw_not = @{ ^"not" ~ !kw_char }
+
+// `config_option_parser`: `Suppress("config.") + generic_identifier`.
+config = { "config." ~ ident }
+
+// `sub_expression_parser`: `Combine(Suppress("$") + generic_identifier)`.
+sub_expr = ${ "$" ~ ident }
+
+// The slice reference in `sliced_param_or_var_parser`: `Suppress("$") + generic_identifier`
+// (not combined, so whitespace may follow the `$`).
+slice_ref = { "$" ~ ident }
+
+// `list_parser`: `Suppress("[") + DelimitedList(MatchFirst(items)) + Suppress("]")`. Every
+// list in the grammar takes numbers and identifiers; which identifiers is resolved later.
+id_list   = { "[" ~ list_item ~ ("," ~ list_item)* ~ "]" }
+list_item = _{ number | ident }
+
+// Arithmetic operators (`arithmetic_parser`).
+sign_op = { "+" | "-" }
+pow_op  = { "**" }
+mul_op  = { "*" | "/" }
+add_op  = { "+" | "-" }
+
+// `Combine(helper_function_name + lpar)` and `Combine(sliced_object_name + lspar)`.
+call_open   = ${ ident ~ "(" }
+sliced_open = ${ ident ~ "[" }
+
+// ---------------------------------------------------------------------------------------
+// Equations and global expressions (`generate_arithmetic_parser`).
+//
+// `infix_notation` levels, highest precedence first: unary sign (right), `**` (left),
+// `* /` (left), `+ -` (left). Each operand level also accepts a parenthesised expression.
+
+arith_e = { term_e ~ (add_op ~ term_e)* }
+term_e  = { pow_e ~ (mul_op ~ pow_e)* }
+pow_e   = { sign_e ~ (pow_op ~ sign_e)* }
+sign_e  = { sign_op ~ sign_e | atom_e }
+atom_e  = _{ call_e | sub_expr | sliced | number | ident | "(" ~ arith_e ~ ")" }
+
+// `helper_function_parser(arithmetic, helper_func_list, evaluatable_identifier)`.
+// The evaluatable identifier is an `arith_e` that is a bare identifier.
+call_e      = { call_open ~ call_args_e ~ ")" }
+call_args_e = { args_e ~ "," ~ kwargs_e | args_e? ~ kwargs_e? }
+args_e      = { arg_e ~ ("," ~ arg_e)* }
+arg_e       = { (arith_e | id_list) ~ !"=" }
+// `DelimitedList(dict_of(key, arg_values))`: `dict_of` is `OneOrMore`, so the comma between
+// keyword arguments is optional.
+kwargs_e = { kwarg_e ~ (","? ~ kwarg_e)* }
+kwarg_e  = { ident ~ "=" ~ arg_e }
+
+// `sliced_param_or_var_parser([number, evaluatable_identifier, slice_list], ...)`.
+sliced     = { sliced_open ~ slice_item ~ ("," ~ slice_item)* ~ "]" }
+slice_item = { ident ~ "=" ~ (slice_ref | number | ident | id_list) }
+
+// Sub-expressions (`generate_sub_expression_parser`): no `$sub_expression` operands.
+arith_s     = { term_s ~ (add_op ~ term_s)* }
+term_s      = { pow_s ~ (mul_op ~ pow_s)* }
+pow_s       = { sign_s ~ (pow_op ~ sign_s)* }
+sign_s      = { sign_op ~ sign_s | atom_s }
+atom_s      = _{ call_s | sliced | number | ident | "(" ~ arith_s ~ ")" }
+call_s      = { call_open ~ call_args_s ~ ")" }
+call_args_s = { args_s ~ "," ~ kwargs_s | args_s? ~ kwargs_s? }
+args_s      = { arg_s ~ ("," ~ arg_s)* }
+arg_s       = { (arith_s | id_list) ~ !"=" }
+kwargs_s    = { kwarg_s ~ (","? ~ kwarg_s)* }
+kwarg_s     = { ident ~ "=" ~ arg_s }
+
+// Slices (`generate_slice_parser`): no arithmetic, no slice references.
+slice_value      = _{ call_slice | sliced_noref | ident | number | id_list }
+call_slice       = { call_open ~ call_args_slice ~ ")" }
+call_args_slice  = { args_slice ~ "," ~ kwargs_slice | args_slice? ~ kwargs_slice? }
+args_slice       = { arg_slice ~ ("," ~ arg_slice)* }
+arg_slice        = { (call_slice | sliced_noref | ident | number | id_list) ~ !"=" }
+kwargs_slice     = { kwarg_slice ~ (","? ~ kwarg_slice)* }
+kwarg_slice      = { ident ~ "=" ~ arg_slice }
+sliced_noref     = { sliced_open ~ slice_item_noref ~ ("," ~ slice_item_noref)* ~ "]" }
+slice_item_noref = { ident ~ "=" ~ (number | ident | id_list) }
+
+// ---------------------------------------------------------------------------------------
+// `where` strings (`generate_where_string_parser`).
+//
+// `infix_notation(MatchFirst(operands), [(not, 1, RIGHT), (and | or, 2, LEFT)])`:
+// `and` and `or` share one precedence level.
+
+where_expr = { where_not ~ (logic_op ~ where_not)* }
+logic_op   = { kw_and | kw_or }
+where_not  = { kw_not ~ where_not | where_atom }
+where_atom = _{ boolean | comparison | call_w | subset | ident | "(" ~ where_expr ~ ")" }
+
+// `helper_function_parser(unique_evaluatable_string, number, id_list, dimensions, inputs,
+// results, config_option)`: single-token arguments only.
+call_w      = { call_open ~ call_args_w ~ ")" }
+call_args_w = { args_w ~ "," ~ kwargs_w | args_w? ~ kwargs_w? }
+args_w      = { arg_w ~ ("," ~ arg_w)* }
+arg_w       = { (ident | number | id_list | config) ~ !"=" }
+kwargs_w    = { kwarg_w ~ (","? ~ kwarg_w)* }
+kwarg_w     = { ident ~ "=" ~ arg_w }
+
+// `comparison_parser(lhs=[arithmetic], rhs=[helper, bool, number, generic string])`.
+comparison = { arith_c ~ cmp_op ~ (call_c | boolean | number | ident) }
+// `one_of(["<", ">", "==", ">=", "<="])` tries the longer operators first.
+cmp_op = { "==" | ">=" | "<=" | "<" | ">" }
+
+arith_c = { term_c ~ (add_op ~ term_c)* }
+term_c  = { pow_c ~ (mul_op ~ pow_c)* }
+pow_c   = { sign_c ~ (pow_op ~ sign_c)* }
+sign_c  = { sign_op ~ sign_c | atom_c }
+atom_c  = _{ call_c | number | config | ident | "(" ~ arith_c ~ ")" }
+
+// The comparison helper: `helper_function_parser(unique_evaluatable_string, number,
+// id_list, arithmetic)`. The leading `unique_evaluatable_string` is resolved in `parse.rs`.
+call_c      = { call_open ~ call_args_c ~ ")" }
+call_args_c = { args_c ~ "," ~ kwargs_c | args_c? ~ kwargs_c? }
+args_c      = { arg_c ~ ("," ~ arg_c)* }
+arg_c       = { (number | id_list | arith_c) ~ !"=" }
+kwargs_c    = { kwarg_c ~ (","? ~ kwarg_c)* }
+kwarg_c     = { ident ~ "=" ~ arg_c }
+
+// `subset_parser(dimensions, config_option, number, general_evaluatable_string)`:
+// `"[" items "]" White(" ", min=1) "in" White(" ", min=1) dimension`.
+subset      = { "[" ~ subset_item ~ ("," ~ subset_item)* ~ subset_in ~ ident }
+subset_item = _{ config | number | ident }
+subset_in   = @{ "]" ~ ("\t" | "\r" | "\n")* ~ " "+ ~ WHITESPACE* ~ "in" ~ ("\t" | "\r" | "\n")* ~ " "+ }
+
+// ---------------------------------------------------------------------------------------
+// Entry points.
+
+where_string          = { SOI ~ where_expr ~ EOI }
+equation_string       = { SOI ~ arith_e ~ eq_op ~ arith_e ~ EOI }
+eq_op                 = { "<=" | ">=" | "==" }
+arithmetic_string     = { SOI ~ arith_e ~ EOI }
+sub_expression_string = { SOI ~ arith_s ~ EOI }
+slice_string          = { SOI ~ slice_value ~ EOI }
