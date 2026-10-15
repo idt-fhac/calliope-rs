@@ -1,3 +1,5 @@
 //! Sparse LP/MILP assembly, HiGHS interface and LP writer.
 //!
-//! Placeholder crate; implemented in a later phase of `PLAN.md`.
+//! Currently provides [`lp_format`], the LP reader, canonicaliser and differ.
+
+pub mod lp_format;
