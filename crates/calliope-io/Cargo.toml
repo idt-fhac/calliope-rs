@@ -8,6 +8,16 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
+calliope-array.workspace = true
+calliope-preprocess = { path = "../calliope-preprocess" }
+calliope-schema.workspace = true
+calliope-yaml.workspace = true
+netcdf = "0.12.1"
+thiserror.workspace = true
 
 [lints]
 workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
+tempfile.workspace = true
