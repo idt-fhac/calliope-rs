@@ -40,7 +40,10 @@ todo = "warn"
 [profile.release]
 debug = "line-tables-only"
 
+[profile.dev]
+debug = "line-tables-only"
+
 [profile.dev.package."*"]
 opt-level = 1
-# Dependencies (Polars) without debuginfo: keeps target/ small on a tight disk.
+# Dependencies without debuginfo: keeps target/ small on a tight disk.
 debug = false
