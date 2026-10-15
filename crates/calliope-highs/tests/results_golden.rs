@@ -86,4 +86,43 @@ fn results_match_golden() {
     // the zero global expression is all zero (kept), nothing is all-NaN
     assert_eq!(res.arrays["zero"].to_dense(), vec![0.0]);
     assert_eq!(res.arrays.len(), 6);
+
+    // Rust results in a model file: Python reads them equal to its own results.
+    let mut arrays = res.arrays.clone();
+    arrays.shift_remove("zero");
+    let mut file = calliope_io::read_netcdf(&dir.join("results.nc")).unwrap();
+    file.results = calliope_io::NcGroup {
+        ds: calliope_io::results_dataset(&arrays).unwrap(),
+        ..Default::default()
+    };
+    let tmp = tempfile::tempdir().unwrap();
+    let out = tmp.path().join("rust.nc");
+    calliope_io::write_netcdf(&out, &file).unwrap();
+    let back = calliope_io::read_netcdf(&out).unwrap();
+    assert_eq!(back.results.ds.vars.len(), arrays.len());
+    let py_dir = std::env::var_os("CALLIOPE_PY_DIR").map_or_else(
+        || Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../calliope"),
+        std::path::PathBuf::from,
+    );
+    if !py_dir.join("pyproject.toml").exists() {
+        eprintln!("note: Python reference env not found; skipped");
+        return;
+    }
+    let script =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../calliope-io/tests/py/nc_compare.py");
+    let o = std::process::Command::new("pixi")
+        .current_dir(&py_dir)
+        .args(["run", "python", "-I"])
+        .arg(script)
+        .arg(dir.join("results.nc"))
+        .arg(&out)
+        .args(["1e-6", "subset"])
+        .output()
+        .unwrap();
+    let report = String::from_utf8_lossy(&o.stdout);
+    assert!(
+        report.trim_end().ends_with("OK"),
+        "{report}{}",
+        String::from_utf8_lossy(&o.stderr)
+    );
 }
