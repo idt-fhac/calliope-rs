@@ -27,38 +27,66 @@ fn extents_of(idx: &[usize]) -> Extents {
     Extents::from(idx.to_vec())
 }
 
+/// How a variable is encoded: coordinates are stored plainly; data variables get
+/// Calliope's `save_netcdf` encoding (zlib level 4 for numbers, `<NA>` fill for strings).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Role {
+    Coord,
+    Data,
+}
+
 fn put_data(
     group: &mut GroupMut<'_>,
     name: &str,
     dims: &[&str],
     data: &Data,
     shape: &[usize],
+    role: Role,
+    attrs: &[(String, AttributeValue)],
 ) -> Result<(), IoError> {
+    let compress = role == Role::Data && !shape.is_empty();
     match data {
         Data::Float(v) => {
             let mut var = group.add_variable::<f64>(name, dims)?;
+            if compress {
+                var.set_compression(4, true)?;
+            }
             var.set_fill_value(f64::NAN)?;
+            put_attrs(&mut var, attrs)?;
             var.put_values(v, ..)?;
         }
         Data::Int(v) => {
             let mut var = group.add_variable::<i64>(name, dims)?;
+            if compress {
+                var.set_compression(4, true)?;
+            }
+            put_attrs(&mut var, attrs)?;
             var.put_values(v, ..)?;
         }
         Data::Bool(v) => {
+            // `{"dtype": "int8", "_FillValue": None}` as in `save_netcdf`
             let vals: Vec<i8> = v.iter().map(|b| i8::from(*b)).collect();
             let mut var = group.add_variable::<i8>(name, dims)?;
-            var.put_attribute("dtype", "bool")?;
+            put_attrs(&mut var, attrs)?;
             var.put_values(&vals, ..)?;
         }
         Data::Datetime(v) => {
             let mut var = group.add_variable::<i64>(name, dims)?;
+            if compress {
+                var.set_compression(4, true)?;
+            }
             var.put_attribute("units", DATETIME_UNITS)?;
             var.put_attribute("calendar", "proleptic_gregorian")?;
             var.set_fill_value(NAT)?;
+            put_attrs(&mut var, attrs)?;
             var.put_values(v, ..)?;
         }
         Data::Object(v) => {
             let mut var = group.add_string_variable(name, dims)?;
+            if role == Role::Data {
+                var.put_attribute("_FillValue", vec![NA_STRING.to_owned()])?;
+            }
+            put_attrs(&mut var, attrs)?;
             for (i, o) in v.iter().enumerate() {
                 let s = match o {
                     Obj::Nan => NA_STRING.to_owned(),
@@ -71,6 +99,16 @@ fn put_data(
                 }
             }
         }
+    }
+    Ok(())
+}
+
+fn put_attrs(
+    var: &mut netcdf::VariableMut<'_>,
+    attrs: &[(String, AttributeValue)],
+) -> Result<(), IoError> {
+    for (k, v) in attrs {
+        var.put_attribute(k, v.clone())?;
     }
     Ok(())
 }
@@ -112,27 +150,60 @@ fn coord_data(c: &Coord) -> Data {
     }
 }
 
-/// Writes a dataset as a group of a new or existing NetCDF file.
+/// Writes a dataset as a group of a new or existing NetCDF file (plain string attributes
+/// on the group, no variable attributes).
 pub fn write_group(
     file: &mut netcdf::FileMut,
     group: &str,
     ds: &Dataset,
     attrs: &[(&str, String)],
 ) -> Result<(), IoError> {
+    let attrs: Vec<(String, AttributeValue)> = attrs
+        .iter()
+        .map(|(k, v)| ((*k).to_string(), AttributeValue::Str(v.clone())))
+        .collect();
+    write_group_raw(file, group, ds, &attrs, &|_| Vec::new())
+}
+
+/// Writes a dataset group with raw group attributes and per-variable (and coordinate)
+/// attributes from `var_attrs`.
+pub(crate) fn write_group_raw(
+    file: &mut netcdf::FileMut,
+    group: &str,
+    ds: &Dataset,
+    attrs: &[(String, AttributeValue)],
+    var_attrs: &dyn Fn(&str) -> Vec<(String, AttributeValue)>,
+) -> Result<(), IoError> {
     let mut g = file.add_group(group)?;
     for (k, v) in attrs {
-        g.add_attribute(k, v.as_str())?;
+        g.add_attribute(k, v.clone())?;
     }
     for (name, c) in &ds.coords {
         g.add_dimension(name, c.len())?;
     }
     for (name, c) in &ds.coords {
-        put_data(&mut g, name, &[name.as_str()], &coord_data(c), &[c.len()])?;
+        put_data(
+            &mut g,
+            name,
+            &[name.as_str()],
+            &coord_data(c),
+            &[c.len()],
+            Role::Coord,
+            &var_attrs(name),
+        )?;
     }
     for (name, var) in &ds.vars {
         let dims: Vec<&str> = var.dims.iter().map(String::as_str).collect();
         let shape: Vec<usize> = var.dims.iter().map(|d| ds.coords[d].len()).collect();
-        put_data(&mut g, name, &dims, &var.data, &shape)?;
+        put_data(
+            &mut g,
+            name,
+            &dims,
+            &var.data,
+            &shape,
+            Role::Data,
+            &var_attrs(name),
+        )?;
     }
     Ok(())
 }
@@ -173,7 +244,7 @@ fn time_unit_ns(units: &str) -> Option<(i64, i64)> {
     Some((mult, origin))
 }
 
-fn read_var(v: &netcdf::Variable<'_>) -> Result<Data, IoError> {
+pub(crate) fn read_var(v: &netcdf::Variable<'_>) -> Result<Data, IoError> {
     let shape: Vec<usize> = v.dimensions().iter().map(netcdf::Dimension::len).collect();
     let total: usize = shape.iter().product();
     let units = attr_str(v, "units");
@@ -265,6 +336,11 @@ pub fn read_group(path: &Path, group: &str) -> Result<Dataset, IoError> {
     let g = file
         .group(group)?
         .ok_or_else(|| IoError::Format(format!("no group `{group}` in {}", path.display())))?;
+    read_group_dataset(&g)
+}
+
+/// Reads an open group into a dataset.
+pub(crate) fn read_group_dataset(g: &netcdf::Group<'_>) -> Result<Dataset, IoError> {
     let mut ds = Dataset::new();
     let dim_names: Vec<String> = g.dimensions().map(|d| d.name()).collect();
     for d in &dim_names {

@@ -12,6 +12,7 @@ calliope-array.workspace = true
 calliope-preprocess = { path = "../calliope-preprocess" }
 calliope-schema.workspace = true
 calliope-yaml.workspace = true
+indexmap.workspace = true
 netcdf = "0.12.1"
 thiserror.workspace = true
 
