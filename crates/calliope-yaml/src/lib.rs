@@ -13,6 +13,7 @@ mod emit;
 mod error;
 mod load;
 mod read;
+mod ser;
 mod tree;
 mod value;
 
@@ -21,5 +22,6 @@ pub use emit::to_yaml;
 pub use error::{LoadError, TreeError};
 pub use load::{parse_node, parse_tree, resolve_plain};
 pub use read::{STRING_SOURCE, read_yaml_file, read_yaml_str, read_yaml_str_at, relative_path};
+pub use ser::{to_node, to_tree};
 pub use tree::{AttrTree, NestedKey, REPLACE_KEY};
 pub use value::{Node, Source, Span, Value, python_float};

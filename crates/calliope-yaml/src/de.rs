@@ -1,9 +1,10 @@
 //! `serde` support: deserialising typed values from [`Node`]s, with the path and source
 //! location of the first error.
 //!
-//! Scalar coercion follows pydantic's lax mode where a YAML document can trigger it: a float
-//! field accepts an int or bool, an int field accepts an integral float or a bool, a bool field
-//! accepts `0`/`1`. Strings are never coerced to or from numbers here; schema types decide that.
+//! Scalar coercion follows pydantic's lax mode for typed fields: a float field accepts an int,
+//! a bool or a numeric string; an int field accepts an integral float, a bool or an integer
+//! string; a bool field accepts `0`/`1` and pydantic's yes/no spellings. Numbers are never
+//! coerced to strings. Untyped targets (`deserialize_any`) see the value as loaded.
 
 use std::fmt;
 
@@ -144,6 +145,13 @@ impl<'de> Deserializer<'de> for &'de Node {
             Value::Bool(b) => visitor.visit_bool(*b),
             Value::Int(0) => visitor.visit_bool(false),
             Value::Int(1) => visitor.visit_bool(true),
+            Value::Float(f) if *f == 0.0 => visitor.visit_bool(false),
+            Value::Float(f) if *f == 1.0 => visitor.visit_bool(true),
+            Value::Str(s) => match s.to_ascii_lowercase().as_str() {
+                "0" | "off" | "f" | "false" | "n" | "no" => visitor.visit_bool(false),
+                "1" | "on" | "t" | "true" | "y" | "yes" => visitor.visit_bool(true),
+                _ => Err(de::Error::invalid_type(unexpected(&self.value), &visitor)),
+            },
             other => Err(de::Error::invalid_type(unexpected(other), &visitor)),
         }
     }
@@ -154,14 +162,22 @@ impl<'de> Deserializer<'de> for &'de Node {
             Value::Bool(b) => visitor.visit_i64(i64::from(*b)),
             #[allow(clippy::cast_possible_truncation)]
             Value::Float(f) if f.is_finite() && f.fract() == 0.0 => visitor.visit_i64(*f as i64),
+            Value::Str(s) => match s.trim().parse::<i64>() {
+                Ok(i) => visitor.visit_i64(i),
+                Err(_) => Err(de::Error::invalid_type(unexpected(&self.value), &visitor)),
+            },
             other => Err(de::Error::invalid_type(unexpected(other), &visitor)),
         }
     }
 
     fn deserialize_f64<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, DeError> {
-        match self.value.as_number() {
-            Some(f) => visitor.visit_f64(f),
-            None => Err(de::Error::invalid_type(unexpected(&self.value), &visitor)),
+        match (&self.value, self.value.as_number()) {
+            (_, Some(f)) => visitor.visit_f64(f),
+            (Value::Str(s), None) => match s.trim().parse::<f64>() {
+                Ok(f) => visitor.visit_f64(f),
+                Err(_) => Err(de::Error::invalid_type(unexpected(&self.value), &visitor)),
+            },
+            (other, None) => Err(de::Error::invalid_type(unexpected(other), &visitor)),
         }
     }
 
