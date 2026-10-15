@@ -2,3 +2,7 @@ LEDGER.md
 .claude/
 .omo/
 /target
+
+# benchmark scratch (synthetic models, temp outputs)
+/bench/.work/
+__pycache__/

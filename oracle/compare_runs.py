@@ -23,6 +23,13 @@ def _same(a: xr.DataArray, b: xr.DataArray) -> bool:
     av, bv = a.values, b.values
     if av.dtype.kind == "f":
         return av.tobytes() == bv.tobytes() or np.array_equal(av, bv, equal_nan=True)
+    if av.dtype.kind in "mM":  # NaT != NaT; compare the int64 representation
+        return np.array_equal(av.view("i8"), bv.view("i8"))
+    if av.dtype.kind == "O":  # strings with NaN as missing; NaN != NaN
+        import pandas as pd
+
+        na, nb = pd.isna(av), pd.isna(bv)
+        return bool((na == nb).all() and (av[~na] == bv[~nb]).all())
     return np.array_equal(av, bv)
 
 
