@@ -25,6 +25,7 @@ fn bytes(d: &Data) -> (usize, &'static str, usize) {
         Data::Float(v) => (v.len(), "float", v.len() * 8),
         Data::Datetime(v) => (v.len(), "datetime", v.len() * 8),
         Data::Object(v) => (v.len(), "object", v.len() * std::mem::size_of_val(&v[0])),
+        Data::Sparse(s) => (s.len, "sparse", s.nnz() * 16),
     }
 }
 

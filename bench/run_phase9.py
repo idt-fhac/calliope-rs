@@ -156,9 +156,11 @@ def main():
     ap.add_argument("--variants", default="rust,main,speedups")
     ap.add_argument("--only", help="comma-separated case prefixes")
     ap.add_argument("--timeout", type=int, default=1200)
+    ap.add_argument("--out", type=Path, default=OUT, help="results directory")
     a = ap.parse_args()
-    OUT.mkdir(parents=True, exist_ok=True)
-    run_bench.RESULTS = OUT
+    out = a.out
+    out.mkdir(parents=True, exist_ok=True)
+    run_bench.RESULTS = out
     cases = CASES
     if a.only:
         cases = [c for c in cases if c.startswith(tuple(a.only.split(",")))]
@@ -166,7 +168,7 @@ def main():
         for case in cases:
             stem = f"{case.replace(':', '_')}__{variant}"
             if variant != "rust" and case in PY_SKIP:
-                (OUT / f"{stem}__r1.json").write_text(
+                (out / f"{stem}__r1.json").write_text(
                     json.dumps(
                         {
                             "case": case,
@@ -182,9 +184,9 @@ def main():
                     res = run_rust(case, a.timeout)
                 else:
                     res = run_bench.run_one(case, variant, a.timeout, build_only(case))
-                    (OUT / f"{stem}.json").unlink(missing_ok=True)
+                    (out / f"{stem}.json").unlink(missing_ok=True)
                 res["rep"] = i
-                (OUT / f"{stem}__r{i}.json").write_text(
+                (out / f"{stem}__r{i}.json").write_text(
                     json.dumps(res, indent=1, default=str)
                 )
                 st = res.get("timings", {}).get("stages", {})
