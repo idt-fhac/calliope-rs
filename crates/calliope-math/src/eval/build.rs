@@ -61,7 +61,9 @@ pub fn build_model(inputs: &Inputs, math: &CalliopeBuildMath, build: &Build) -> 
             objectives: IndexMap::new(),
         },
     };
+    let timing = std::env::var_os("CALLIOPE_BUILD_TIMING").is_some();
     for comp in &comps {
+        let start = std::time::Instant::now();
         match comp.group {
             Group::Variables => b.variable(comp)?,
             Group::GlobalExpressions => b.global_expression(comp)?,
@@ -69,6 +71,14 @@ pub fn build_model(inputs: &Inputs, math: &CalliopeBuildMath, build: &Build) -> 
             Group::PiecewiseConstraints => b.piecewise(comp)?,
             Group::Objectives => b.objective(comp)?,
             Group::Postprocessed | Group::Checks => {}
+        }
+        if timing {
+            eprintln!(
+                "{:>8.3} s  {}:{}",
+                start.elapsed().as_secs_f64(),
+                comp.group.as_str(),
+                comp.name
+            );
         }
     }
     Ok(b.out)
