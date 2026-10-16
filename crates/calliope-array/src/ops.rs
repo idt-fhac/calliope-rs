@@ -298,6 +298,19 @@ impl<T: Element> LArray<T> {
         Ok((dims, keep, groups))
     }
 
+    /// Reduces over the dimensions in `over`: groups the non-missing cells by their codes on
+    /// the remaining dimensions and applies `f` to each group (cells in storage order). Groups
+    /// without cells are missing (`skipna=True, min_count=1`).
+    pub fn reduce<U: Element>(
+        &self,
+        over: &[&str],
+        f: impl Fn(&[&T]) -> U,
+    ) -> Result<LArray<U>, ArrayError> {
+        let (dims, _, groups) = self.group_cells(over)?;
+        let cells: Vec<(Vec<u32>, U)> = groups.into_iter().map(|(k, vs)| (k, f(&vs))).collect();
+        LArray::from_cells(dims, cells)
+    }
+
     /// `roll(dim=shift)` (numpy semantics; coordinates stay in place).
     pub fn roll(&self, dim: &str, shift: i64) -> Result<LArray<T>, ArrayError> {
         let ax = self.axis(dim)?;
