@@ -14,12 +14,11 @@ mod common;
 use common::{fixture, fixture_dirs, read_meta, reference, solve_overrides};
 
 /// Objective tolerance per fixture where the difference is classified (docs/findings.md,
-/// `xtask/src/known.rs`): a zero objective (any feasible point is optimal), a degenerate
-/// SPORE propagated by evolving-average scoring, and a MILP solved to a 5% gap.
+/// `xtask/src/known.rs`): a zero objective (any feasible point is optimal) and a MILP
+/// solved to a 5% gap.
 fn tolerance(name: &str) -> f64 {
     match name {
         "national_scale_check_feasibility" => f64::INFINITY,
-        "national_scale_spores_evolving_average" => 1e-4,
         "urban_scale_milp" => 0.05,
         _ => 1e-6,
     }

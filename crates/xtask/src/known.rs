@@ -49,12 +49,6 @@ pub const KNOWN: &[Known] = &[
         reason: "bench/BUGS.md #14: the scenario's objective `check_feasibility` does not exist, so both solve a zero objective; any feasible point is optimal and the reported `min_cost_optimisation` depends on it (docs/findings.md R3)",
     },
     Known {
-        fixture: "national_scale_spores_evolving_average",
-        class: "degenerate",
-        allow: Allow::Objective(1e-4),
-        reason: "SPORE 1 has the same objective but another optimal vertex (flow_cap differs by 0.1%); evolving-average scores depend on the capacities, so SPORE 2's `min_spores` differs by 1.4e-5 (docs/findings.md R1)",
-    },
-    Known {
         fixture: "urban_scale_milp",
         class: "mip-gap",
         allow: Allow::Objective(0.05),
