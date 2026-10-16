@@ -41,6 +41,7 @@ __all__ = [
     "ModelAttrs",
     "ModelError",
     "__version__",
+    "math_documentation",
     "read_dict",
     "read_netcdf",
     "read_yaml",
@@ -513,6 +514,30 @@ class Backend:
     def has_integer_or_binary_variables(self) -> bool:
         """True if the problem is a MILP."""
         return self._core.backend_has_integer_or_binary_variables()
+
+
+# ---- math documentation ----------------------------------------------------------------
+
+
+def math_documentation(model: Model, include: str = "all") -> Any:
+    """`calliope.postprocess.math_documentation.MathDocumentation` for a calliope_rs model.
+
+    The documentation is built by Python Calliope (which must be installed) from the
+    model's NetCDF, so it is the same as for the model read with Calliope:
+    `math_documentation(model).write(format="md")` (or `"tex"`, `"rst"`).
+    """
+    import tempfile
+
+    from calliope import read_netcdf
+    from calliope.postprocess.math_documentation import MathDocumentation
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "model.nc"
+        model.to_netcdf(path)
+        py_model = read_netcdf(path)
+        py_model.inputs.load()
+        py_model.results.load()
+        return MathDocumentation(py_model, include=include)
 
 
 # ---- readers -----------------------------------------------------------------------------
