@@ -25,6 +25,9 @@ features = ["pyo3/extension-module"]
 # The extension and the bundled CLI link the system NetCDF/HDF5, so auditwheel
 # repair cannot vendor them; its in-place ELF patching also breaks rebuilds.
 auditwheel = "skip"
+# The wheel is a distribution artifact; the plain cargo build keeps line tables for
+# profiling (see build_wheel.sh, which strips the CLI copy the same way).
+strip = true
 # The CLI binary that build_wheel.sh copies in before the wheel is built. A glob,
 # so that `maturin build` without it still works (cli.py then reports it missing).
 include = [{ path = "calliope_rs/bin/*", format = "wheel" }]

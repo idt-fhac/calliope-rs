@@ -17,6 +17,8 @@ export LIBCLANG_PATH="${LIBCLANG_PATH:-$HOME/.local/opt/libclang/clang/native}"
 cargo build --release -p calliope-cli
 mkdir -p python/calliope_rs/bin
 cp ../../target/release/calliope python/calliope_rs/bin/calliope
+# Strip the wheel copy, not the cargo build: local binaries keep line tables.
+strip python/calliope_rs/bin/calliope
 
 if command -v maturin >/dev/null; then
   maturin build --release "$@"
