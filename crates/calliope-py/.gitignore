@@ -1,2 +1,4 @@
 # Built by `maturin develop`
 python/calliope_rs/*.so
+# Copied in by build_wheel.sh
+python/calliope_rs/bin/

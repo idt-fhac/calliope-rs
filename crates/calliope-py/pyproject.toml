@@ -13,10 +13,21 @@ dynamic = ["version"]
 [project.optional-dependencies]
 test = ["pytest", "netCDF4"]
 
+# Only `calliope-rs`, deliberately: the `calliope` command belongs to the Python
+# package, so both can be installed side by side.
+[project.scripts]
+calliope-rs = "calliope_rs.cli:main"
+
 [tool.maturin]
 python-source = "python"
 module-name = "calliope_rs._core"
 features = ["pyo3/extension-module"]
+# The extension and the bundled CLI link the system NetCDF/HDF5, so auditwheel
+# repair cannot vendor them; its in-place ELF patching also breaks rebuilds.
+auditwheel = "skip"
+# The CLI binary that build_wheel.sh copies in before the wheel is built. A glob,
+# so that `maturin build` without it still works (cli.py then reports it missing).
+include = [{ path = "calliope_rs/bin/*", format = "wheel" }]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
