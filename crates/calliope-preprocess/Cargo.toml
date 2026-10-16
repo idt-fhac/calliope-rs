@@ -16,10 +16,17 @@ chrono = { version = "0.4", default-features = false, features = ["std"] }
 geographiclib-rs = "0.2.7"
 indexmap.workspace = true
 csv = "1.3"
+parquet = { version = "60", default-features = false, features = ["snap"], optional = true }
 regex.workspace = true
 serde.workspace = true
+serde_json = { workspace = true, optional = true }
 thiserror.workspace = true
 tracing.workspace = true
+
+[features]
+default = ["parquet"]
+# Parquet data tables (as written by `pandas.DataFrame.to_parquet`, snappy or uncompressed).
+parquet = ["dep:parquet", "dep:serde_json"]
 
 [lints]
 workspace = true

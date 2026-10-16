@@ -13,6 +13,8 @@ mod model;
 pub mod model_data;
 mod model_definition;
 pub mod model_math;
+#[cfg(feature = "parquet")]
+pub mod parquet_table;
 pub mod table;
 mod templates;
 pub mod time;

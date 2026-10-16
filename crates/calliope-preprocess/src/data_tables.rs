@@ -1,4 +1,5 @@
-//! `DataTable` (`preprocess/data_tables.py`): tabular data loaded from CSV.
+//! `DataTable` (`preprocess/data_tables.py`): tabular data loaded from CSV, Parquet (an
+//! extension) or in-memory frames.
 
 use std::collections::BTreeSet;
 use std::path::Path;
@@ -76,16 +77,19 @@ impl DataTable {
             dataset: Dataset::new(),
         };
         let path = Path::new(&input.table);
-        let is_csv = path
-            .file_name()
-            .and_then(|f| f.to_str())
-            .is_some_and(|f| f.split('.').skip(1).any(|s| s == "csv"));
-        let frame = if is_csv {
+        let has_suffix = |suffix: &str| {
+            path.file_name()
+                .and_then(|f| f.to_str())
+                .is_some_and(|f| f.split('.').skip(1).any(|s| s == suffix))
+        };
+        let frame = if has_suffix("csv") {
             let columns = t.columns();
             let rows = t.rows();
             let n_header = columns.as_ref().map_or(1, Vec::len);
             let file = relative_path(model_definition_path, path);
             read_csv(&file, n_header, rows.as_ref().map(Vec::len)).map_err(|e| t.error(&e))?
+        } else if has_suffix("parquet") {
+            t.read_parquet(&relative_path(model_definition_path, path))?
         } else if let Some(df) = dfs.get(&input.table) {
             df.clone()
         } else {
@@ -96,6 +100,17 @@ impl DataTable {
         };
         t.dataset = t.frame_to_ds(frame)?;
         Ok(t)
+    }
+
+    /// A Parquet table (an extension: Calliope reads CSV files only).
+    #[cfg(feature = "parquet")]
+    fn read_parquet(&self, file: &Path) -> Result<Frame, ModelError> {
+        crate::parquet_table::read_parquet(file).map_err(|e| self.error(&e))
+    }
+
+    #[cfg(not(feature = "parquet"))]
+    fn read_parquet(&self, _file: &Path) -> Result<Frame, ModelError> {
+        Err(self.error("Parquet data tables need the `parquet` feature"))
     }
 
     /// Builds a table from an already-read frame (for tests).
