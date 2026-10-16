@@ -11,6 +11,7 @@ publish.workspace = true
 calliope-io = { path = "../calliope-io" }
 calliope-lp = { path = "../calliope-lp" }
 calliope-math = { path = "../calliope-math" }
+calliope-model = { path = "../calliope-model" }
 calliope-preprocess = { path = "../calliope-preprocess" }
 calliope-schema.workspace = true
 calliope-yaml.workspace = true

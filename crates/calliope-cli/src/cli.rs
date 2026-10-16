@@ -8,7 +8,7 @@ use clap::{Args, Parser, Subcommand};
 
 use crate::check::{CheckKind, check_file, render};
 use crate::error::{CliError, CliResult};
-use crate::facade::{LoadOptions, SolveOptions, load_model};
+use crate::facade::{self, LoadOptions, SolveOptions, load_model};
 use crate::generate::{Kind, RunsArgs, generate, scenarios_yaml};
 use crate::lp_diff::{LpDiffArgs, lp_diff};
 use crate::new_cmd::new_model;
@@ -253,8 +253,8 @@ fn run(a: &RunArgs) -> CliResult<()> {
             if a.save_csv.is_some() || a.save_netcdf.is_some() {
                 println!("WARNING: Model will not be solved - ignoring other save options!");
             }
-            model.build()?;
-            model.to_lp(Path::new(lp))?;
+            facade::build(&mut model)?;
+            facade::to_lp(&model, Path::new(lp))?;
             print_end_time(start, "complete");
             return Ok(());
         }
@@ -271,22 +271,25 @@ fn run(a: &RunArgs) -> CliResult<()> {
             save_logs: a.save_logs.as_ref().map(PathBuf::from),
             ..SolveOptions::default()
         };
-        if let (Some(nc), Some(_)) = (&a.save_netcdf, model.spores_save_path()) {
+        if let (Some(nc), Some(_)) = (
+            &a.save_netcdf,
+            model.config.solve.spores.save_per_spore_path.as_ref(),
+        ) {
             opts.save_per_spore_path = Some(
                 Path::new(nc)
                     .parent()
                     .map_or_else(PathBuf::new, Path::to_path_buf),
             );
         }
-        model.build()?;
-        let termination = model.solve(&opts)?;
+        facade::build(&mut model)?;
+        let termination = facade::solve(&mut model, &opts)?;
         if let Some(d) = &a.save_csv {
             println!("Saving CSV results to directory: {d}");
-            model.to_csv(Path::new(d))?;
+            facade::to_csv(&model, Path::new(d))?;
         }
         if let Some(f) = &a.save_netcdf {
             println!("Saving NetCDF results to file: {f}");
-            model.to_netcdf(Path::new(f))?;
+            facade::to_netcdf(&model, Path::new(f))?;
         }
         print_end_time(start, "complete");
         if !a.no_fail_when_infeasible && termination != "optimal" {

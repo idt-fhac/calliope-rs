@@ -1,12 +1,11 @@
-//! The `Model` facade the CLI talks to.
-//!
-//! [`load_model`] returns a [`Model`]. The current implementation covers preprocessing only
-//! (YAML load with scenarios and overrides, inputs from NetCDF); `build` and `solve` return a
-//! clear error. Swap [`load_model`] for the evaluator-backed implementation when it exists.
+//! Loading models for the CLI (`_run_setup_model`) and the run steps it calls on
+//! [`calliope_model::Model`].
 
 use std::path::{Path, PathBuf};
 
-use calliope_preprocess::{ModelInputs, ReadOptions, read_yaml};
+use calliope_model::{BuildOptions, Model};
+use calliope_preprocess::ReadOptions;
+use calliope_yaml::{AttrTree, Node, Value};
 
 use crate::error::{CliError, CliResult};
 use crate::generate::read_rich_yaml;
@@ -18,24 +17,6 @@ pub struct SolveOptions {
     pub save_logs: Option<PathBuf>,
     /// Directory for per-SPORE results (`solve.spores.save_per_spore_path`).
     pub save_per_spore_path: Option<PathBuf>,
-}
-
-/// What the CLI needs from a model.
-pub trait Model {
-    /// `Model.info()`.
-    fn info(&self) -> String;
-    /// `config.solve.spores.save_per_spore_path`.
-    fn spores_save_path(&self) -> Option<PathBuf>;
-    /// `Model.build()`.
-    fn build(&mut self) -> CliResult<()>;
-    /// `Model.solve(...)`; returns the termination condition.
-    fn solve(&mut self, opts: &SolveOptions) -> CliResult<String>;
-    /// `Model.backend.to_lp(path)`.
-    fn to_lp(&self, path: &Path) -> CliResult<()>;
-    /// `Model.to_csv(dir)`.
-    fn to_csv(&self, dir: &Path) -> CliResult<()>;
-    /// `Model.to_netcdf(path)`.
-    fn to_netcdf(&self, path: &Path) -> CliResult<()>;
 }
 
 /// How to load a model (`_run_setup_model`).
@@ -51,82 +32,12 @@ pub struct LoadOptions {
     pub override_dict: Option<String>,
 }
 
-const UNAVAILABLE: &str = "building and solving models is not available yet in this version of calliope-rs (preprocessing only)";
-
-/// A model that went through preprocessing only.
-#[derive(Debug)]
-pub struct PreprocessedModel {
-    name: Option<String>,
-    dims: Vec<(String, usize)>,
-    n_active: usize,
-    spores_path: Option<PathBuf>,
-    /// Warnings raised while preprocessing.
-    pub warnings: Vec<String>,
+fn err(e: &calliope_model::Error) -> CliError {
+    CliError::from_error(e)
 }
 
-impl PreprocessedModel {
-    fn from_dataset(
-        ds: &calliope_preprocess::xr::Dataset,
-        name: Option<String>,
-        spores_path: Option<PathBuf>,
-        warnings: Vec<String>,
-    ) -> Self {
-        let dims = ds
-            .coords
-            .iter()
-            .map(|(k, c)| (k.clone(), c.len()))
-            .collect();
-        let n_active = ds.vars.get("active").map_or(0, |v| {
-            (0..v.data.len())
-                .filter(|&i| v.data.get(i).truthy())
-                .count()
-        });
-        Self {
-            name,
-            dims,
-            n_active,
-            spores_path,
-            warnings,
-        }
-    }
-}
-
-impl Model for PreprocessedModel {
-    fn info(&self) -> String {
-        let dims = self
-            .dims
-            .iter()
-            .map(|(k, n)| format!("'{k}': {n}"))
-            .collect::<Vec<_>>()
-            .join(", ");
-        format!(
-            "Model name:   {}\nModel size:   {{{dims}}} ({} valid node:tech:carrier combinations)",
-            self.name.as_deref().unwrap_or("None"),
-            self.n_active
-        )
-    }
-    fn spores_save_path(&self) -> Option<PathBuf> {
-        self.spores_path.clone()
-    }
-    fn build(&mut self) -> CliResult<()> {
-        Err(CliError::new(UNAVAILABLE))
-    }
-    fn solve(&mut self, _opts: &SolveOptions) -> CliResult<String> {
-        Err(CliError::new(UNAVAILABLE))
-    }
-    fn to_lp(&self, _path: &Path) -> CliResult<()> {
-        Err(CliError::new(UNAVAILABLE))
-    }
-    fn to_csv(&self, _dir: &Path) -> CliResult<()> {
-        Err(CliError::new(UNAVAILABLE))
-    }
-    fn to_netcdf(&self, _path: &Path) -> CliResult<()> {
-        Err(CliError::new(UNAVAILABLE))
-    }
-}
-
-/// `_run_setup_model`.
-pub fn load_model(o: &LoadOptions) -> CliResult<Box<dyn Model>> {
+/// `_run_setup_model`: a model from YAML (with scenario and overrides) or NetCDF.
+pub fn load_model(o: &LoadOptions) -> CliResult<Model> {
     let ext = o.model_file.rsplit('.').next().unwrap_or("");
     let format = match o.model_format.as_deref() {
         Some(f) => f.to_owned(),
@@ -150,16 +61,7 @@ pub fn load_model(o: &LoadOptions) -> CliResult<Box<dyn Model>> {
                 override_dict: overrides,
                 ..ReadOptions::default()
             };
-            let m: ModelInputs =
-                read_yaml(Path::new(&o.model_file), &opts).map_err(|e| CliError::from_error(&e))?;
-            let name = m.config.init.name.clone();
-            let spores = m.config.solve.spores.save_per_spore_path.clone();
-            Ok(Box::new(PreprocessedModel::from_dataset(
-                &m.inputs,
-                name,
-                spores,
-                m.warnings.clone(),
-            )))
+            Model::from_yaml(Path::new(&o.model_file), &opts).map_err(|e| err(&e))
         }
         "netcdf" => {
             if o.scenario.is_some() || o.override_dict.is_some() {
@@ -168,15 +70,59 @@ pub fn load_model(o: &LoadOptions) -> CliResult<Box<dyn Model>> {
                      --override_dict options are not available.",
                 ));
             }
-            let nc = calliope_io::read_netcdf(Path::new(&o.model_file))
-                .map_err(|e| CliError::from_error(&e))?;
-            Ok(Box::new(PreprocessedModel::from_dataset(
-                &nc.inputs.ds,
-                None,
-                None,
-                Vec::new(),
-            )))
+            Model::from_netcdf(Path::new(&o.model_file)).map_err(|e| err(&e))
         }
         other => Err(CliError::new(format!("Invalid model format: {other}"))),
     }
+}
+
+/// `model.build()`.
+pub fn build(model: &mut Model) -> CliResult<()> {
+    model.build(&BuildOptions::default()).map_err(|e| err(&e))
+}
+
+/// `model.backend.to_lp(path)`.
+pub fn to_lp(model: &Model, path: &Path) -> CliResult<()> {
+    model
+        .backend()
+        .ok_or_else(|| CliError::new("The model has not been built."))?
+        .to_lp(path)
+        .map_err(|e| err(&e))
+}
+
+/// `model.solve(**kwargs)`; returns the termination condition.
+pub fn solve(model: &mut Model, opts: &SolveOptions) -> CliResult<String> {
+    let mut overrides = AttrTree::new();
+    let path = |p: &Path| Node::new(Value::Str(p.to_string_lossy().into_owned()));
+    if let Some(d) = &opts.save_logs {
+        overrides
+            .set_key("save_logs", path(d))
+            .map_err(|e| CliError::new(e.to_string()))?;
+    }
+    if let Some(d) = &opts.save_per_spore_path {
+        overrides
+            .set_key("spores.save_per_spore_path", path(d))
+            .map_err(|e| CliError::new(e.to_string()))?;
+    }
+    model
+        .solve(&calliope_model::SolveOptions {
+            overrides,
+            ..calliope_model::SolveOptions::default()
+        })
+        .map_err(|e| err(&e))?;
+    Ok(model
+        .runtime
+        .termination_condition
+        .clone()
+        .unwrap_or_default())
+}
+
+/// `model.to_csv(dir)`.
+pub fn to_csv(model: &Model, dir: &Path) -> CliResult<()> {
+    model.to_csv(dir, true, false).map_err(|e| err(&e))
+}
+
+/// `model.to_netcdf(path)`.
+pub fn to_netcdf(model: &Model, path: &Path) -> CliResult<()> {
+    model.to_netcdf(path).map_err(|e| err(&e))
 }

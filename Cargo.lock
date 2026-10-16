@@ -214,6 +214,7 @@ dependencies = [
  "calliope-io",
  "calliope-lp",
  "calliope-math",
+ "calliope-model",
  "calliope-preprocess",
  "calliope-schema",
  "calliope-yaml",

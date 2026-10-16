@@ -1,5 +1,5 @@
-//! Ports of the cases of Python's `tests/cli_test.py` that need neither build nor solve, and
-//! byte-for-byte comparisons of the generated scripts with Python's.
+//! Ports of Python's `tests/cli_test.py` (build, solve and save included), and byte-for-byte
+//! comparisons of the generated scripts with Python's.
 
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
@@ -92,27 +92,119 @@ fn fail_no_debug_no_stderr_and_debug_stderr() {
     assert!(!o.stderr.is_empty());
 }
 
+fn test_model() -> PathBuf {
+    reference().join("tests/common/test_model/model.yaml")
+}
+
 #[test]
-fn run_accepts_all_flags_and_reports_unavailable_build() {
+fn run_from_yaml_saves_netcdf_csv_and_logs() {
+    let Some(m) = national() else { return };
+    let d = tempfile::tempdir().unwrap();
+    let nc = d.path().join("o.nc");
+    let logs = d.path().join("logs");
+    let o = run(&[
+        "run",
+        m.to_str().unwrap(),
+        "--override_dict={'config.solve.solver': 'glpk'}",
+        &format!("--save_netcdf={}", nc.display()),
+        &format!("--save_csv={}", d.path().join("csv").display()),
+        &format!("--save_logs={}", logs.display()),
+        "--quiet",
+        "--pdb",
+        "--profile",
+    ]);
+    let out = stdout(&o);
+    assert_eq!(o.status.code(), Some(0), "{out}");
+    assert!(out.contains("Model name:"), "{out}");
+    assert!(nc.is_file());
+    assert!(d.path().join("csv/results_flow_cap.csv").is_file());
+    assert!(d.path().join("csv/attrs.yaml").is_file());
+    // Python drops `--save_logs` (bench/BUGS.md #3); the port passes it to HiGHS.
+    assert!(logs.join("highs.log").is_file());
+}
+
+#[test]
+fn run_from_netcdf() {
+    let Some(m) = national() else { return };
+    let d = tempfile::tempdir().unwrap();
+    // A model file written by calliope-rs before solving, and one written by Python.
+    let ours = d.path().join("model.nc");
+    calliope_model::Model::from_yaml(&m, &calliope_preprocess::ReadOptions::default())
+        .unwrap()
+        .to_netcdf(&ours)
+        .unwrap();
+    let python =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../golden/national_scale/inputs.nc");
+    for (i, model_file) in [ours, python].iter().enumerate() {
+        let out = d.path().join(format!("output{i}.nc"));
+        let o = run(&[
+            "run",
+            model_file.to_str().unwrap(),
+            &format!("--save_netcdf={}", out.display()),
+        ]);
+        assert_eq!(o.status.code(), Some(0), "{}", stdout(&o));
+        assert!(out.is_file());
+    }
+}
+
+#[test]
+fn run_save_lp() {
+    let Some(m) = national() else { return };
+    let d = tempfile::tempdir().unwrap();
+    let lp = d.path().join("output.lp");
+    let o = run(&[
+        "run",
+        m.to_str().unwrap(),
+        &format!("--save_lp={}", lp.display()),
+    ]);
+    assert_eq!(o.status.code(), Some(0), "{}", stdout(&o));
+    let text = std::fs::read_to_string(&lp).unwrap();
+    assert!(text.contains("min"));
+}
+
+#[test]
+fn save_per_spore() {
     let Some(m) = national() else { return };
     let d = tempfile::tempdir().unwrap();
     let o = run(&[
         "run",
         m.to_str().unwrap(),
-        "--scenario=run1",
-        "--override_dict={'config.solve.solver': 'glpk'}",
-        &format!("--save_netcdf={}", d.path().join("o.nc").display()),
-        &format!("--save_csv={}", d.path().join("csv").display()),
-        &format!("--save_logs={}", d.path().join("logs").display()),
-        "--quiet",
-        "--no_fail_when_infeasible",
-        "--pdb",
-        "--profile",
+        &format!("--save_netcdf={}", d.path().join("output.nc").display()),
+        "--scenario=spores",
+        &format!(
+            "--override_dict={{config.solve.spores.save_per_spore_path: '{}', config.init.subset.timesteps: ['2005-01-01', '2005-01-02']}}",
+            d.path().join("elsewhere").display()
+        ),
     ]);
-    let out = stdout(&o);
-    assert!(out.contains("Model name:"), "{out}");
-    assert!(out.contains("not available yet"), "{out}");
-    assert_eq!(o.status.code(), Some(1));
+    assert_eq!(o.status.code(), Some(0), "{}", stdout(&o));
+    // With --save_netcdf the SPOREs go next to it (Python drops the redirect, bug03).
+    for i in 0..4 {
+        assert!(
+            d.path().join(format!("spore_{i}.nc")).is_file(),
+            "spore {i}"
+        );
+    }
+    assert!(d.path().join("output.nc").is_file());
+}
+
+#[test]
+fn exit_code_when_infeasible() {
+    let m = test_model();
+    if !m.is_file() {
+        return;
+    }
+    let args = [
+        "run",
+        m.to_str().unwrap(),
+        "--scenario=simple_supply",
+        "--override_dict={techs.test_supply_elec.flow_cap_max: 1}",
+    ];
+    let o = run(&args);
+    assert_ne!(o.status.code(), Some(0), "{}", stdout(&o));
+    let mut with_flag = args.to_vec();
+    with_flag.push("--no_fail_when_infeasible");
+    let o = run(&with_flag);
+    assert_eq!(o.status.code(), Some(0), "{}", stdout(&o));
 }
 
 #[test]
