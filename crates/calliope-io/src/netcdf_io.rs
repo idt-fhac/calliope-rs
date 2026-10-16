@@ -12,7 +12,44 @@ use netcdf::{AttributeValue, Extents, GroupMut};
 use crate::IoError;
 
 const NA_STRING: &str = "<NA>";
-const DATETIME_UNITS: &str = "nanoseconds since 1970-01-01";
+
+/// CF time units, largest first, with their length in ns (`xarray.coding.times`).
+const TIME_UNITS: [(&str, i64); 7] = [
+    ("days", 86_400_000_000_000),
+    ("hours", 3_600_000_000_000),
+    ("minutes", 60_000_000_000),
+    ("seconds", 1_000_000_000),
+    ("milliseconds", 1_000_000),
+    ("microseconds", 1_000),
+    ("nanoseconds", 1),
+];
+
+/// xarray's CF encoding of a datetime array (`infer_datetime_units`): the reference is the
+/// first non-NaT value, the unit the largest that divides every step between consecutive
+/// non-NaT values; NaT is stored as `i64::MIN` without a `_FillValue`.
+fn encode_datetimes(v: &[i64]) -> (String, Vec<i64>) {
+    let valid: Vec<i64> = v.iter().copied().filter(|t| *t != NAT).collect();
+    let Some(&reference) = valid.first() else {
+        return ("days since 1970-01-01".to_owned(), v.to_vec());
+    };
+    let (unit, len) = TIME_UNITS
+        .iter()
+        .copied()
+        .find(|(_, len)| valid.windows(2).all(|w| (w[1] - w[0]) % len == 0))
+        .unwrap_or(("nanoseconds", 1));
+    let values = v
+        .iter()
+        .map(|t| {
+            if *t == NAT {
+                NAT
+            } else {
+                (t - reference) / len
+            }
+        })
+        .collect();
+    let since = calliope_preprocess::xr::format_datetime(reference);
+    (format!("{unit} since {since}"), values)
+}
 
 fn flat_to_index(mut flat: usize, shape: &[usize]) -> Vec<usize> {
     let mut idx = vec![0; shape.len()];
@@ -75,11 +112,11 @@ fn put_data(
             if compress {
                 var.set_compression(4, true)?;
             }
-            var.put_attribute("units", DATETIME_UNITS)?;
+            let (units, values) = encode_datetimes(v);
+            var.put_attribute("units", units)?;
             var.put_attribute("calendar", "proleptic_gregorian")?;
-            var.set_fill_value(NAT)?;
             put_attrs(&mut var, attrs)?;
-            var.put_values(v, ..)?;
+            var.put_values(&values, ..)?;
         }
         Data::Object(v) => {
             let mut var = group.add_string_variable(name, dims)?;
