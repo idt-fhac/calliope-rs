@@ -1,6 +1,8 @@
 //! Phase 3 exit check: the preprocessed input dataset matches `golden/<fixture>/inputs.nc`
 //! (written by Python Calliope 0.7.0) for every fixture: same variables, coordinates (label
-//! order), dimension order, dtypes, and values within 1e-12.
+//! order), dimension order, dtypes, and values: bit for bit for the fixtures (CSV floats
+//! are parsed like pandas' `precise_xstrtod`), within 1e-12 for the math LP models (one
+//! `source_unit: per_cap` scaling differs in the last bit).
 //!
 //! The example and test models are read from the Calliope reference checkout
 //! (`../calliope`, or `CALLIOPE_REFERENCE`); without it the test is skipped.
@@ -109,7 +111,7 @@ fn run_fixture(root: &Path, dir: &Path) -> Result<Vec<String>, String> {
                     println!("      variable order differs:\n        {e:?}\n        {a:?}");
                 }
             }
-            Ok(compare_datasets(&expected, &actual, 1e-12)
+            Ok(compare_datasets(&expected, &actual, 0.0)
                 .iter()
                 .map(ToString::to_string)
                 .collect())

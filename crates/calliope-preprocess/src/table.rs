@@ -44,6 +44,119 @@ fn parse_bool(s: &str) -> Option<bool> {
     }
 }
 
+/// Exact powers of ten as C double literals (`1e0` .. `1e308`), as in pandas' tokenizer.
+fn pow10(n: usize) -> f64 {
+    static TABLE: std::sync::OnceLock<Vec<f64>> = std::sync::OnceLock::new();
+    TABLE.get_or_init(|| {
+        (0..=308)
+            .map(|i| format!("1e{i}").parse().unwrap_or(f64::INFINITY))
+            .collect()
+    })[n]
+}
+
+/// pandas' `precise_xstrtod` (`read_csv`'s default float converter): at most 17
+/// significant digits are accumulated (leading zeros count, further digits are dropped),
+/// then scaled by a power of ten. Not always correctly rounded: `0.17191199999999998`
+/// reads as `0.1719119999999999`. `None` if `s` is not a plain decimal number.
+fn precise_xstrtod(s: &str) -> Option<f64> {
+    const MAX_DIGITS: i32 = 17;
+    let b = s.trim().as_bytes();
+    let mut p = 0;
+    let negative = match b.first() {
+        Some(b'-') => {
+            p += 1;
+            true
+        }
+        Some(b'+') => {
+            p += 1;
+            false
+        }
+        _ => false,
+    };
+    let (mut number, mut exponent, mut num_digits) = (0.0f64, 0i64, 0i32);
+    while p < b.len() && b[p].is_ascii_digit() {
+        if num_digits < MAX_DIGITS {
+            number = number * 10.0 + f64::from(b[p] - b'0');
+            num_digits += 1;
+        } else {
+            exponent += 1;
+        }
+        p += 1;
+    }
+    if p < b.len() && b[p] == b'.' {
+        p += 1;
+        let mut num_decimals = 0;
+        while p < b.len() && num_digits < MAX_DIGITS && b[p].is_ascii_digit() {
+            number = number * 10.0 + f64::from(b[p] - b'0');
+            p += 1;
+            num_digits += 1;
+            num_decimals += 1;
+        }
+        while p < b.len() && b[p].is_ascii_digit() {
+            p += 1;
+        }
+        exponent -= num_decimals;
+    }
+    if num_digits == 0 {
+        return None;
+    }
+    if negative {
+        number = -number;
+    }
+    if p < b.len() && (b[p] == b'e' || b[p] == b'E') {
+        p += 1;
+        let neg_exp = match b.get(p) {
+            Some(b'-') => {
+                p += 1;
+                true
+            }
+            Some(b'+') => {
+                p += 1;
+                false
+            }
+            _ => false,
+        };
+        let start = p;
+        let mut n: i64 = 0;
+        while p < b.len() && b[p].is_ascii_digit() {
+            n = n.saturating_mul(10).saturating_add(i64::from(b[p] - b'0'));
+            p += 1;
+        }
+        if p == start {
+            return None;
+        }
+        exponent += if neg_exp { -n } else { n };
+    }
+    if p != b.len() {
+        return None;
+    }
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    let v = if exponent > 308 {
+        if number == 0.0 {
+            0.0
+        } else {
+            number.signum() * f64::INFINITY
+        }
+    } else if exponent > 0 {
+        number * pow10(exponent as usize)
+    } else if exponent < -308 {
+        if exponent < -616 {
+            0.0
+        } else {
+            number / pow10((-308 - exponent) as usize) / pow10(308)
+        }
+    } else {
+        number / pow10((-exponent) as usize)
+    };
+    Some(v)
+}
+
+/// A float cell as pandas' `read_csv` reads it ([`precise_xstrtod`]; other spellings such
+/// as `inf` and `nan` as Python does).
+fn csv_float(s: &str) -> Option<f64> {
+    precise_xstrtod(s).or_else(|| parse_py_float(s))
+}
+
 /// pandas C-parser type inference for one column of raw cells: `int64` (no missing),
 /// `float64`, `bool` (no missing), else `object` with the raw strings (NA → NaN).
 pub fn infer_column(cells: &[&str]) -> Data {
@@ -69,7 +182,7 @@ pub fn infer_column(cells: &[&str]) -> Data {
                 .collect(),
         );
     }
-    if present().all(|c| parse_py_float(c).is_some()) {
+    if present().all(|c| csv_float(c).is_some()) {
         return Data::Float(
             cells
                 .iter()
@@ -78,7 +191,7 @@ pub fn infer_column(cells: &[&str]) -> Data {
                     if *n {
                         f64::NAN
                     } else {
-                        parse_py_float(c).unwrap_or(f64::NAN)
+                        csv_float(c).unwrap_or(f64::NAN)
                     }
                 })
                 .collect(),
@@ -603,4 +716,25 @@ fn infer_objects(col: &[Obj]) -> DType {
         return DType::Float;
     }
     DType::Object
+}
+
+#[cfg(test)]
+mod float_tests {
+    use super::precise_xstrtod;
+
+    #[test]
+    fn pandas_float_parsing() {
+        // Values pandas 3.0 `read_csv` returns (float_precision=None).
+        assert_eq!(
+            precise_xstrtod("0.17191199999999998"),
+            Some(0.171_911_999_999_999_9)
+        );
+        assert_eq!(precise_xstrtod("0.171912"), Some(0.171_912));
+        assert_eq!(precise_xstrtod("-1.5e3"), Some(-1500.0));
+        assert_eq!(precise_xstrtod("1e-320"), Some(1e-320));
+        assert_eq!(precise_xstrtod(" 2 "), Some(2.0));
+        assert_eq!(precise_xstrtod("1e"), None);
+        assert_eq!(precise_xstrtod("inf"), None);
+        assert_eq!(precise_xstrtod("."), None);
+    }
 }
