@@ -124,6 +124,12 @@ impl ModelStatus {
         }
     }
 
+    /// A limit stopped the solve (time, iterations, solution count, objective bound or
+    /// target, interrupt, memory): a MILP may have a feasible incumbent.
+    pub fn feasible_limit(self) -> bool {
+        matches!(self.0, 11..=14 | 16..=18)
+    }
+
     /// Calliope's `termination_condition` string.
     pub fn termination_condition(self) -> String {
         self.as_str().to_lowercase()

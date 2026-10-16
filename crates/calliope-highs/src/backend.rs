@@ -344,7 +344,23 @@ impl HighsBackend {
         h.run()?;
         let status = h.model_status();
         let (ncol, nrow) = (self.model.num_cols(), self.model.num_rows());
-        let outcome = if status == ModelStatus::OPTIMAL {
+        // bench/BUGS.md #7: a MILP stopped by a limit (time, solution count, ...) with a
+        // feasible incumbent keeps its solution; Python discards it.
+        let feasible_mip = status != ModelStatus::OPTIMAL
+            && self.model.is_mip()
+            && h.primal_valid()
+            && status.feasible_limit();
+        let outcome = if feasible_mip {
+            let mut sol = h.solution()?;
+            sol.col_value.truncate(ncol);
+            SolveOutcome {
+                status,
+                termination_condition: status.termination_condition(),
+                objective: Some(h.objective_value()),
+                col_value: Some(sol.col_value),
+                row_dual: None,
+            }
+        } else if status == ModelStatus::OPTIMAL {
             let mut sol = h.solution()?;
             sol.col_value.truncate(ncol);
             sol.row_dual.truncate(nrow);
@@ -367,6 +383,159 @@ impl HighsBackend {
         };
         self.last = Some(outcome);
         Ok(self.last.as_ref().expect("just set"))
+    }
+
+    /// Brings the held model to `new` in place when only values changed: same columns
+    /// (labels, integrality), rows (labels), sparsity pattern and SOS sets. Coefficients,
+    /// bounds and the objective are changed through HiGHS' `change*` calls, so the solver
+    /// keeps its instance (and basis, for warm starts). Fixed columns and deactivated rows
+    /// keep their state; their saved bounds take the new values. Only rows and columns whose
+    /// label is `affected` (and the objective, if its label is) are changed, so manual
+    /// changes elsewhere (`update_variable_bounds`) survive. Returns `false`, changing
+    /// nothing, if the structure differs.
+    pub fn update_values(
+        &mut self,
+        new: &LpModel,
+        affected: &dyn Fn(&calliope_lp::Label) -> bool,
+    ) -> Result<bool> {
+        let m = &self.model;
+        let same = m.num_cols() == new.num_cols()
+            && m.num_rows() == new.num_rows()
+            && m.row_start == new.row_start
+            && m.row_index == new.row_index
+            && m.sos2 == new.sos2
+            && m.cols
+                .iter()
+                .zip(&new.cols)
+                .all(|(a, b)| a.label == b.label && a.integer == b.integer)
+            && m.rows
+                .iter()
+                .zip(&new.rows)
+                .all(|(a, b)| a.label == b.label);
+        if !same {
+            return Ok(false);
+        }
+        for r in 0..new.num_rows() {
+            if !affected(&new.rows[r].label) {
+                continue;
+            }
+            let (s, e) = (new.row_start[r], new.row_start[r + 1]);
+            for k in s..e {
+                let v = new.row_value[k];
+                if self.model.row_value[k].to_bits() != v.to_bits() {
+                    self.model.row_value[k] = v;
+                    if self.synced {
+                        self.highs.change_coeff(r, new.row_index[k], v)?;
+                    }
+                }
+            }
+            let (lb, ub) = (new.rows[r].lb, new.rows[r].ub);
+            let row = &self.model.rows[r];
+            if let Some(saved) = self.deactivated.get_mut(&r) {
+                *saved = (lb, ub);
+            } else if row.lb.to_bits() != lb.to_bits() || row.ub.to_bits() != ub.to_bits() {
+                self.set_row_bounds(r, lb, ub)?;
+            }
+        }
+        for c in 0..new.num_cols() {
+            if !affected(&new.cols[c].label) {
+                continue;
+            }
+            let (lb, ub) = (new.cols[c].lb, new.cols[c].ub);
+            if let Some(saved) = self.fixed.get_mut(&c) {
+                *saved = (lb, ub);
+                continue;
+            }
+            let col = &self.model.cols[c];
+            if col.lb.to_bits() != lb.to_bits() || col.ub.to_bits() != ub.to_bits() {
+                self.set_col_bounds(c, lb, ub)?;
+            }
+        }
+        let (a, b) = (&self.model.objective, &new.objective);
+        if (affected(&a.label) || affected(&b.label))
+            && (a.sense != b.sense
+                || a.label != b.label
+                || a.expr.constant.to_bits() != b.expr.constant.to_bits()
+                || a.expr.merged() != b.expr.merged())
+        {
+            self.set_objective(b.label.clone(), b.sense, b.expr.clone())?;
+        }
+        Ok(true)
+    }
+
+    /// Replaces the held model by a structurally different one (passed to HiGHS on the next
+    /// solve). Rows deactivated before stay deactivated, fixed columns stay fixed, and
+    /// columns not `affected` keep their bounds, where a row or column with the same label
+    /// exists in `new`.
+    pub fn replace_model(
+        &mut self,
+        mut new: LpModel,
+        affected: &dyn Fn(&calliope_lp::Label) -> bool,
+    ) {
+        // Bounds of unaffected columns and rows are kept (manual changes survive).
+        let col_bounds: HashMap<calliope_lp::Label, (f64, f64)> = self
+            .model
+            .cols
+            .iter()
+            .filter(|c| !affected(&c.label))
+            .map(|c| (c.label.clone(), (c.lb, c.ub)))
+            .collect();
+        for c in &mut new.cols {
+            if let Some(&(lb, ub)) = col_bounds.get(&c.label) {
+                (c.lb, c.ub) = (lb, ub);
+            }
+        }
+        let fixed: HashMap<calliope_lp::Label, (f64, f64)> = self
+            .fixed
+            .iter()
+            .map(|(&c, &b)| (self.model.cols[c].label.clone(), b))
+            .collect();
+        let deactivated: std::collections::HashSet<calliope_lp::Label> = self
+            .deactivated
+            .keys()
+            .map(|&r| self.model.rows[r].label.clone())
+            .collect();
+        let x: HashMap<calliope_lp::Label, f64> =
+            match self.last.as_ref().and_then(|o| o.col_value.as_ref()) {
+                Some(x) if !fixed.is_empty() => self
+                    .model
+                    .cols
+                    .iter()
+                    .zip(x)
+                    .map(|(c, v)| (c.label.clone(), *v))
+                    .collect(),
+                _ => HashMap::new(),
+            };
+        self.model = new;
+        self.synced = false;
+        self.fixed.clear();
+        self.deactivated.clear();
+        for c in 0..self.model.num_cols() {
+            let label = &self.model.cols[c].label;
+            if let (Some(&saved), Some(&v)) = (fixed.get(label), x.get(label)) {
+                self.fixed.insert(c, saved);
+                self.model.cols[c].lb = v;
+                self.model.cols[c].ub = v;
+            }
+        }
+        for r in 0..self.model.num_rows() {
+            if deactivated.contains(&self.model.rows[r].label) {
+                let row = &mut self.model.rows[r];
+                self.deactivated.insert(r, (row.lb, row.ub));
+                row.lb = f64::NEG_INFINITY;
+                row.ub = f64::INFINITY;
+            }
+        }
+    }
+
+    /// True if column `col` is fixed by [`Self::fix_variable`].
+    pub fn is_fixed(&self, col: ColId) -> bool {
+        self.fixed.contains_key(&col)
+    }
+
+    /// True if row `row` is deactivated.
+    pub fn is_deactivated(&self, row: RowId) -> bool {
+        self.deactivated.contains_key(&row)
     }
 
     /// Write the model as HiGHS sees it (`.lp` or `.mps`), like Calliope's `to_lp`.
