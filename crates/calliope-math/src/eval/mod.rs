@@ -7,17 +7,21 @@
 //! - [`expr`]: the interpreter over [`crate::ir::Ir`];
 //! - [`build`]: variables, global expressions, constraints, piecewise constraints and
 //!   objectives, emitted into a [`calliope_lp::LpModel`]; math `checks`;
-//!   `pre_validate_math_strings`.
+//!   `pre_validate_math_strings`; postprocessed arrays;
+//! - [`deps`]: what each component refers to (the dependency index of `update_input`).
 
 pub mod build;
+pub mod deps;
 pub mod expr;
 pub mod inputs;
 pub mod lin;
 pub mod value;
 
 pub use build::{
-    BuiltModel, CheckOutcome, build_model, label_str, pre_validate_math_strings, run_checks,
+    BuiltModel, CheckOutcome, build_model, label_str, postprocess, pre_validate_math_strings,
+    run_checks,
 };
+pub use deps::{ComponentRefs, Dependencies};
 pub use expr::Evaluator;
 pub use inputs::Inputs;
 pub use lin::Lin;

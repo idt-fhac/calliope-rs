@@ -84,6 +84,45 @@ pub fn build_model(inputs: &Inputs, math: &CalliopeBuildMath, build: &Build) -> 
     Ok(b.out)
 }
 
+/// `BackendModel.add_postprocessed_arrays`: evaluates the active `postprocessed` components in
+/// `order` on the solved values of variables, global expressions and objectives (`results`,
+/// as [`Value::Num`]) and the inputs. Each array is available to the later ones. Inactive
+/// components and components whose `where` is false everywhere give a NaN scalar, which the
+/// caller drops with the other all-NaN arrays.
+pub fn postprocess(
+    inputs: &Inputs,
+    math: &CalliopeBuildMath,
+    build: &Build,
+    results: &IndexMap<String, Value>,
+) -> Result<Vec<(String, LArray<f64>)>> {
+    let (comps, diags) = parse_math(math, ParseMode::Build);
+    if let Some(d) = diags.iter().find(|d| d.is_error()) {
+        return Err(EvalError(d.short()));
+    }
+    let config = serde_json::to_value(build).map_err(|e| EvalError(e.to_string()))?;
+    let mut b = Builder {
+        inputs,
+        math,
+        config,
+        objective: build.objective.clone(),
+        out: BuiltModel {
+            lp: LpModel::new(),
+            results: results.clone(),
+            constraints: IndexMap::new(),
+            objectives: IndexMap::new(),
+        },
+    };
+    let mut out = Vec::new();
+    for comp in comps.iter().filter(|c| c.group == Group::Postprocessed) {
+        let v = b.postprocessed(comp)?;
+        b.out
+            .results
+            .insert(comp.name.clone(), Value::Num(v.clone()));
+        out.push((comp.name.clone(), v));
+    }
+    Ok(out)
+}
+
 /// The outcome of the math `checks` (`BackendModel._check_inputs`).
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct CheckOutcome {
@@ -413,6 +452,44 @@ impl Builder<'_> {
             .results
             .insert(comp.name.clone(), Value::Expr(value));
         Ok(())
+    }
+
+    /// `_add_postprocessed`: like a global expression, on numbers, without the
+    /// "missing where `where` is true" check (the HiGHS backend's `_add_global_expression`
+    /// only applies the mask).
+    fn postprocessed(&self, comp: &ParsedComponent) -> Result<LArray<f64>> {
+        let low = lower(comp, self.math);
+        let Some(w) = self.top_where(&low)? else {
+            return Ok(LArray::scalar(f64::NAN));
+        };
+        let foreach = &low.mask.foreach;
+        let mut acc: LArray<f64> =
+            LArray::empty(w.dims().to_vec()).map_err(|e| EvalError(e.to_string()))?;
+        for eq in &low.equations {
+            let Some(ew) = self.equation_where(&w, eq, foreach)? else {
+                continue;
+            };
+            overlap(&eq.name, &acc, &ew)?;
+            let Body::Expression(e) = &eq.body else {
+                unreachable!("postprocessed arrays have no comparison")
+            };
+            let v = self.ev().eval(e, mask_of(&ew))?.to_num()?;
+            let extra = extra_dims(&Value::Num(v.clone()), ew.dims());
+            if !extra.is_empty() {
+                return Err(EvalError(format!(
+                    "{} | The expression array is indexed over dimensions not present in `foreach`: {}",
+                    eq.name,
+                    py_set(&extra)
+                )));
+            }
+            let v = conform(&v, ew.dims())?.where_(&ew);
+            acc = acc.fillna_with(&conform(&v, w.dims())?);
+        }
+        Ok(if acc.count() == 0 {
+            LArray::scalar(f64::NAN)
+        } else {
+            acc
+        })
     }
 
     /// Evaluates an equation expression masked by `ew` and checks it is defined where `ew`
@@ -771,7 +848,7 @@ fn drop_dims_not_in_foreach(w: &LArray<bool>, foreach: &[String]) -> Result<LArr
 }
 
 /// An evaluated expression with the target's dims, in the target's order.
-fn conform(v: &LArray<Lin>, dims: &[Coord]) -> Result<LArray<Lin>> {
+fn conform<T: Element>(v: &LArray<T>, dims: &[Coord]) -> Result<LArray<T>> {
     let order: Vec<&str> = dims.iter().map(Coord::name).collect();
     if v.dim_names() == order {
         return Ok(v.clone());

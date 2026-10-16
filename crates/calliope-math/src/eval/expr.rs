@@ -101,9 +101,12 @@ impl Evaluator<'_> {
             Some(lookup_default(&l.default))
         } else if let Some(v) = self.math.variables.get(name) {
             Some(Value::num(numeric(&v.default)))
+        } else if let Some(g) = self.math.global_expressions.get(name) {
+            Some(Value::num(numeric(&g.default)))
         } else {
+            // `math.find` also searches postprocessed arrays (referenced by later ones).
             self.math
-                .global_expressions
+                .postprocessed
                 .get(name)
                 .map(|g| Value::num(numeric(&g.default)))
         }
