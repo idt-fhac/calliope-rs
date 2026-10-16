@@ -17,6 +17,9 @@ pub struct SolveOptions {
     pub save_logs: Option<PathBuf>,
     /// Directory for per-SPORE results (`solve.spores.save_per_spore_path`).
     pub save_per_spore_path: Option<PathBuf>,
+    /// Show the solver log (`calliope run` without `--quiet`, as Python's highspy does),
+    /// unless `solver_options.output_flag` is set in the model.
+    pub solver_output: bool,
 }
 
 /// How to load a model (`_run_setup_model`).
@@ -102,6 +105,17 @@ pub fn solve(model: &mut Model, opts: &SolveOptions) -> CliResult<String> {
     if let Some(d) = &opts.save_per_spore_path {
         overrides
             .set_key("spores.save_per_spore_path", path(d))
+            .map_err(|e| CliError::new(e.to_string()))?;
+    }
+    if opts.solver_output
+        && !model
+            .config
+            .solve
+            .solver_options
+            .contains_key("output_flag")
+    {
+        overrides
+            .set_key("solver_options.output_flag", Node::new(Value::Bool(true)))
             .map_err(|e| CliError::new(e.to_string()))?;
     }
     model

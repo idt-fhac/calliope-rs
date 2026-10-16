@@ -413,6 +413,16 @@ impl Backend {
         }
     }
 
+    /// The row of every cell of a constraint (`None` where it has no row).
+    pub fn constraint_rows(&self, name: &str) -> Option<&LArray<Option<u32>>> {
+        self.built.constraints.get(name)
+    }
+
+    /// The sense and affine expression of a built objective.
+    pub fn objective_expression(&self, name: &str) -> Option<&(calliope_lp::ObjSense, Lin)> {
+        self.built.objectives.get(name)
+    }
+
     /// The affine cells of a variable or global expression.
     pub fn expression(&self, name: &str) -> Option<&LArray<Lin>> {
         match self.built.results.get(name) {

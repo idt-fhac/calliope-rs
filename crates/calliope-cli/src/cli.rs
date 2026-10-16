@@ -6,10 +6,12 @@ use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 use clap::{Args, Parser, Subcommand};
 
+use crate::bench;
 use crate::check::{CheckKind, check_file, render};
 use crate::error::{CliError, CliResult};
 use crate::facade::{self, LoadOptions, SolveOptions, load_model};
 use crate::generate::{Kind, RunsArgs, generate, scenarios_yaml};
+use crate::inspect::{InspectOptions, inspect};
 use crate::lp_diff::{LpDiffArgs, lp_diff};
 use crate::new_cmd::new_model;
 
@@ -105,6 +107,32 @@ enum Command {
         /// Exit with an error on warnings too.
         #[arg(long)]
         deny_warnings: bool,
+    },
+    /// Show one math component of a built model: its definition, expanded equations,
+    /// active index set and the LP rows/columns of the first index items.
+    Inspect {
+        model_file: String,
+        /// Variable, global expression, constraint, piecewise constraint or objective.
+        #[arg(long)]
+        component: String,
+        #[arg(long)]
+        scenario: Option<String>,
+        #[arg(long = "override_dict")]
+        override_dict: Option<String>,
+        /// Index items to show in full.
+        #[arg(long, default_value_t = 10)]
+        max: usize,
+    },
+    /// Time a run stage by stage (preprocess, build, solve, write) with peak memory.
+    Bench {
+        model_file: String,
+        #[arg(long)]
+        scenario: Option<String>,
+        #[arg(long = "override_dict")]
+        override_dict: Option<String>,
+        /// Print JSON instead of a table.
+        #[arg(long)]
+        json: bool,
     },
     /// Canonicalise and diff CPLEX LP files.
     #[command(name = "lp-diff")]
@@ -269,6 +297,7 @@ fn run(a: &RunArgs) -> CliResult<()> {
         // per-SPORE redirect reach the solver.
         let mut opts = SolveOptions {
             save_logs: a.save_logs.as_ref().map(PathBuf::from),
+            solver_output: !a.common.quiet,
             ..SolveOptions::default()
         };
         if let (Some(nc), Some(_)) = (
@@ -443,6 +472,68 @@ pub fn main() -> ExitCode {
                 override_dict.as_deref(),
                 deny_warnings,
             ))
+        }
+        Command::Inspect {
+            model_file,
+            component,
+            scenario,
+            override_dict,
+            max,
+        } => {
+            init_logging(false, true);
+            let r = load_model(&LoadOptions {
+                model_file,
+                scenario,
+                model_format: None,
+                override_dict,
+            })
+            .and_then(|mut m| {
+                facade::build(&mut m)?;
+                inspect(&m, &InspectOptions { component, max })
+            });
+            match r {
+                Ok(text) => {
+                    print!("{text}");
+                    ExitCode::SUCCESS
+                }
+                Err(e) => {
+                    report(&e, false, None);
+                    ExitCode::from(1)
+                }
+            }
+        }
+        Command::Bench {
+            model_file,
+            scenario,
+            override_dict,
+            json,
+        } => {
+            init_logging(false, true);
+            let r = bench::bench(&LoadOptions {
+                model_file,
+                scenario,
+                model_format: None,
+                override_dict,
+            });
+            match r {
+                Ok((model, stages)) => {
+                    if json {
+                        print!("{}", bench::json(&stages));
+                    } else {
+                        println!(
+                            "{}
+",
+                            model.info()
+                        );
+                        print!("{}", bench::table(&stages));
+                    }
+                    ExitCode::SUCCESS
+                }
+                Err(e) => {
+                    report(&e, false, None);
+                    ExitCode::from(1)
+                }
+            }
         }
         Command::LpDiff {
             files,
