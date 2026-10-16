@@ -54,8 +54,9 @@ against 61 s.
 
 `cargo run -p xtask -- parity` runs calliope-rs on all 37 golden fixtures (read, build,
 solve, write `inputs.nc`, LP and `results.nc`) and compares them with Calliope's. Result:
-104 comparisons pass, 7 fixture parts are classified (`crates/xtask/src/known.rs`), none
-fail. `cargo test -p calliope-model --test golden_results` checks every objective value
+93 comparisons (inputs, LP, results per fixture) pass, 14 are classified
+(`crates/xtask/src/known.rs`: 5 result comparisons, plus all three parts of the three
+expected-error fixtures), none fail. `cargo test -p calliope-model --test golden_results` checks every objective value
 (per operate timestep and per SPORE) and termination condition the same way. All operate
 fixtures and the `integer`, `random` (numpy's MT19937, seed 0) and `relative_deployment`
 SPORES fixtures match to 1e-6 in every objective value.
