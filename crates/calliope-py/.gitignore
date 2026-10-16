@@ -1,0 +1,2 @@
+# Built by `maturin develop`
+python/calliope_rs/*.so

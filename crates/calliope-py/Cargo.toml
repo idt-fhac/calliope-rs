@@ -1,0 +1,33 @@
+[package]
+name = "calliope-py"
+description = "Python bindings (`calliope_rs`): the calliope-rs Model with xarray inputs and results."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "calliope_rs"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+calliope-array.workspace = true
+calliope-io = { path = "../calliope-io" }
+calliope-math = { path = "../calliope-math" }
+calliope-model = { path = "../calliope-model" }
+calliope-preprocess = { path = "../calliope-preprocess" }
+calliope-yaml.workspace = true
+indexmap.workspace = true
+pyo3 = { version = "0.30", features = ["abi3-py311"] }
+
+# PyO3's macros expand to `unsafe` code, so the workspace's `unsafe_code = "forbid"` lint
+# cannot apply here.
+[lints.rust]
+missing_debug_implementations = "warn"
+unused_qualifications = "warn"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+dbg_macro = "warn"
+todo = "warn"

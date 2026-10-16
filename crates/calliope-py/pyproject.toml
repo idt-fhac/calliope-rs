@@ -1,0 +1,25 @@
+[build-system]
+requires = ["maturin>=1.9,<2"]
+build-backend = "maturin"
+
+[project]
+name = "calliope-rs"
+description = "calliope-rs (a Rust port of Calliope) with Calliope's Python model API"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+dependencies = ["numpy", "pandas", "xarray"]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = ["pytest", "netCDF4"]
+
+[tool.maturin]
+python-source = "python"
+module-name = "calliope_rs._core"
+features = ["pyo3/extension-module"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["calliope_rs"]
