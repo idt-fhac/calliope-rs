@@ -8,6 +8,7 @@
 //!   pydantic schema produced by the Calliope pixi env (`$CALLIOPE_REFERENCE`, default
 //!   `../calliope`). `--update` rewrites the fixture used by the `calliope-schema` tests.
 
+mod altopt;
 mod known;
 mod ncdiff;
 mod parity;

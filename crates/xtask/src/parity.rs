@@ -4,7 +4,10 @@
 //! - `inputs.nc`: NetCDF data/attrs, relative tolerance 1e-9 (see [`crate::ncdiff`]);
 //! - LP: canonical comparison against the Pyomo (or HiGHS) LP ([`calliope_lp::lp_format`]);
 //! - results: objective relative 1e-6, `results.nc` arrays absolute 1e-6 scaled by magnitude.
-//!   Operate and SPORES runs depend on the solver path: arrays are reported, not failed.
+//!   Array differences fail unless the fixture is classified ([`crate::known`]); an
+//!   [`Allow::AlternativeOptimum`] classification holds only while
+//!   [`Runner::verify_alternative_optimum`] shows that Calliope's solution is feasible and
+//!   optimal in the port's LP for every solve.
 //!
 //! [`crate::runner::RustRunner`] runs calliope-rs in-process. `--self-check` runs the comparison
 //! machinery with the golden files as the "actual" output, which must pass everywhere.
@@ -39,11 +42,6 @@ impl Fixture {
     pub fn file(&self, name: &str) -> PathBuf {
         self.dir.join(name)
     }
-
-    /// Operate and SPORES results depend on the path the solver takes.
-    pub fn path_dependent(&self) -> bool {
-        self.name.contains("operate") || self.name.contains("spores")
-    }
 }
 
 /// Files written by a run of calliope-rs.
@@ -77,6 +75,15 @@ pub trait Runner {
     fn name(&self) -> &str;
     /// Build, solve and write the outputs of `fixture` below `work`.
     fn run(&self, fixture: &Fixture, work: &Path) -> Result<RunOutput, RunError>;
+    /// Evidence that the result arrays of `out` differ from Calliope's only by the choice of
+    /// optimal point ([`crate::altopt`]): `Ok((true, lines))` if it holds for every solve.
+    fn verify_alternative_optimum(
+        &self,
+        _fixture: &Fixture,
+        _out: &RunOutput,
+    ) -> Result<(bool, Vec<String>), String> {
+        Err(format!("runner {} cannot verify optima", self.name()))
+    }
 }
 
 /// A runner that runs nothing (tests the "not run" path).
@@ -337,13 +344,20 @@ impl<'a> Comparer<'a> {
         } else {
             to_status(self.lp(f, out.lp.as_deref()))
         };
-        rep.results = self.results(f, &out, &mut rep.notes);
+        rep.results = self.results(f, &out, runner, &mut rep.notes);
         rep
     }
 
-    fn results(&mut self, f: &Fixture, out: &RunOutput, notes: &mut Vec<String>) -> Status {
+    fn results(
+        &mut self,
+        f: &Fixture,
+        out: &RunOutput,
+        runner: &dyn Runner,
+        notes: &mut Vec<String>,
+    ) -> Status {
         let known = crate::known::lookup(&f.name);
-        let objective_tol = match known.map(|k| k.allow) {
+        let allow = known.map(|k| k.allow);
+        let objective_tol = match allow {
             Some(Allow::Objective(t)) => t,
             _ => 1e-6,
         };
@@ -354,22 +368,31 @@ impl<'a> Comparer<'a> {
         {
             fails.push(format!("termination condition {g:?} vs {t:?}"));
         }
-        let arrays_allowed = matches!(
-            known.map(|k| k.allow),
-            Some(Allow::Arrays | Allow::Objective(_))
-        );
         let g_res = f.file("results.nc");
         if g_res.exists() {
             match self.nc(&g_res, out.results_nc.as_deref(), Part::Results, RESULT_TOL) {
-                Ok(d) if f.path_dependent() => {
-                    notes.extend(
-                        d.into_iter()
-                            .take(10)
-                            .map(|l| format!("vertex/array (not failing): {l}")),
-                    );
-                }
-                Ok(d) if arrays_allowed => classified.extend(d),
-                Ok(d) => fails.extend(d),
+                Ok(d) if d.is_empty() => {}
+                Ok(d) => match allow {
+                    Some(Allow::Arrays | Allow::Objective(_)) => classified.extend(d),
+                    Some(Allow::AlternativeOptimum) => {
+                        match runner.verify_alternative_optimum(f, out) {
+                            Ok((true, evidence)) => {
+                                classified.extend(d);
+                                notes
+                                    .extend(evidence.into_iter().map(|l| format!("evidence: {l}")));
+                            }
+                            Ok((false, evidence)) => {
+                                fails.extend(d);
+                                fails.extend(evidence);
+                            }
+                            Err(e) => {
+                                fails.extend(d);
+                                fails.push(format!("alternative optimum not verified: {e}"));
+                            }
+                        }
+                    }
+                    _ => fails.extend(d),
+                },
                 Err(e) => return Status::Error(e),
             }
         }

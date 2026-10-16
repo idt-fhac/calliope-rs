@@ -5,7 +5,7 @@
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
-use calliope_model::{BuildOptions, Model, SolveOptions};
+use calliope_model::{BuildOptions, Model, Results, SolveOptions};
 use calliope_preprocess::ReadOptions;
 use calliope_yaml::{AttrTree, Node, Value};
 
@@ -62,12 +62,9 @@ fn failed(e: impl ToString) -> RunError {
     RunError::Failed(e.to_string())
 }
 
-impl Runner for RustRunner {
-    fn name(&self) -> &str {
-        "calliope-rs"
-    }
-
-    fn run(&self, f: &Fixture, work: &Path) -> Result<RunOutput, RunError> {
+impl RustRunner {
+    /// The fixture's `meta.json` and its model, read as Calliope read it.
+    fn read(&self, f: &Fixture) -> Result<(serde_json::Value, Model), RunError> {
         let meta = read_meta(&f.dir).map_err(failed)?;
         let fx = &meta["fixture"];
         let tree = |k: &str| fx.get(k).filter(|v| v.is_object()).map(json_tree);
@@ -83,12 +80,36 @@ impl Runner for RustRunner {
                 .as_str()
                 .ok_or_else(|| failed("meta.json: no model"))?,
         );
-        let out_dir = work.join(&f.name);
-        std::fs::create_dir_all(&out_dir).map_err(failed)?;
         let mut model = Model::from_yaml(&model_path, &opts).map_err(failed)?;
         if let Some(seed) = fx["numpy_seed"].as_u64() {
             model.set_random_seed(u32::try_from(seed).map_err(failed)?);
         }
+        Ok((meta, model))
+    }
+}
+
+/// `{solve: overrides}` with dotted keys expanded.
+fn solve_tree(overrides: &AttrTree) -> AttrTree {
+    let mut inner = AttrTree::new();
+    for (k, v) in overrides.iter() {
+        let _ = inner.set_key(k, v.clone());
+    }
+    let mut t = AttrTree::new();
+    t.insert("solve", Node::new(Value::Map(inner)));
+    t
+}
+
+impl Runner for RustRunner {
+    fn name(&self) -> &str {
+        "calliope-rs"
+    }
+
+    fn run(&self, f: &Fixture, work: &Path) -> Result<RunOutput, RunError> {
+        let (meta, mut model) = self.read(f)?;
+        let fx = &meta["fixture"];
+        let tree = |k: &str| fx.get(k).filter(|v| v.is_object()).map(json_tree);
+        let out_dir = work.join(&f.name);
+        std::fs::create_dir_all(&out_dir).map_err(failed)?;
         let inputs_nc = out_dir.join("inputs.nc");
         model.to_netcdf(&inputs_nc).map_err(failed)?;
         model.build(&BuildOptions::default()).map_err(failed)?;
@@ -119,5 +140,35 @@ impl Runner for RustRunner {
             objectives,
             termination: model.runtime.termination_condition.clone(),
         })
+    }
+
+    fn verify_alternative_optimum(
+        &self,
+        f: &Fixture,
+        out: &RunOutput,
+    ) -> Result<(bool, Vec<String>), String> {
+        let (meta, mut model) = self.read(f).map_err(|e| format!("{e:?}"))?;
+        if let Some(t) = meta["fixture"]
+            .get("solve_kwargs")
+            .filter(|v| v.is_object())
+        {
+            model.config = model
+                .config
+                .update(&solve_tree(&json_tree(t)), true)
+                .map_err(|e| e.to_string())?;
+        }
+        let results = |p: &Path| -> Result<Results, String> {
+            Ok(Model::from_netcdf(p).map_err(|e| e.to_string())?.results)
+        };
+        let golden = results(&f.file("results.nc"))?;
+        let rust = match &out.results_nc {
+            Some(p) => results(p)?,
+            None => Results::default(),
+        };
+        let checks = crate::altopt::check(&mut model, &golden, &rust)?;
+        Ok((
+            checks.iter().all(crate::altopt::SolveCheck::ok),
+            checks.iter().map(crate::altopt::SolveCheck::line).collect(),
+        ))
     }
 }

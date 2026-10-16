@@ -8,6 +8,8 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
+calliope-array.workspace = true
+calliope-math = { path = "../calliope-math" }
 calliope-schema.workspace = true
 calliope-lp = { path = "../calliope-lp" }
 calliope-model = { path = "../calliope-model" }

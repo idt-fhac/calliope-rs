@@ -6,8 +6,13 @@
 /// What a classification allows to differ.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Allow {
-    /// Result arrays (an alternative optimal vertex); objectives and termination match.
+    /// Result arrays (another optimal point); objectives and termination match. Not checked
+    /// further (used where Calliope's solution cannot be put into the port's LP).
     Arrays,
+    /// Result arrays, while `xtask parity` verifies for every solve (each SPORE) that
+    /// Calliope's solution is feasible and optimal in the port's LP ([`crate::altopt`]);
+    /// objectives and termination match.
+    AlternativeOptimum,
     /// Result arrays and objective values within this relative tolerance; termination
     /// matches.
     Objective(f64),
@@ -33,8 +38,32 @@ pub const KNOWN: &[Known] = &[
     Known {
         fixture: "urban_scale",
         class: "degenerate",
-        allow: Allow::Arrays,
+        allow: Allow::AlternativeOptimum,
         reason: "alternative optimum: same LP (canonical diff equal, same column/row order) and objective; highspy merges duplicate terms with a cumsum difference and orients rows by its own rules, so some coefficients differ in the last bits and some rows are negated, and HiGHS (1.15.0 vs 1.15.1) ends on another optimal vertex (docs/findings.md R1)",
+    },
+    Known {
+        fixture: "national_scale_spores_evolving_average",
+        class: "degenerate",
+        allow: Allow::AlternativeOptimum,
+        reason: "alternative optimum per SPORE: same LP and objective in every SPORE; HiGHS ends on another optimal vertex (R1), and evolving_average scores of later SPORES depend on the capacities of earlier ones (docs/findings.md R1, P1)",
+    },
+    Known {
+        fixture: "national_scale_spores_integer",
+        class: "degenerate",
+        allow: Allow::AlternativeOptimum,
+        reason: "alternative optimum per SPORE: same LP and objective in every SPORE; HiGHS ends on another optimal vertex (docs/findings.md R1)",
+    },
+    Known {
+        fixture: "national_scale_spores_random",
+        class: "degenerate",
+        allow: Allow::AlternativeOptimum,
+        reason: "alternative optimum per SPORE: same LP (seeded MT19937 scores equal numpy's) and objective in every SPORE; HiGHS ends on another optimal vertex (docs/findings.md R1)",
+    },
+    Known {
+        fixture: "national_scale_spores_relative_deployment",
+        class: "degenerate",
+        allow: Allow::AlternativeOptimum,
+        reason: "alternative optimum per SPORE: same LP and objective in every SPORE; HiGHS ends on another optimal vertex (docs/findings.md R1)",
     },
     Known {
         fixture: "docs_piecewise",
