@@ -280,6 +280,8 @@ dependencies = [
 name = "calliope-model"
 version = "0.1.0"
 dependencies = [
+ "calliope-array",
+ "calliope-highs",
  "calliope-io",
  "calliope-lp",
  "calliope-math",
@@ -289,6 +291,7 @@ dependencies = [
  "indexmap",
  "serde_json",
  "tempfile",
+ "thiserror",
  "tracing",
 ]
 
@@ -1806,7 +1809,10 @@ name = "xtask"
 version = "0.1.0"
 dependencies = [
  "calliope-lp",
+ "calliope-model",
+ "calliope-preprocess",
  "calliope-schema",
+ "calliope-yaml",
  "serde_json",
  "tempfile",
 ]
