@@ -1,0 +1,11 @@
+*.lp text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.rs text eol=lf
+*.py text eol=lf
+*.md text
+*.nc binary
+*.h5 binary
+*.parquet binary
+*.whl binary
+bench/results/** -diff
