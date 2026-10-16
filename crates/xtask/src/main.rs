@@ -8,8 +8,10 @@
 //!   pydantic schema produced by the Calliope pixi env (`$CALLIOPE_REFERENCE`, default
 //!   `../calliope`). `--update` rewrites the fixture used by the `calliope-schema` tests.
 
+mod known;
 mod ncdiff;
 mod parity;
+mod runner;
 
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
@@ -115,7 +117,7 @@ fn lp_diff(args: &[String]) -> Result<bool, String> {
 }
 
 fn parity_task(args: &[String]) -> Result<bool, String> {
-    use parity::{Comparer, Env, GoldenRunner, Runner, Unimplemented};
+    use parity::{Comparer, Env, GoldenRunner, Runner};
     let mut filters = Vec::new();
     let (mut self_check, mut strict) = (false, false);
     let mut it = args.iter();
@@ -139,7 +141,9 @@ fn parity_task(args: &[String]) -> Result<bool, String> {
     let runner: Box<dyn Runner> = if self_check {
         Box::new(GoldenRunner)
     } else {
-        Box::new(Unimplemented)
+        Box::new(runner::RustRunner {
+            reference: reference(),
+        })
     };
     let work = root.join("target/parity");
     let mut cmp = Comparer::new(&env);
@@ -148,9 +152,12 @@ fn parity_task(args: &[String]) -> Result<bool, String> {
         .map(|f| cmp.compare(f, runner.as_ref(), &work))
         .collect();
     print!("{}", parity::render(&reports, runner.name()));
-    let (pass, fail, not_run) = parity::tally(&reports);
-    println!("\nparity: {pass} passed, {fail} failed, {not_run} not run");
-    Ok(fail == 0 && (!strict || not_run == 0))
+    let t = parity::tally(&reports);
+    println!(
+        "\nparity: {} passed, {} classified, {} failed, {} not run",
+        t.pass, t.classified, t.fail, t.not_run
+    );
+    Ok(t.fail == 0 && (!strict || t.not_run == 0))
 }
 
 fn main() -> ExitCode {

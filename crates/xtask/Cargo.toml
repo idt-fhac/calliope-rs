@@ -10,6 +10,9 @@ publish.workspace = true
 [dependencies]
 calliope-schema.workspace = true
 calliope-lp = { path = "../calliope-lp" }
+calliope-model = { path = "../calliope-model" }
+calliope-preprocess = { path = "../calliope-preprocess" }
+calliope-yaml.workspace = true
 serde_json.workspace = true
 
 [dev-dependencies]

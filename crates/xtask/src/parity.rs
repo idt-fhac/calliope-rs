@@ -6,10 +6,12 @@
 //! - results: objective relative 1e-6, `results.nc` arrays absolute 1e-6 scaled by magnitude.
 //!   Operate and SPORES runs depend on the solver path: arrays are reported, not failed.
 //!
-//! calliope-rs does not exist yet. The [`Runner`] trait is the hook the CLI will implement; until
-//! then [`Unimplemented`] reports "not implemented". `--self-check` runs the comparison machinery
-//! with the golden files as the "actual" output, which must pass everywhere.
+//! [`crate::runner::RustRunner`] runs calliope-rs in-process. `--self-check` runs the comparison
+//! machinery with the golden files as the "actual" output, which must pass everywhere.
+//! Differences with a recorded reason ([`crate::known`]) are reported as classified and do not
+//! fail the run.
 
+use crate::known::Allow;
 use crate::ncdiff::{self, INPUT_TOL, Part, RESULT_TOL};
 use calliope_lp::lp_format::{DiffOptions, diff_lp};
 use serde_json::Value;
@@ -62,7 +64,8 @@ pub struct RunOutput {
 /// Why a run produced no output.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RunError {
-    /// calliope-rs cannot run this fixture yet.
+    /// The runner cannot run this fixture.
+    #[cfg_attr(not(test), allow(dead_code))]
     NotImplemented,
     /// calliope-rs ran and failed with this message (compared against `expected_error`).
     Failed(String),
@@ -76,10 +79,12 @@ pub trait Runner {
     fn run(&self, fixture: &Fixture, work: &Path) -> Result<RunOutput, RunError>;
 }
 
-/// Placeholder until calliope-rs exists.
+/// A runner that runs nothing (tests the "not run" path).
+#[cfg(test)]
 #[derive(Debug, Clone, Copy)]
 pub struct Unimplemented;
 
+#[cfg(test)]
 impl Runner for Unimplemented {
     fn name(&self) -> &str {
         "calliope-rs (not implemented)"
@@ -127,6 +132,8 @@ pub enum Status {
     Skipped(String),
     /// The comparison itself failed (unreadable file, parse error, Python failure).
     Error(String),
+    /// Differences with a recorded reason ([`crate::known`]); not failing.
+    Classified(&'static str, Vec<String>),
 }
 
 impl fmt::Display for Status {
@@ -137,6 +144,7 @@ impl fmt::Display for Status {
             Self::NotRun(_) => f.write_str("not implemented"),
             Self::Skipped(_) => f.write_str("n/a"),
             Self::Error(_) => f.write_str("ERROR"),
+            Self::Classified(c, _) => write!(f, "classified:{c}"),
         }
     }
 }
@@ -291,8 +299,16 @@ impl<'a> Comparer<'a> {
                 return rep;
             }
             Err(RunError::Failed(msg)) => {
+                let known = crate::known::lookup(&f.name);
                 let s = match &f.expected_error {
                     Some(e) if msg.contains(e.as_str()) => Status::Pass,
+                    Some(e) if known.is_some_and(|k| k.allow == Allow::ErrorMessage) => {
+                        let k = known.expect("checked");
+                        Status::Classified(
+                            k.class,
+                            vec![k.reason.to_owned(), format!("error {msg:?} vs {e:?}")],
+                        )
+                    }
                     Some(e) => Status::Fail(vec![format!("error {msg:?} does not contain {e:?}")]),
                     None => Status::Fail(vec![format!("unexpected failure: {msg}")]),
                 };
@@ -326,12 +342,22 @@ impl<'a> Comparer<'a> {
     }
 
     fn results(&mut self, f: &Fixture, out: &RunOutput, notes: &mut Vec<String>) -> Status {
-        let mut fails = objective_diff(f, out);
+        let known = crate::known::lookup(&f.name);
+        let objective_tol = match known.map(|k| k.allow) {
+            Some(Allow::Objective(t)) => t,
+            _ => 1e-6,
+        };
+        let mut fails = objective_diff_tol(f, out, objective_tol);
+        let mut classified = objective_diff(f, out);
         if let (Some(g), Some(t)) = (&f.termination, &out.termination)
             && g != t
         {
             fails.push(format!("termination condition {g:?} vs {t:?}"));
         }
+        let arrays_allowed = matches!(
+            known.map(|k| k.allow),
+            Some(Allow::Arrays | Allow::Objective(_))
+        );
         let g_res = f.file("results.nc");
         if g_res.exists() {
             match self.nc(&g_res, out.results_nc.as_deref(), Part::Results, RESULT_TOL) {
@@ -342,20 +368,31 @@ impl<'a> Comparer<'a> {
                             .map(|l| format!("vertex/array (not failing): {l}")),
                     );
                 }
+                Ok(d) if arrays_allowed => classified.extend(d),
                 Ok(d) => fails.extend(d),
                 Err(e) => return Status::Error(e),
             }
         }
-        if fails.is_empty() {
+        if !fails.is_empty() {
+            Status::Fail(fails)
+        } else if classified.is_empty() {
             Status::Pass
         } else {
-            Status::Fail(fails)
+            let k = known.expect("only classified fixtures allow differences");
+            let mut lines = vec![k.reason.to_owned()];
+            lines.extend(classified);
+            Status::Classified(k.class, lines)
         }
     }
 }
 
 /// Objective comparison, relative 1e-6.
 pub fn objective_diff(f: &Fixture, out: &RunOutput) -> Vec<String> {
+    objective_diff_tol(f, out, 1e-6)
+}
+
+/// Objective comparison with relative tolerance `tol`.
+pub fn objective_diff_tol(f: &Fixture, out: &RunOutput, tol: f64) -> Vec<String> {
     let mut d = Vec::new();
     for (name, want) in &f.objectives {
         let Some(got) = out.objectives.get(name) else {
@@ -371,7 +408,7 @@ pub fn objective_diff(f: &Fixture, out: &RunOutput) -> Vec<String> {
             continue;
         }
         for (i, (w, g)) in want.iter().zip(got).enumerate() {
-            if (w - g).abs() > 1e-6 * w.abs().max(g.abs()).max(1e-12) {
+            if (w - g).abs() > tol * w.abs().max(g.abs()).max(1e-12) {
                 d.push(format!("objective {name}[{i}]: {w} vs {g}"));
                 break;
             }
@@ -420,6 +457,12 @@ pub fn render(reports: &[FixtureReport], runner: &str) -> String {
                     let _ = writeln!(s, "  {l}");
                 }
             }
+            if let Status::Classified(c, d) = st {
+                let _ = writeln!(s, "\n{} {label} (classified {c}):", r.name);
+                for l in d.iter().take(6) {
+                    let _ = writeln!(s, "  {l}");
+                }
+            }
         }
         for n in &r.notes {
             let _ = writeln!(s, "note {}: {n}", r.name);
@@ -428,20 +471,34 @@ pub fn render(reports: &[FixtureReport], runner: &str) -> String {
     s
 }
 
-/// Count `(pass, fail, not_run)` over all statuses.
-pub fn tally(reports: &[FixtureReport]) -> (usize, usize, usize) {
-    let (mut p, mut f, mut n) = (0, 0, 0);
+/// Counts over all statuses.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct Tally {
+    /// Equal.
+    pub pass: usize,
+    /// Different with a recorded reason.
+    pub classified: usize,
+    /// Different (or the comparison failed).
+    pub fail: usize,
+    /// Not run.
+    pub not_run: usize,
+}
+
+/// Count statuses.
+pub fn tally(reports: &[FixtureReport]) -> Tally {
+    let mut t = Tally::default();
     for r in reports {
         for s in r.statuses() {
             match s {
-                Status::Pass => p += 1,
-                Status::Fail(_) | Status::Error(_) => f += 1,
-                Status::NotRun(_) => n += 1,
+                Status::Pass => t.pass += 1,
+                Status::Classified(..) => t.classified += 1,
+                Status::Fail(_) | Status::Error(_) => t.fail += 1,
+                Status::NotRun(_) => t.not_run += 1,
                 Status::Skipped(_) => {}
             }
         }
     }
-    (p, f, n)
+    t
 }
 
 #[cfg(test)]
