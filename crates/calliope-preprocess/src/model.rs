@@ -71,6 +71,9 @@ pub fn read_dict(
     let init = &prepared.config.init;
     let priority = get_math_priority(init);
     let math = build_math(&priority, &prepared.math_init, None)?;
+    if init.pre_validate_math_strings {
+        calliope_math::eval::pre_validate_math_strings(&math).map_err(ModelError::new)?;
+    }
     let mut tables = Vec::new();
     for (name, t) in &prepared.definition.data_tables.0 {
         tables.push(DataTable::new(name, t, definition_path)?);

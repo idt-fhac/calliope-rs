@@ -6,6 +6,7 @@
 //! Math `checks` are evaluated with the `where` parser in `calliope-math`, as Python does at
 //! build time.
 
+pub mod backend;
 pub mod data_tables;
 mod error;
 mod model;

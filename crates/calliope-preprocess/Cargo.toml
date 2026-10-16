@@ -9,6 +9,7 @@ publish.workspace = true
 
 [dependencies]
 calliope-array.workspace = true
+calliope-math = { path = "../calliope-math" }
 calliope-schema.workspace = true
 calliope-yaml.workspace = true
 chrono = { version = "0.4", default-features = false, features = ["std"] }
