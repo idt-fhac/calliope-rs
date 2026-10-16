@@ -1,0 +1,20 @@
+# Memory probe for preprocessing (Phase 9): RSS per stage and dataset sizes.
+# Not a workspace member. Build reusing the workspace's compiled deps:
+#   cp Cargo.lock bench/memprobe/ && cd bench/memprobe && \
+#   CARGO_TARGET_DIR=../../target cargo build --release
+#   ../../target/release/memprobe ../.work/syn_250_2190/model.yaml
+[package]
+name = "memprobe"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+calliope-preprocess = { path = "../../crates/calliope-preprocess" }
+calliope-yaml = { path = "../../crates/calliope-yaml" }
+calliope-schema = { path = "../../crates/calliope-schema" }
+
+[profile.release]
+debug = "line-tables-only"
