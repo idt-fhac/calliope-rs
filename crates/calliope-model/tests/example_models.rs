@@ -142,6 +142,66 @@ fn national_scale_from_data_tables_sense_checks() {
     national_scale_checks(&m);
 }
 
+/// The data-table model with every table as a Parquet file (`fixtures/parquet_model`,
+/// written by pandas): same inputs as with CSV files and an in-memory table, also when the
+/// time series has a `DatetimeIndex`; then the sense checks.
+#[test]
+fn parquet_tables_match_csv_tables() {
+    let Some(root) = common::reference() else {
+        return;
+    };
+    let csv_model = root.join("tests/example_models/national_scale_from_data_tables/model.yaml");
+    let csv =
+        root.join("src/calliope/example_models/national_scale/data_tables/time_varying_params.csv");
+    let mut opts = ReadOptions {
+        init_kwargs: subset("2005-01-01", "2005-01-01"),
+        ..ReadOptions::default()
+    };
+    opts.data_table_dfs.insert(
+        "time_varying_df".into(),
+        read_csv(&csv, 4, Some(1)).unwrap(),
+    );
+    let want = Model::from_yaml(&csv_model, &opts).unwrap();
+
+    let parquet_model =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/parquet_model/model.yaml");
+    let opts = ReadOptions {
+        init_kwargs: subset("2005-01-01", "2005-01-01"),
+        ..ReadOptions::default()
+    };
+    let mut got = Model::from_yaml(&parquet_model, &opts).unwrap();
+    let diffs = calliope_io::compare_datasets(&want.inputs, &got.inputs, 0.0);
+    assert!(diffs.is_empty(), "{diffs:#?}");
+
+    let mut over = AttrTree::new();
+    over.set_key(
+        "data_tables.time_varying_data_from_df.table",
+        Node::new(Value::Str(
+            "data_tables/time_varying_datetime.parquet".into(),
+        )),
+    )
+    .unwrap();
+    let opts = ReadOptions {
+        override_dict: Some(over),
+        init_kwargs: subset("2005-01-01", "2005-01-01"),
+        ..ReadOptions::default()
+    };
+    let dt = Model::from_yaml(&parquet_model, &opts).unwrap();
+    let diffs = calliope_io::compare_datasets(&want.inputs, &dt.inputs, 0.0);
+    assert!(diffs.is_empty(), "{diffs:#?}");
+
+    got.build(&BuildOptions::default()).unwrap();
+    let mut o = AttrTree::new();
+    o.set_key("solver_options.output_flag", Node::new(Value::Bool(false)))
+        .unwrap();
+    got.solve(&SolveOptions {
+        overrides: o,
+        ..SolveOptions::default()
+    })
+    .unwrap();
+    national_scale_checks(&got);
+}
+
 #[test]
 fn missing_in_memory_table_is_an_error() {
     let Some(root) = common::reference() else {
