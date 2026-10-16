@@ -8,9 +8,27 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
+calliope-io = { path = "../calliope-io" }
+calliope-lp = { path = "../calliope-lp" }
+calliope-math = { path = "../calliope-math" }
+calliope-preprocess = { path = "../calliope-preprocess" }
+calliope-schema.workspace = true
+calliope-yaml.workspace = true
+clap = { version = "4.6", features = ["derive"] }
+include_dir = "0.7.4"
+miette = { version = "7.6", features = ["fancy"] }
+tracing.workspace = true
+tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt", "std", "ansi"] }
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [lints]
 workspace = true
+
+[lib]
+name = "calliope_cli"
+path = "src/lib.rs"
 
 [[bin]]
 name = "calliope"

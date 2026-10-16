@@ -1,6 +1,5 @@
-//! The `calliope` binary. Placeholder until Phase 7 of `PLAN.md`.
+//! The `calliope` binary.
 
-fn main() {
-    eprintln!("calliope-rs: the command-line interface is not implemented yet");
-    std::process::exit(2);
+fn main() -> std::process::ExitCode {
+    calliope_cli::cli::main()
 }
