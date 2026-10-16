@@ -161,6 +161,7 @@ name = "calliope-math"
 version = "0.1.0"
 dependencies = [
  "calliope-array",
+ "calliope-lp",
  "calliope-schema",
  "calliope-yaml",
  "indexmap",
@@ -175,12 +176,25 @@ dependencies = [
 [[package]]
 name = "calliope-model"
 version = "0.1.0"
+dependencies = [
+ "calliope-io",
+ "calliope-lp",
+ "calliope-math",
+ "calliope-preprocess",
+ "calliope-schema",
+ "calliope-yaml",
+ "indexmap",
+ "serde_json",
+ "tempfile",
+ "tracing",
+]
 
 [[package]]
 name = "calliope-preprocess"
 version = "0.1.0"
 dependencies = [
  "calliope-array",
+ "calliope-math",
  "calliope-schema",
  "calliope-yaml",
  "chrono",
