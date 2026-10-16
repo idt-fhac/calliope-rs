@@ -1,0 +1,72 @@
+== syn_250_168
+    0.02s  rss=      10 MB  end of definition+math
+    0.07s  rss=      15 MB  end of load data tables (CSV)
+  [table time_varying_parameters] 2 vars, 1 MB of values
+    sink_use_equals                (timesteps,nodes,techs       ) float   cells=      84000        1 MB
+    source_use_max                 (timesteps,nodes,techs       ) float   cells=      84000        1 MB
+  [table cost_parameters] 6 vars, 0 MB of values
+    cost_flow_cap                  (costs,techs                 ) float   cells=        103        0 MB
+    cost_storage_cap               (costs,techs                 ) float   cells=        103        0 MB
+    cost_area_use                  (costs,techs                 ) float   cells=        103        0 MB
+    cost_source_cap                (costs,techs                 ) float   cells=        103        0 MB
+    cost_source_use                (costs,techs                 ) float   cells=        103        0 MB
+    cost_flow_out                  (costs,techs                 ) float   cells=        103        0 MB
+    2.28s  rss=     185 MB  end of ModelDataBuilder::new (init_from_data_tables)
+    6.98s  rss=     190 MB  end of ModelDataBuilder::build
+  [after build] 35 vars, 173 MB of values
+    sink_use_equals                (timesteps,nodes,techs       ) float   cells=   10668000       85 MB
+    source_use_max                 (timesteps,nodes,techs       ) float   cells=   10668000       85 MB
+    active                         (nodes,techs                 ) float   cells=      63500        1 MB
+    carrier_in                     (nodes,techs,carriers        ) float   cells=      63500        1 MB
+    carrier_out                    (nodes,techs,carriers        ) float   cells=      63500        1 MB
+    flow_cap_max                   (nodes,techs                 ) float   cells=      63500        1 MB
+    8.26s  rss=     185 MB  end of ModelDataCleaner::clean
+  [cleaned inputs] 38 vars, 171 MB of values
+    sink_use_equals                (timesteps,nodes,techs       ) float   cells=   10668000       85 MB
+    source_use_max                 (timesteps,nodes,techs       ) float   cells=   10668000       85 MB
+    flow_cap_max                   (nodes,techs                 ) float   cells=      63500        1 MB
+    active                         (nodes,techs                 ) bool    cells=      63500        0 MB
+    carrier_in                     (nodes,techs,carriers        ) bool    cells=      63500        0 MB
+    carrier_out                    (nodes,techs,carriers        ) bool    cells=      63500        0 MB
+peak RSS per stage:
+  definition+math                                     0.0s       10 MB
+  load data tables (CSV)                              0.0s       21 MB
+  ModelDataBuilder::new (init_from_data_tables)       2.2s      909 MB
+  ModelDataBuilder::build                             4.7s      922 MB
+  ModelDataCleaner::clean                             1.3s      601 MB
+== syn_250_2190
+    0.02s  rss=      10 MB  end of definition+math
+    0.95s  rss=      95 MB  end of load data tables (CSV)
+  [table time_varying_parameters] 2 vars, 18 MB of values
+    sink_use_equals                (timesteps,nodes,techs       ) float   cells=    1095000        9 MB
+    source_use_max                 (timesteps,nodes,techs       ) float   cells=    1095000        9 MB
+  [table cost_parameters] 6 vars, 0 MB of values
+    cost_flow_cap                  (costs,techs                 ) float   cells=        103        0 MB
+    cost_storage_cap               (costs,techs                 ) float   cells=        103        0 MB
+    cost_area_use                  (costs,techs                 ) float   cells=        103        0 MB
+    cost_source_cap                (costs,techs                 ) float   cells=        103        0 MB
+    cost_source_use                (costs,techs                 ) float   cells=        103        0 MB
+    cost_flow_out                  (costs,techs                 ) float   cells=        103        0 MB
+   18.78s  rss=    2223 MB  end of ModelDataBuilder::new (init_from_data_tables)
+   57.52s  rss=    2162 MB  end of ModelDataBuilder::build
+  [after build] 35 vars, 2227 MB of values
+    sink_use_equals                (timesteps,nodes,techs       ) float   cells=  139065000     1113 MB
+    source_use_max                 (timesteps,nodes,techs       ) float   cells=  139065000     1113 MB
+    active                         (nodes,techs                 ) float   cells=      63500        1 MB
+    carrier_in                     (nodes,techs,carriers        ) float   cells=      63500        1 MB
+    carrier_out                    (nodes,techs,carriers        ) float   cells=      63500        1 MB
+    flow_cap_max                   (nodes,techs                 ) float   cells=      63500        1 MB
+   70.94s  rss=    2162 MB  end of ModelDataCleaner::clean
+  [cleaned inputs] 38 vars, 2226 MB of values
+    sink_use_equals                (timesteps,nodes,techs       ) float   cells=  139065000     1113 MB
+    source_use_max                 (timesteps,nodes,techs       ) float   cells=  139065000     1113 MB
+    flow_cap_max                   (nodes,techs                 ) float   cells=      63500        1 MB
+    active                         (nodes,techs                 ) bool    cells=      63500        0 MB
+    carrier_in                     (nodes,techs,carriers        ) bool    cells=      63500        0 MB
+    carrier_out                    (nodes,techs,carriers        ) bool    cells=      63500        0 MB
+peak RSS per stage:
+  definition+math                                     0.0s       10 MB
+  load data tables (CSV)                              0.9s      215 MB
+  ModelDataBuilder::new (init_from_data_tables)      17.8s    11769 MB
+  ModelDataBuilder::build                            38.7s    11710 MB
+  ModelDataCleaner::clean                            13.4s     7728 MB

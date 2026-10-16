@@ -1,0 +1,157 @@
+{
+ "case": "spores:31",
+ "variant": "speedups",
+ "calliope_file": "/home/idt/workspace/calliope-speedups/src/calliope/__init__.py",
+ "status": "ok",
+ "sizes": {
+  "techs": 8,
+  "costs": 1,
+  "nodes": 5,
+  "carriers": 1,
+  "timesteps": 744
+ },
+ "timings": {
+  "stages": {
+   "preprocess": {
+    "wall_s": 1.054630944505334,
+    "peak_rss_mb": 200.1328125,
+    "start_rss_mb": 156.38671875,
+    "share": 0.02344544269290527
+   },
+   "build": {
+    "wall_s": 5.023981679230928,
+    "peak_rss_mb": 231.25390625,
+    "start_rss_mb": 171.01953125,
+    "share": 0.11168786120329793
+   },
+   "solve": {
+    "wall_s": 33.87803663499653,
+    "peak_rss_mb": 318.6875,
+    "start_rss_mb": 231.22265625,
+    "wall_s_incl_postprocess": 38.26051436364651,
+    "share": 0.7531407746114541
+   },
+   "write": {
+    "wall_s": 0.6432159915566444,
+    "peak_rss_mb": 330.23046875,
+    "start_rss_mb": 318.6875,
+    "share": 0.014299299435287221
+   },
+   "postprocess": {
+    "wall_s": 4.382477728649974,
+    "nested_in": "solve",
+    "share": 0.09742662205705549
+   }
+  },
+  "total_wall_s": 44.982342978939414,
+  "process_peak_rss_mb": 330.00390625,
+  "events": [
+   {
+    "kind": "model_build",
+    "t": 6.0795,
+    "wall_s": 5.02379891090095,
+    "rss_mb": 231.22265625
+   },
+   {
+    "kind": "update_input",
+    "t": 6.180486,
+    "wall_s": 0.0998514462262392,
+    "rss_mb": 231.22265625,
+    "name": "spores_score"
+   },
+   {
+    "kind": "load_results",
+    "t": 11.32113,
+    "wall_s": 1.1955890730023384,
+    "rss_mb": 288.37109375
+   },
+   {
+    "kind": "backend_solve",
+    "t": 11.321334,
+    "wall_s": 5.1348964888602495,
+    "rss_mb": 288.37109375
+   },
+   {
+    "kind": "update_input",
+    "t": 11.698877,
+    "wall_s": 0.3768317364156246,
+    "rss_mb": 285.62109375,
+    "name": "spores_baseline_cost"
+   },
+   {
+    "kind": "update_input",
+    "t": 11.814948,
+    "wall_s": 0.10644715093076229,
+    "rss_mb": 285.62109375,
+    "name": "spores_score"
+   },
+   {
+    "kind": "load_results",
+    "t": 24.108027,
+    "wall_s": 1.057164067402482,
+    "rss_mb": 303.20703125
+   },
+   {
+    "kind": "backend_solve",
+    "t": 24.108152,
+    "wall_s": 12.293098293244839,
+    "rss_mb": 303.20703125
+   },
+   {
+    "kind": "update_input",
+    "t": 24.372152,
+    "wall_s": 0.2583112195134163,
+    "rss_mb": 303.6015625,
+    "name": "spores_score"
+   },
+   {
+    "kind": "load_results",
+    "t": 33.995843,
+    "wall_s": 1.0613064039498568,
+    "rss_mb": 308.48046875
+   },
+   {
+    "kind": "backend_solve",
+    "t": 33.995964,
+    "wall_s": 9.623712867498398,
+    "rss_mb": 308.48046875
+   },
+   {
+    "kind": "update_input",
+    "t": 34.118208,
+    "wall_s": 0.11664735153317451,
+    "rss_mb": 304.12109375,
+    "name": "spores_score"
+   },
+   {
+    "kind": "load_results",
+    "t": 44.308843,
+    "wall_s": 1.0684181842952967,
+    "rss_mb": 310.9609375
+   },
+   {
+    "kind": "backend_solve",
+    "t": 44.308974,
+    "wall_s": 10.190678348764777,
+    "rss_mb": 310.9609375
+   }
+  ]
+ },
+ "termination_condition": "optimal",
+ "objective": [
+  1940256.7485091018,
+  2910385.1227636593,
+  2910385.1227636356,
+  2910385.122763654
+ ],
+ "objective_min_spores": [
+  0.0,
+  33607628.758169934,
+  71135642.95485988,
+  110547037.1814389
+ ],
+ "netcdf_mb": 0.9640178680419922,
+ "wall_total_s": 46.45421485975385,
+ "observed_peak_rss_mb": 328.3984375,
+ "rep": 3
+}

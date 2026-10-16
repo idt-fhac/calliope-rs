@@ -1,0 +1,14 @@
+rustc rustc 1.99.0 (b940084d7 2026-09-28)
+clean release build: cargo build --release -p calliope-cli (empty target/release, 16 vCPU)
+    Finished `release` profile [optimized + debuginfo] target(s) in 59.22s
+compiled units: 178
+target/release/calliope: 84243520 bytes (debug = line-tables-only); stripped: 17274584 bytes
+shared libraries (ldd): 47
+	libnetcdf.so.22 => /lib/x86_64-linux-gnu/libnetcdf.so.22 (0x00007fb8c145d000)
+	libcurl-gnutls.so.4 => /lib/x86_64-linux-gnu/libcurl-gnutls.so.4 (0x00007fb8c1281000)
+	libhdf5_serial_hl.so.310 => /lib/x86_64-linux-gnu/libhdf5_serial_hl.so.310 (0x00007fb8c271e000)
+	libhdf5_serial.so.310 => /lib/x86_64-linux-gnu/libhdf5_serial.so.310 (0x00007fb8c0800000)
+	libcurl.so.4 => /lib/x86_64-linux-gnu/libcurl.so.4 (0x00007fb8bfb10000)
+Cargo.lock packages: 249
+third-party crates in calliope-cli normal dependency tree: 146
+Python pixi default env: 794 MB, 81 conda packages; dev env 974 MB

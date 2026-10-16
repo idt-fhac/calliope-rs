@@ -1,0 +1,32 @@
+{
+ "case": "syn:50:2190",
+ "variant": "rust",
+ "status": "ok-build-only",
+ "cmd": [
+  "/home/idt/workspace/calliope-rust/target/release/examples/build_timing",
+  "/home/idt/workspace/calliope-rust/bench/.work/syn_50_2190/model.yaml"
+ ],
+ "wall_total_s": 21.94971122778952,
+ "observed_peak_rss_mb": 1695.37890625,
+ "timings": {
+  "stages": {
+   "preprocess": {
+    "wall_s": 3.47
+   },
+   "build": {
+    "wall_s": 18.21
+   }
+  },
+  "total_wall_s": 21.68
+ },
+ "lp": {
+  "cols": 1007680,
+  "rows": 1270271,
+  "nnz": 3502760
+ },
+ "sizes": {
+  "timesteps": 2190
+ },
+ "process_peak_rss_mb": 1695.2421875,
+ "rep": 1
+}

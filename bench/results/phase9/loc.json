@@ -1,0 +1,181 @@
+[
+ {
+  "subsystem": "YAML + config schemas",
+  "crates": [
+   "calliope-yaml",
+   "calliope-schema"
+  ],
+  "rust": {
+   "src": 5047,
+   "inline_tests": 0,
+   "tests": 2299,
+   "examples": 61
+  },
+  "python_code": 1026,
+  "python_raw": 1650
+ },
+ {
+  "subsystem": "Preprocess (definition, data tables, time, model data)",
+  "crates": [
+   "calliope-preprocess"
+  ],
+  "rust": {
+   "src": 4887,
+   "inline_tests": 32,
+   "tests": 1457,
+   "examples": 0
+  },
+  "python_code": 1243,
+  "python_raw": 1993
+ },
+ {
+  "subsystem": "Arrays (xarray subset)",
+  "crates": [
+   "calliope-array"
+  ],
+  "rust": {
+   "src": 1545,
+   "inline_tests": 0,
+   "tests": 629,
+   "examples": 0
+  },
+  "python_code": 0,
+  "python_raw": 0
+ },
+ {
+  "subsystem": "Math engine (parser, where, helpers, eval)",
+  "crates": [
+   "calliope-math"
+  ],
+  "rust": {
+   "src": 5810,
+   "inline_tests": 0,
+   "tests": 1961,
+   "examples": 0
+  },
+  "python_code": 2672,
+  "python_raw": 5329
+ },
+ {
+  "subsystem": "LP model + LP format/diff",
+  "crates": [
+   "calliope-lp"
+  ],
+  "rust": {
+   "src": 1880,
+   "inline_tests": 184,
+   "tests": 186,
+   "examples": 0
+  },
+  "python_code": 0,
+  "python_raw": 0
+ },
+ {
+  "subsystem": "HiGHS backend",
+  "crates": [
+   "calliope-highs"
+  ],
+  "rust": {
+   "src": 1293,
+   "inline_tests": 53,
+   "tests": 396,
+   "examples": 0
+  },
+  "python_code": 487,
+  "python_raw": 656
+ },
+ {
+  "subsystem": "Model, modes (operate, SPORES)",
+  "crates": [
+   "calliope-model"
+  ],
+  "rust": {
+   "src": 1951,
+   "inline_tests": 18,
+   "tests": 1893,
+   "examples": 50
+  },
+  "python_code": 560,
+  "python_raw": 861
+ },
+ {
+  "subsystem": "I/O (NetCDF, CSV)",
+  "crates": [
+   "calliope-io"
+  ],
+  "rust": {
+   "src": 993,
+   "inline_tests": 27,
+   "tests": 451,
+   "examples": 0
+  },
+  "python_code": 210,
+  "python_raw": 333
+ },
+ {
+  "subsystem": "CLI + generate_runs + examples",
+  "crates": [
+   "calliope-cli"
+  ],
+  "rust": {
+   "src": 1561,
+   "inline_tests": 0,
+   "tests": 402,
+   "examples": 0
+  },
+  "python_code": 491,
+  "python_raw": 680
+ },
+ {
+  "subsystem": "Misc (exceptions, logging, tools)",
+  "crates": [],
+  "rust": {
+   "src": 0,
+   "inline_tests": 0,
+   "tests": 0,
+   "examples": 0
+  },
+  "python_code": 173,
+  "python_raw": 380
+ },
+ {
+  "subsystem": "Pyomo / Gurobi / LaTeX backends, math docs",
+  "crates": [],
+  "rust": {
+   "src": 0,
+   "inline_tests": 0,
+   "tests": 0,
+   "examples": 0
+  },
+  "python_code": 1638,
+  "python_raw": 2319
+ },
+ {
+  "subsystem": "Python bindings",
+  "crates": [
+   "calliope-py"
+  ],
+  "rust": {
+   "src": 808,
+   "inline_tests": 0,
+   "tests": 0,
+   "examples": 0
+  },
+  "python_code": 0,
+  "python_raw": 0
+ },
+ {
+  "subsystem": "Dev tooling (parity, golden, schema-diff)",
+  "crates": [
+   "xtask"
+  ],
+  "rust": {
+   "src": 927,
+   "inline_tests": 125,
+   "tests": 0,
+   "examples": 0
+  },
+  "python_code": 0,
+  "python_raw": 0
+ }
+]

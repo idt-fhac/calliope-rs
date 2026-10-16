@@ -1,0 +1,42 @@
+{
+ "case": "syn:250:168",
+ "variant": "main",
+ "calliope_file": "/home/idt/workspace/calliope/src/calliope/__init__.py",
+ "status": "ok-build-only",
+ "sizes": {
+  "costs": 1,
+  "nodes": 250,
+  "techs": 254,
+  "carriers": 1,
+  "timesteps": 168
+ },
+ "timings": {
+  "stages": {
+   "preprocess": {
+    "wall_s": 27.422874281182885,
+    "peak_rss_mb": 1084.40234375,
+    "start_rss_mb": 165.66796875,
+    "share": 0.12289127994240645
+   },
+   "build": {
+    "wall_s": 195.7245637960732,
+    "peak_rss_mb": 4143.6015625,
+    "start_rss_mb": 362.921875,
+    "share": 0.8771087200575935
+   }
+  },
+  "total_wall_s": 223.14743807725608,
+  "process_peak_rss_mb": 4280.48828125,
+  "events": [
+   {
+    "kind": "model_build",
+    "t": 223.710672,
+    "wall_s": 195.72435387410223,
+    "rss_mb": 3023.47265625
+   }
+  ]
+ },
+ "wall_total_s": 226.46422592923045,
+ "observed_peak_rss_mb": 4182.6484375,
+ "rep": 1
+}

@@ -1,0 +1,45 @@
+{
+ "case": "syn:5:2190",
+ "variant": "rust",
+ "status": "ok",
+ "cmd": [
+  "/home/idt/workspace/calliope-rust/target/release/calliope",
+  "bench",
+  "--json",
+  "/home/idt/workspace/calliope-rust/bench/.work/syn_5_2190/model.yaml",
+  "--override_dict",
+  "{\"config.solve.solver_options\": {\"threads\": 1, \"random_seed\": 0}}"
+ ],
+ "wall_total_s": 14.607579393312335,
+ "observed_peak_rss_mb": 259.77734375,
+ "timings": {
+  "stages": {
+   "preprocess": {
+    "wall_s": 0.044295933,
+    "start_rss_mb": 17.4296875,
+    "peak_rss_mb": 31.31640625,
+    "share": 0.003053048283398706
+   },
+   "build": {
+    "wall_s": 0.483423746,
+    "start_rss_mb": 27.55859375,
+    "peak_rss_mb": 109.984375,
+    "share": 0.0333194480378023
+   },
+   "solve": {
+    "wall_s": 13.875585594,
+    "start_rss_mb": 95.75390625,
+    "peak_rss_mb": 243.3515625,
+    "share": 0.9563594196991745
+   },
+   "write": {
+    "wall_s": 0.105450858,
+    "start_rss_mb": 243.3515625,
+    "peak_rss_mb": 261.3984375,
+    "share": 0.007268083979624511
+   }
+  },
+  "total_wall_s": 14.508756131
+ },
+ "rep": 2
+}

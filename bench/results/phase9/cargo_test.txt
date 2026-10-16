@@ -1,0 +1,112 @@
+     Running unittests src/lib.rs (target/debug/deps/calliope_array-8ad7b8b0f4ecafd1)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/properties.rs (target/debug/deps/properties-d9a74a627b1bfa31)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/xarray_oracle.rs (target/debug/deps/xarray_oracle-9ec5b4a45986036b)
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.08s
+     Running unittests src/lib.rs (target/debug/deps/calliope_cli-19875be281524863)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/main.rs (target/debug/deps/calliope-0baa441f300a8f5c)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/cli.rs (target/debug/deps/cli-0e532d1a183c82d6)
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.23s
+     Running unittests src/lib.rs (target/debug/deps/calliope_highs-efb634d731131f03)
+test results::tests::datetime_strings ... ok
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/backend.rs (target/debug/deps/backend-d365c6ba56655457)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/golden_objectives.rs (target/debug/deps/golden_objectives-8a85b66aed8f1de3)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.13s
+     Running tests/results_golden.rs (target/debug/deps/results_golden-a04d02555ef776f4)
+test results_match_golden ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.29s
+     Running unittests src/lib.rs (target/debug/deps/calliope_io-b416eb8b63e3a9cd)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/golden_inputs.rs (target/debug/deps/golden_inputs-25bee8e557807285)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 19.55s
+     Running tests/netcdf_roundtrip.rs (target/debug/deps/netcdf_roundtrip-84c9bef1ced055a6)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 24.68s
+     Running unittests src/lib.rs (target/debug/deps/calliope_lp-e57fecb868850fa4)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/golden.rs (target/debug/deps/golden-1322dcb7485b91bd)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 43.31s
+     Running unittests src/lib.rs (target/debug/deps/calliope_math-fa7a995637a870ac)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/expansion.rs (target/debug/deps/expansion-fd29dfcb47f8c7cf)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.92s
+     Running tests/expression_parser.rs (target/debug/deps/expression_parser-8a4f841c47cf44f7)
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+     Running tests/helper_functions.rs (target/debug/deps/helper_functions-cb9558a6e8ed812a)
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/ir.rs (target/debug/deps/ir-5420ac9580eabd3b)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.92s
+     Running tests/parse_corpus.rs (target/debug/deps/parse_corpus-3b3999d0244bc14c)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+     Running tests/typecheck.rs (target/debug/deps/typecheck-cd6017ce1cc5a75e)
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/typecheck_builtin.rs (target/debug/deps/typecheck_builtin-6299e971a79e37fa)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.97s
+     Running tests/where_parser.rs (target/debug/deps/where_parser-a1a23b511cd1360c)
+test results ... ok
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/debug/deps/calliope_model-be25afd01d818e8f)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/backend_interface.rs (target/debug/deps/backend_interface-db658156043fb50b)
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.67s
+     Running tests/checks.rs (target/debug/deps/checks-2ccf12d21ba23d92)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.88s
+     Running tests/example_models.rs (target/debug/deps/example_models-5e697123b3e45ad9)
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.21s
+     Running tests/golden_results.rs (target/debug/deps/golden_results-e6691a8a0e004977)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 72.24s
+     Running tests/lp_parity.rs (target/debug/deps/lp_parity-c391d10aa94e31da)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 50.94s
+     Running tests/modes.rs (target/debug/deps/modes-4833018cb7232694)
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.13s
+     Running unittests src/lib.rs (target/debug/deps/calliope_preprocess-9809f56b175e6074)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/data_tables.rs (target/debug/deps/data_tables-05b8aca55a8f5a8f)
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/input_model_schema.rs (target/debug/deps/input_model_schema-0ce69bf8df9d351b)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+     Running tests/pipeline.rs (target/debug/deps/pipeline-58d88fca6cf10af1)
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.69s
+     Running tests/templates.rs (target/debug/deps/templates-ef59ed0ef84df481)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/debug/deps/calliope_rs-1a07000b905abb14)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/debug/deps/calliope_schema-8a5b967b38177d11)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/config.rs (target/debug/deps/config-24c7c8f988f4be7f)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/data_table.rs (target/debug/deps/data_table-4e6067366d803b04)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/dimension_data.rs (target/debug/deps/dimension_data-1e39f52e3964e374)
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/general.rs (target/debug/deps/general-4d54343c9b508f64)
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/json_schema.rs (target/debug/deps/json_schema-b64238f64b98c406)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+     Running tests/math_schema.rs (target/debug/deps/math_schema-1d8f172018381f7c)
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running unittests src/lib.rs (target/debug/deps/calliope_yaml-261e7280d05b9283)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/attrdict.rs (target/debug/deps/attrdict-6c13e8afbbaf7dea)
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/io_yaml.rs (target/debug/deps/io_yaml-8713e4cb7260ad9e)
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/loader.rs (target/debug/deps/loader-28513184156e55bf)
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+     Running unittests src/main.rs (target/debug/deps/xtask-31418ff4e4aa3674)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.71s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

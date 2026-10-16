@@ -1,0 +1,73 @@
+ok                             national       rust      r1    247.2s peak=907MB preprocess=0.17s build=2.02s solve=244.56s write=0.30s
+ok                             urban          rust      r1     59.0s peak=1458MB preprocess=0.42s build=4.02s solve=53.54s write=0.82s
+ok                             syn:5:168      rust      r1      0.4s peak=54MB preprocess=0.02s build=0.06s solve=0.17s write=0.05s
+ok                             syn:5:168      rust      r2      0.4s peak=56MB preprocess=0.02s build=0.06s solve=0.17s write=0.05s
+ok                             syn:5:168      rust      r3      0.4s peak=57MB preprocess=0.02s build=0.06s solve=0.17s write=0.05s
+ok                             syn:5:2190     rust      r1     14.6s peak=257MB preprocess=0.04s build=0.48s solve=13.91s write=0.10s
+ok                             syn:5:2190     rust      r2     14.6s peak=260MB preprocess=0.04s build=0.48s solve=13.88s write=0.11s
+ok                             syn:5:2190     rust      r3     14.8s peak=254MB preprocess=0.04s build=0.49s solve=14.02s write=0.11s
+ok                             syn:5:8760     rust      r1    195.4s peak=908MB preprocess=0.16s build=1.93s solve=192.91s write=0.29s
+ok                             syn:50:168     rust      r1     99.4s peak=325MB preprocess=0.23s build=1.17s solve=97.61s write=0.31s
+ok-build-only                  syn:50:2190    rust      r1     21.9s peak=1695MB preprocess=3.47s build=18.21s
+ok-build-only                  syn:50:8760    rust      r1     86.2s peak=6692MB preprocess=13.62s build=71.70s
+ok-build-only                  syn:250:168    rust      r1     46.9s peak=2217MB preprocess=10.75s build=35.97s
+killed: RSS > 28.0 GB          syn:250:2190   rust      r1    407.9s peak=28689MB 
+killed: RSS > 28.0 GB          syn:250:8760   rust      r1     64.1s peak=28676MB 
+ok                             operate:10     rust      r1      1.1s peak=59MB preprocess=0.18s build=0.02s solve=0.52s write=0.05s
+ok                             operate:10     rust      r2      0.8s peak=59MB preprocess=0.19s build=0.02s solve=0.54s write=0.04s
+ok                             operate:10     rust      r3      0.8s peak=47MB preprocess=0.17s build=0.02s solve=0.54s write=0.04s
+ok                             operate:31     rust      r1      2.0s peak=59MB preprocess=0.17s build=0.02s solve=1.69s write=0.06s
+ok                             operate:31     rust      r2      2.0s peak=59MB preprocess=0.17s build=0.02s solve=1.69s write=0.06s
+ok                             operate:31     rust      r3      2.0s peak=54MB preprocess=0.18s build=0.02s solve=1.69s write=0.06s
+ok                             spores:10      rust      r1      4.3s peak=71MB preprocess=0.18s build=0.07s solve=3.87s write=0.07s
+ok                             spores:10      rust      r2      4.2s peak=71MB preprocess=0.18s build=0.07s solve=3.86s write=0.07s
+ok                             spores:10      rust      r3      4.3s peak=72MB preprocess=0.17s build=0.07s solve=3.87s write=0.08s
+ok                             spores:31      rust      r1     33.5s peak=151MB preprocess=0.19s build=0.18s solve=32.95s write=0.13s
+ok                             spores:31      rust      r2     33.8s peak=150MB preprocess=0.18s build=0.18s solve=33.26s write=0.12s
+ok                             spores:31      rust      r3     33.0s peak=150MB preprocess=0.17s build=0.17s solve=32.43s write=0.12s
+ok                             national       main      r1    278.5s peak=1113MB preprocess=1.11s build=34.86s solve=236.90s write=0.60s postprocess=2.86s
+ok                             urban          main      r1    124.5s peak=1768MB preprocess=1.68s build=59.93s solve=54.57s write=1.07s postprocess=4.89s
+ok                             syn:5:168      main      r1      8.2s peak=228MB preprocess=0.96s build=4.22s solve=0.18s write=0.37s postprocess=0.83s
+ok                             syn:5:168      main      r2      8.2s peak=228MB preprocess=0.89s build=4.34s solve=0.18s write=0.37s postprocess=0.85s
+ok                             syn:5:168      main      r3      8.2s peak=227MB preprocess=0.91s build=4.28s solve=0.18s write=0.37s postprocess=0.84s
+ok                             syn:5:2190     main      r1     28.8s peak=420MB preprocess=0.95s build=10.05s solve=14.41s write=0.42s postprocess=1.29s
+ok                             syn:5:2190     main      r2     29.2s peak=415MB preprocess=0.97s build=10.48s solve=14.48s write=0.42s postprocess=1.25s
+ok                             syn:5:2190     main      r3     28.4s peak=415MB preprocess=0.92s build=9.84s solve=14.20s write=0.45s postprocess=1.28s
+ok                             syn:5:8760     main      r1    229.9s peak=1062MB preprocess=1.05s build=34.80s solve=187.99s write=0.60s postprocess=3.18s
+ok                             syn:50:168     main      r1    128.7s peak=570MB preprocess=5.27s build=13.46s solve=105.60s write=0.68s postprocess=1.79s
+ok-build-only                  syn:50:2190    main      r1    152.2s peak=2885MB preprocess=6.28s build=142.21s
+ok-build-only                  syn:50:8760    main      r1    725.6s peak=11006MB preprocess=10.00s build=707.08s
+ok-build-only                  syn:250:168    main      r1    226.5s peak=4183MB preprocess=27.42s build=195.72s
+ok                             operate:10     main      r1     44.1s peak=214MB preprocess=1.08s build=2.93s solve=22.15s write=0.39s postprocess=16.08s
+ok                             operate:10     main      r2     44.2s peak=218MB preprocess=1.11s build=3.01s solve=22.08s write=0.37s postprocess=16.16s
+ok                             operate:10     main      r3     44.3s peak=215MB preprocess=1.08s build=2.96s solve=22.13s write=0.41s postprocess=16.20s
+ok                             operate:31     main      r1    123.7s peak=220MB preprocess=1.08s build=3.06s solve=66.65s write=0.40s postprocess=51.15s
+ok                             spores:10      main      r1     16.0s peak=248MB preprocess=1.05s build=4.66s solve=4.15s write=0.42s postprocess=4.18s
+ok                             spores:10      main      r2     16.2s peak=249MB preprocess=1.05s build=4.70s solve=4.23s write=0.42s postprocess=4.24s
+ok                             spores:10      main      r3     15.8s peak=248MB preprocess=1.04s build=4.60s solve=4.14s write=0.42s postprocess=4.13s
+ok                             spores:31      main      r1     48.3s peak=332MB preprocess=1.03s build=6.02s solve=34.71s write=0.47s postprocess=4.55s
+ok                             spores:31      main      r2     47.9s peak=322MB preprocess=1.03s build=6.01s solve=34.23s write=0.62s postprocess=4.38s
+ok                             spores:31      main      r3     47.9s peak=323MB preprocess=1.06s build=6.14s solve=33.94s write=0.49s postprocess=4.60s
+ok                             national       speedups  r1    268.3s peak=1087MB preprocess=1.11s build=22.73s solve=238.93s write=0.62s postprocess=2.94s
+ok                             urban          speedups  r1    105.5s peak=1775MB preprocess=1.74s build=39.85s solve=55.63s write=1.13s postprocess=4.57s
+ok                             syn:5:168      speedups  r1      8.0s peak=228MB preprocess=0.91s build=4.03s solve=0.18s write=0.37s postprocess=0.86s
+ok                             syn:5:168      speedups  r2      8.0s peak=227MB preprocess=0.91s build=4.04s solve=0.18s write=0.37s postprocess=0.86s
+ok                             syn:5:168      speedups  r3      8.0s peak=228MB preprocess=0.89s build=4.07s solve=0.18s write=0.38s postprocess=0.86s
+ok                             syn:5:2190     speedups  r1     25.8s peak=413MB preprocess=0.92s build=7.10s solve=14.34s write=0.43s postprocess=1.31s
+ok                             syn:5:2190     speedups  r2     26.0s peak=416MB preprocess=0.95s build=7.15s solve=14.50s write=0.42s postprocess=1.31s
+ok                             syn:5:2190     speedups  r3     26.0s peak=417MB preprocess=1.31s build=6.93s solve=14.22s write=0.43s postprocess=1.33s
+ok                             syn:5:8760     speedups  r1    226.3s peak=1104MB preprocess=1.08s build=23.37s solve=196.20s write=0.58s postprocess=2.92s
+ok                             syn:50:168     speedups  r1    125.7s peak=582MB preprocess=5.14s build=10.71s solve=105.34s write=0.70s postprocess=1.83s
+ok-build-only                  syn:50:2190    speedups  r1    114.7s peak=2818MB preprocess=6.27s build=104.42s
+ok-build-only                  syn:50:8760    speedups  r1    587.3s peak=10908MB preprocess=9.10s build=569.29s
+ok-build-only                  syn:250:168    speedups  r1    213.9s peak=4245MB preprocess=30.60s build=179.97s
+ok                             operate:10     speedups  r1     44.9s peak=215MB preprocess=1.21s build=3.04s solve=22.14s write=0.39s postprocess=16.44s
+ok                             operate:10     speedups  r2     44.2s peak=218MB preprocess=1.10s build=2.92s solve=22.08s write=0.38s postprocess=16.29s
+ok                             operate:10     speedups  r3     44.3s peak=215MB preprocess=1.09s build=2.94s solve=22.20s write=0.39s postprocess=16.24s
+ok                             operate:31     speedups  r1    122.7s peak=220MB preprocess=1.10s build=2.91s solve=66.68s write=0.51s postprocess=50.10s
+ok                             spores:10      speedups  r1     15.2s peak=248MB preprocess=1.04s build=4.19s solve=4.14s write=0.43s postprocess=4.06s
+ok                             spores:10      speedups  r2     15.2s peak=248MB preprocess=1.03s build=4.19s solve=4.16s write=0.42s postprocess=4.06s
+ok                             spores:10      speedups  r3     15.6s peak=248MB preprocess=1.03s build=4.25s solve=4.17s write=0.42s postprocess=4.15s
+ok                             spores:31      speedups  r1     46.5s peak=322MB preprocess=1.04s build=5.00s solve=33.99s write=0.64s postprocess=4.34s
+ok                             spores:31      speedups  r2     46.9s peak=323MB preprocess=1.06s build=5.12s solve=34.18s write=0.62s postprocess=4.36s
+ok                             spores:31      speedups  r3     46.5s peak=328MB preprocess=1.05s build=5.02s solve=33.88s write=0.64s postprocess=4.38s

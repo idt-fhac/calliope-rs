@@ -1,0 +1,12 @@
+{
+ "case": "syn:250:2190",
+ "variant": "rust",
+ "status": "killed: RSS > 28.0 GB",
+ "cmd": [
+  "/home/idt/workspace/calliope-rust/target/release/examples/build_timing",
+  "/home/idt/workspace/calliope-rust/bench/.work/syn_250_2190/model.yaml"
+ ],
+ "wall_total_s": 407.93484875932336,
+ "observed_peak_rss_mb": 28689.25,
+ "rep": 1
+}
