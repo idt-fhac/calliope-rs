@@ -1,4 +1,7 @@
+# agent planning files (kept local, not part of the repo)
 LEDGER.md
+PLAN.md
+SPEC.md
 .claude/
 .omo/
 /target
