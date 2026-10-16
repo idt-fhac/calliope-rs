@@ -284,3 +284,37 @@ pub fn check(
     }
     Ok(out)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::parity::{RunOutput, Runner, load_manifest};
+    use crate::runner::RustRunner;
+
+    #[test]
+    fn accepts_calliopes_point_and_rejects_a_worse_one() {
+        let reference = crate::reference();
+        if !reference.join("src/calliope").exists() {
+            eprintln!("skipping: no Calliope checkout");
+            return;
+        }
+        let f = load_manifest(&crate::workspace_root().join("golden"))
+            .unwrap()
+            .into_iter()
+            .find(|f| f.name == "test_model__simple_supply__two_hours")
+            .unwrap();
+        let runner = RustRunner { reference };
+        let (ok, lines) = runner
+            .verify_alternative_optimum(&f, &RunOutput::default())
+            .unwrap();
+        assert!(ok, "{lines:?}");
+
+        // Calliope's point with more capacity: not optimal (or beyond a bound).
+        let mut golden = Model::from_netcdf(&f.file("results.nc")).unwrap().results;
+        let cap = golden.arrays.get_mut("flow_cap").unwrap();
+        *cap = cap.map(|v| v * 2.0 + 1.0);
+        let mut model = Model::from_netcdf(&f.file("inputs.nc")).unwrap();
+        let checks = check(&mut model, &golden, &Results::default()).unwrap();
+        assert!(checks.iter().any(|c| !c.ok()), "{:?}", checks);
+    }
+}
