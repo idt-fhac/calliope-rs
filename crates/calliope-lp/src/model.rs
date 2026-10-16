@@ -99,17 +99,22 @@ impl fmt::Display for Label {
         s.push_str(self.kind.prefix());
         s.push('(');
         s.push_str(&self.component);
-        s.push_str(")(");
-        for (i, item) in self.index.iter().enumerate() {
-            if i > 0 {
-                s.push_str("__");
-            }
-            s.push_str(item);
-        }
-        if self.index.is_empty() {
-            s.push('0');
-        }
         s.push(')');
+        // Pyomo names a dimensionless component `name[0]` and Calliope's `verbose_strings`
+        // drops the `[0]` (`CoordObj._update_name`); objectives are never renamed.
+        if !self.index.is_empty() || self.kind == ComponentKind::Objective {
+            s.push('(');
+            for (i, item) in self.index.iter().enumerate() {
+                if i > 0 {
+                    s.push_str("__");
+                }
+                s.push_str(item);
+            }
+            if self.index.is_empty() {
+                s.push('0');
+            }
+            s.push(')');
+        }
         if let Some(sfx) = &self.suffix {
             s.push_str(sfx);
         }
