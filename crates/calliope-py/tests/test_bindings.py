@@ -408,3 +408,40 @@ def test_read_dict_and_errors():
     with pytest.raises(calliope_rs.ModelError, match="already has a built"):
         model.build()
         model.build()
+
+
+@needs_ref
+def test_upstream_data_tables_example_test():
+    """`tests/example_models/example_models_test.py` itself, for the data-table model,
+    with `calliope.read_yaml` swapped for `calliope_rs.read_yaml` (`rs_shim.py`)."""
+    pytest.importorskip("calliope")
+    import subprocess
+    import sys
+
+    env = dict(
+        os.environ, PYTHONPATH=str(Path(__file__).parent), PYTHONDONTWRITEBYTECODE="1"
+    )
+    run = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-p",
+            "rs_shim",
+            "-p",
+            "no:cacheprovider",
+            "-o",
+            "addopts=",
+            "-q",
+            "tests/example_models/example_models_test.py",
+            "-k",
+            "SenseChecks and nat_model_from_data_tables",
+        ],
+        cwd=REF,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert run.returncode == 0, run.stdout + run.stderr
+    assert " passed" in run.stdout
