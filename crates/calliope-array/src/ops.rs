@@ -110,6 +110,9 @@ impl<T: Element> LArray<T> {
         join: Join,
         f: impl Fn(&T, &U) -> V,
     ) -> LArray<V> {
+        if let Some(out) = self.zip_fast(other, &f) {
+            return out;
+        }
         let al = align(&self.dims, &other.dims, join);
         let shared: Vec<usize> = al
             .b_axes
@@ -170,6 +173,9 @@ impl<T: Element> LArray<T> {
         join: Join,
         f: impl Fn(Option<&T>, Option<&U>) -> V,
     ) -> LArray<V> {
+        if let Some(out) = self.zip_union_fast(other, &f) {
+            return out;
+        }
         let al = align(&self.dims, &other.dims, join);
         let b_only: Vec<usize> = (0..al.dims.len())
             .filter(|ax| !al.a_axes.contains(ax))
@@ -262,6 +268,9 @@ impl<T: Element> LArray<T> {
         if value.is_missing() {
             return self.clone();
         }
+        if self.n_sparse() > 0 || self.dense.is_some() {
+            return self.fillna_fast(&value);
+        }
         let filled: Vec<T> = self
             .to_dense()
             .into_iter()
@@ -277,6 +286,34 @@ impl<T: Element> LArray<T> {
             (None, Some(b)) => b.clone(),
             (None, None) => T::missing(),
         })
+    }
+
+    /// The per-key reduction, if the result keeps the time dimension consistent.
+    fn reduce_checked<U: Element>(
+        &self,
+        over: &[&str],
+        f: &impl Fn(&[&T]) -> U,
+    ) -> Result<Option<LArray<U>>, ArrayError> {
+        for d in over {
+            self.axis(d)?;
+        }
+        let kept: Vec<Coord> = self
+            .dims
+            .iter()
+            .filter(|d| !over.contains(&d.name()))
+            .cloned()
+            .collect();
+        let dense_kept = self
+            .dense
+            .is_some_and(|d| !over.contains(&self.dims[d].name()));
+        let rd = crate::array::pick_dense(&kept);
+        let consistent = match rd {
+            Some(i) => {
+                dense_kept && Some(kept[i].name()) == self.dense.map(|d| self.dims[d].name())
+            }
+            None => !dense_kept,
+        };
+        Ok(consistent.then(|| self.reduce_fast(over, f)))
     }
 
     /// Groups non-missing cells by the codes of the dims that remain after removing `over`.
@@ -306,6 +343,9 @@ impl<T: Element> LArray<T> {
         over: &[&str],
         f: impl Fn(&[&T]) -> U,
     ) -> Result<LArray<U>, ArrayError> {
+        if let Some(out) = self.reduce_checked(over, &f)? {
+            return Ok(out);
+        }
         let (dims, _, groups) = self.group_cells(over)?;
         let cells: Vec<(Vec<u32>, U)> = groups.into_iter().map(|(k, vs)| (k, f(&vs))).collect();
         LArray::from_cells(dims, cells)
@@ -450,6 +490,10 @@ impl LArray<f64> {
     /// (over the full product of the remaining dims); otherwise groups with fewer values are
     /// NaN.
     pub fn sum(&self, over: &[&str], min_count: usize) -> Result<LArray<f64>, ArrayError> {
+        if min_count <= 1 {
+            let out = self.reduce(over, |vs| vs.iter().copied().sum())?;
+            return Ok(if min_count == 0 { out.fillna(0.0) } else { out });
+        }
         let (dims, _, groups) = self.group_cells(over)?;
         let cells: Vec<(Vec<u32>, f64)> = groups
             .into_iter()
@@ -567,6 +611,9 @@ impl LArray<f64> {
 impl LArray<bool> {
     /// `any(over)`.
     pub fn any(&self, over: &[&str]) -> Result<LArray<bool>, ArrayError> {
+        if let Some(out) = self.reduce_checked(over, &|_: &[&bool]| true)? {
+            return Ok(out);
+        }
         let (dims, _, groups) = self.group_cells(over)?;
         LArray::from_cells(
             dims,

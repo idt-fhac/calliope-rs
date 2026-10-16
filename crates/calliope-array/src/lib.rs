@@ -49,6 +49,7 @@
 
 mod array;
 mod coord;
+mod fast;
 mod ops;
 
 pub use array::{Element, LArray};

@@ -122,6 +122,16 @@ impl<T: Element> LArray<T> {
         let dense = pick_dense(&dims);
         let n_sparse = dims.len() - usize::from(dense.is_some());
         let dlen = dense.map_or(1, |d| dims[d].len());
+        // Keys packed into a u64 (in lexicographic order) when the codes fit.
+        let bits: Vec<u32> = dims
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| Some(*i) != dense)
+            .map(|(_, d)| usize::BITS - d.len().leading_zeros())
+            .collect();
+        if bits.iter().sum::<u32>() <= 64 {
+            return Self::from_cells_packed(dims, dense, &bits, cells);
+        }
         let mut map: std::collections::BTreeMap<Vec<u32>, Vec<T>> = Default::default();
         for (codes, v) in cells {
             if codes.len() != dims.len() {
@@ -144,6 +154,72 @@ impl<T: Element> LArray<T> {
         for (k, v) in map {
             keys.extend(k);
             values.extend(v);
+        }
+        if n_sparse == 0 && values.is_empty() && dims.iter().all(|d| !d.is_empty()) {
+            values = vec![T::missing(); dlen];
+        }
+        Ok(Self {
+            dims,
+            dense,
+            keys,
+            values,
+        })
+    }
+
+    fn from_cells_packed(
+        dims: Vec<Coord>,
+        dense: Option<usize>,
+        bits: &[u32],
+        cells: impl IntoIterator<Item = (Vec<u32>, T)>,
+    ) -> Result<Self, ArrayError> {
+        let n_sparse = bits.len();
+        let dlen = dense.map_or(1, |d| dims[d].len());
+        let mut slot: std::collections::HashMap<u64, usize> = Default::default();
+        let mut rows: Vec<(u64, Vec<T>)> = Vec::new();
+        for (codes, v) in cells {
+            if codes.len() != dims.len() {
+                return Err(ArrayError::Shape("cell has wrong number of codes".into()));
+            }
+            let mut packed = 0u64;
+            let mut b = bits.iter();
+            let mut t = 0usize;
+            for (i, (c, d)) in codes.iter().zip(&dims).enumerate() {
+                if *c as usize >= d.len() {
+                    return Err(ArrayError::Shape(format!(
+                        "code {c} out of range for `{}`",
+                        d.name()
+                    )));
+                }
+                if Some(i) == dense {
+                    t = *c as usize;
+                } else {
+                    let w = *b.next().expect("one width per sparse dim");
+                    packed = if w == 64 {
+                        u64::from(*c)
+                    } else {
+                        (packed << w) | u64::from(*c)
+                    };
+                }
+            }
+            let idx = *slot.entry(packed).or_insert_with(|| {
+                rows.push((packed, vec![T::missing(); dlen]));
+                rows.len() - 1
+            });
+            rows[idx].1[t] = v;
+        }
+        rows.sort_unstable_by_key(|r| r.0);
+        let mut keys = Vec::with_capacity(rows.len() * n_sparse);
+        let mut values = Vec::with_capacity(rows.len() * dlen);
+        for (p, r) in rows {
+            let mut shift = 0u32;
+            let start = keys.len();
+            keys.resize(start + n_sparse, 0);
+            for (k, w) in bits.iter().enumerate().rev() {
+                let mask = if *w >= 64 { u64::MAX } else { (1u64 << w) - 1 };
+                keys[start + k] = u32::try_from((p >> shift) & mask).expect("fits");
+                shift += w;
+            }
+            values.extend(r);
         }
         if n_sparse == 0 && values.is_empty() && dims.iter().all(|d| !d.is_empty()) {
             values = vec![T::missing(); dlen];
