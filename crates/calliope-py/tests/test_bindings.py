@@ -445,3 +445,18 @@ def test_upstream_data_tables_example_test():
     )
     assert run.returncode == 0, run.stdout + run.stderr
     assert " passed" in run.stdout
+
+
+@needs_ref
+@pytest.mark.parametrize("fmt", ["md", "tex", "rst"])
+def test_math_documentation_matches_calliope(fmt):
+    """Math docs of a calliope_rs model (built by Python Calliope from its NetCDF) equal
+    those of the same model read by Calliope."""
+    calliope = pytest.importorskip("calliope")
+    from calliope.postprocess.math_documentation import MathDocumentation
+
+    path = EXAMPLES / "national_scale" / "model.yaml"
+    subset = {"timesteps": ["2005-01-01", "2005-01-01"]}
+    ours = calliope_rs.math_documentation(calliope_rs.read_yaml(path, subset=subset))
+    theirs = MathDocumentation(calliope.read_yaml(path, subset=subset))
+    assert ours.write(format=fmt) == theirs.write(format=fmt)
