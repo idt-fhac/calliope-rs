@@ -284,7 +284,11 @@ impl Dataset {
         for (name, v) in old {
             let src = dims_of(&v.dims, &old_coords);
             let dst = dims_of(&v.dims, &self.coords);
-            let data = super::array::conform_data(v.data, &src, &dst, DType::Float);
+            let data = if src == dst {
+                v.data
+            } else {
+                super::array::conform_data(&v.data, &src, &dst, DType::Float)
+            };
             self.vars.insert(name, Var { dims: v.dims, data });
         }
     }

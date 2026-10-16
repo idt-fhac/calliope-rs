@@ -447,13 +447,19 @@ impl Data {
         }
     }
 
+    /// True if `nnz` values in `len` cells are better stored sparsely.
+    pub fn is_sparse_enough(nnz: usize, len: usize) -> bool {
+        #[allow(clippy::cast_precision_loss)]
+        let sparse = len > 0 && (nnz as f64) <= SPARSE_MAX_DENSITY * len as f64;
+        sparse
+    }
+
     /// `float64` data stored sparsely if few cells hold a value; other data unchanged.
     pub fn into_sparse_if_sparse(self) -> Data {
         match self {
             Data::Float(v) => {
                 let nnz = v.iter().filter(|x| !x.is_nan()).count();
-                #[allow(clippy::cast_precision_loss)]
-                if !v.is_empty() && (nnz as f64) <= SPARSE_MAX_DENSITY * v.len() as f64 {
+                if Data::is_sparse_enough(nnz, v.len()) {
                     Data::Sparse(SparseF64::from_dense(&v))
                 } else {
                     Data::Float(v)

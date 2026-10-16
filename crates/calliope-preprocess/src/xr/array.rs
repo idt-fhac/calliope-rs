@@ -211,14 +211,27 @@ fn conform_sparse(s: &SparseF64, src: &[Coord], dst: &[Coord]) -> SparseF64 {
     SparseF64::from_pairs(total, pairs)
 }
 
-pub(crate) fn conform_data(data: Data, src: &[Coord], dst: &[Coord], fill: DType) -> Data {
-    if src == dst {
-        return data;
-    }
-    if let Data::Sparse(s) = &data {
+pub(crate) fn conform_data(data: &Data, src: &[Coord], dst: &[Coord], fill: DType) -> Data {
+    if let Data::Sparse(s) = data {
         return Data::Sparse(conform_sparse(s, src, dst));
     }
     let map = Mapping::new(src, dst);
+    // A float array reindexed into a mostly empty one (e.g. a data table's techs joined with
+    // all techs) is built sparse, without the dense intermediate.
+    if let Data::Float(v) = data
+        && map.any_missing()
+    {
+        // At most every stored value times the size of the new (broadcast) dims.
+        let broadcast: usize = dst
+            .iter()
+            .filter(|d| src.iter().all(|c| c.name() != d.name()))
+            .map(Coord::len)
+            .product();
+        let nnz = v.iter().filter(|x| !x.is_nan()).count();
+        if Data::is_sparse_enough(nnz.saturating_mul(broadcast), map.len()) {
+            return Data::Sparse(conform_sparse(&SparseF64::from_dense(v), src, dst));
+        }
+    }
     data.gather_iter(map.iter(), map.len(), map.any_missing(), fill)
 }
 
@@ -278,17 +291,9 @@ impl DataArray {
         if self.coords == dst {
             return self.clone();
         }
-        if let Data::Sparse(s) = &self.data {
-            return DataArray::new(
-                dst.to_vec(),
-                Data::Sparse(conform_sparse(s, &self.coords, dst)),
-            );
-        }
-        let map = Mapping::new(&self.coords, dst);
         DataArray::new(
             dst.to_vec(),
-            self.data
-                .gather_iter(map.iter(), map.len(), map.any_missing(), fill),
+            conform_data(&self.data, &self.coords, dst, fill),
         )
     }
 
