@@ -63,7 +63,7 @@ SPORES fixtures match to 1e-6 in every objective value.
 
 | ID | Class | Fixture | Finding |
 |---|---|---|---|
-| R1 | degenerate | `urban_scale` (and, until Phase 8, `national_scale_spores_evolving_average`) | Same LP (canonical diff equal; HiGHS LP written in the same column/row order), same objective, another optimal vertex. The model HiGHS receives differs only in rounding and row signs: highspy merges duplicate terms with a cumsum difference (`unique_elements`), so some coefficients differ in the last bits (e.g. `0.0249999999999999` vs `0.025`), and orients rows by its own "most terms first" rules (`area_use == flow_cap * k` becomes `k*flow_cap - area_use = 0`). With HiGHS 1.15.0 vs Calliope's 1.15.1 that is enough to end on another vertex. In SPORES, SPORE 1 had equal objectives but `flow_cap` differed by 0.1% in one cell; `evolving_average` scores depend on capacities, so SPORE 2's `min_spores` differed by 1.4e-5. That case came from the last-bit CSV input differences of P1 and passes since they are fixed. |
+| R1 | degenerate | `urban_scale` (and, until Phase 8, `national_scale_spores_evolving_average`) | Same LP (canonical diff equal; HiGHS LP written in the same column/row order), same objective, another optimal vertex. The model HiGHS receives differs only in rounding and row signs: highspy merges duplicate terms with a cumsum difference (`unique_elements`), so some coefficients differ in the last bits (e.g. `0.0249999999999999` vs `0.025`), and orients rows by its own "most terms first" rules (`area_use == flow_cap * k` becomes `k*flow_cap - area_use = 0`). With HiGHS 1.15.0 vs Calliope's 1.15.1 that is enough to end on another vertex. In SPORES, SPORE 1 had equal objectives but `flow_cap` differed by 0.1% in one cell; `evolving_average` scores depend on capacities, so SPORE 2's `min_spores` differed by 1.4e-5. The objective difference came from the last-bit CSV input differences of P1 and is gone since they are fixed; the vertex still differs. |
 | R2 | solver | `docs_piecewise` | The golden run is Pyomo + CBC (SOS2); the port solves with HiGHS, SOS2 as binaries. Same objective, 8 cells differ. |
 | R3 | Calliope bug | `national_scale_check_feasibility` | bench/BUGS.md #14: the objective does not exist, so both solve a zero objective and any feasible point is optimal; the reported `min_cost_optimisation` (254838 vs 287661) depends on the point. The port logs a warning. |
 | R4 | MIP gap | `urban_scale_milp` | `mip_rel_gap = 0.05`: 901.51 (Calliope) vs 901.67, both within the gap. |
@@ -124,7 +124,7 @@ the oracle and read-only here. It is covered by the tests above and by
 
 | ID | Class | Finding |
 |---|---|---|
-| P1 | pandas quirk | pandas' default CSV float converter (`precise_xstrtod`) keeps 17 significant digits and counts leading zeros as digits, so `0.17191199999999998` reads as `0.1719119999999999`, which is not correctly rounded. The port now parses CSV floats the same way, and the golden fixture inputs match bit for bit (before: within 1e-12). As a result `national_scale_spores_evolving_average` reaches Calliope's vertex and is no longer classified: `xtask parity` gives 94 passed, 13 classified, 0 failed (was 93/14/0). One `source_unit: per_cap` scaling in the math LP fixtures still differs in the last bit (`19.200000000000003` vs `…06`). |
+| P1 | pandas quirk | pandas' default CSV float converter (`precise_xstrtod`) keeps 17 significant digits and counts leading zeros as digits, so `0.17191199999999998` reads as `0.1719119999999999`, which is not correctly rounded. The port now parses CSV floats the same way, and the golden fixture inputs match bit for bit (before: within 1e-12). As a result the objectives of `national_scale_spores_evolving_average` match Calliope's in every SPORE (before, SPORE 2's `min_spores` differed by 1.4e-5). Its result arrays still differ: it ends on another optimal point, like the other SPORES fixtures (see "Alternative optima" below). One `source_unit: per_cap` scaling in the math LP fixtures still differs in the last bit (`19.200000000000003` vs `…06`). |
 | P2 | HiGHS | HiGHS keeps one scheduler per thread, which lives as long as any instance uses it. A `threads` option that differs from the running scheduler's makes `Highs_run` fail with "global scheduler has already been initialized" (as in highspy). This happens when several models are solved one after another, e.g. from Python. The backend restarts the scheduler when `threads` changes. |
 
 Deviations and extensions:
@@ -151,3 +151,39 @@ Not done:
   `unique_elements` cumsum and its row signs would make the model HiGHS receives
   bit-identical. The goldens were solved with HiGHS 1.15.1 and the port links 1.15.0,
   though, so the same vertex is still not guaranteed. Left classified.
+
+## Alternative optima, verified (2026-10-16)
+
+Until now, `xtask parity` reported operate and SPORES result arrays without failing on
+them. Now any array difference fails unless the fixture is classified in
+`crates/xtask/src/known.rs`. The classification `AlternativeOptimum` holds only while a
+check passes on every run (`crates/xtask/src/altopt.rs`). For each solve (base mode, or
+each SPORE) the check:
+
+1. rebuilds the problem Calliope solved with calliope-rs, using the scores and cost budget
+   from Calliope's results for that SPORE (`spores_score_cumulative`,
+   `spores_baseline_cost_tracked`);
+2. solves it with calliope-rs;
+3. puts Calliope's decision-variable values from `results.nc` into the port's LP and
+   evaluates every row, bound and the objective.
+
+It passes when every column has a value, no row or bound is violated by more than 1e-6
+(scaled by `max(1, |bound|)`), and Calliope's objective value equals the port's optimum
+to 1e-6 relative. In that case Calliope's solution is feasible and optimal in the port's
+LP, and the two runs differ only in which optimal point HiGHS returned.
+
+| Fixture | Solves | Max row violation | Max objective gap | Scores used by the port's own run |
+|---|---|---|---|---|
+| `urban_scale` | 1 | 1.5e-13 | 0 | – |
+| `national_scale_spores_integer` | SPORE 0–3 | 1.5e-9 | 1.3e-16 | equal |
+| `national_scale_spores_random` | SPORE 0–3 | 9.6e-10 | 1.5e-16 | equal |
+| `national_scale_spores_relative_deployment` | SPORE 0–3 | 7.9e-10 | 2.4e-16 | equal to 1e-14 |
+| `national_scale_spores_evolving_average` | SPORE 0–3 | 5.8e-10 | 9.6e-16 | equal to 2e-11 |
+
+No column lacks a value and no column bound is violated. The SPORES scores of the
+port's own run match Calliope's to rounding, even where an earlier SPORE ended on
+another vertex, so each SPORE solves the same LP in both. The operate fixtures' result
+arrays match Calliope's. `xtask parity` now gives 90 passed, 17 classified, 0 failed:
+the four SPORES fixtures moved from "pass with notes" to classified.
+`docs_piecewise` stays classified as `Arrays` without this check, because Calliope's
+solution there (Pyomo + CBC, SOS2) has no values for the port's SOS2 binaries.
