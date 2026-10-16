@@ -341,3 +341,99 @@ fn lp_diff_equal_files() {
     let o = run(&["lp-diff", f.to_str().unwrap(), f.to_str().unwrap()]);
     assert!(o.status.success(), "{}", stdout(&o));
 }
+
+const ONE_DAY: &str =
+    "--override_dict={'config.init.subset.timesteps': ['2005-01-01', '2005-01-01']}";
+
+#[test]
+fn run_shows_solver_output_unless_quiet() {
+    let Some(m) = national() else { return };
+    let o = run(&["run", m.to_str().unwrap(), ONE_DAY]);
+    assert!(o.status.success());
+    assert!(stdout(&o).contains("HiGHS"), "{}", stdout(&o));
+    let o = run(&["run", m.to_str().unwrap(), ONE_DAY, "--quiet"]);
+    assert!(o.status.success());
+    assert!(!stdout(&o).contains("HiGHS"), "{}", stdout(&o));
+}
+
+#[test]
+fn inspect_shows_equations_index_set_and_rows() {
+    let Some(m) = national() else { return };
+    let o = run(&[
+        "inspect",
+        m.to_str().unwrap(),
+        ONE_DAY,
+        "--component",
+        "balance_supply_with_storage",
+        "--max",
+        "2",
+    ]);
+    let out = stdout(&o);
+    assert!(o.status.success(), "{out}");
+    assert!(
+        out.starts_with("constraints.balance_supply_with_storage\n"),
+        "{out}"
+    );
+    assert!(out.contains("expanded equations (3):"), "{out}");
+    assert!(
+        out.contains("constraints:balance_supply_with_storage:0-storage_previous_step:1"),
+        "{out}"
+    );
+    // csp at three nodes for 24 hours.
+    assert!(
+        out.contains("active index set: 72 of 960 foreach combinations"),
+        "{out}"
+    );
+    assert!(
+        out.contains("  [region1_1, csp, power, 2005-01-01 00:00]\n"),
+        "{out}"
+    );
+    assert!(out.contains("== 0\n"), "{out}");
+    assert!(out.contains("... 70 more (--max)"), "{out}");
+
+    let o = run(&[
+        "inspect",
+        m.to_str().unwrap(),
+        ONE_DAY,
+        "--component",
+        "flow_cap",
+    ]);
+    let out = stdout(&o);
+    assert!(
+        out.contains("0 <= variables(flow_cap)(region1__ccgt__power) <= 30000"),
+        "{out}"
+    );
+
+    let o = run(&[
+        "inspect",
+        m.to_str().unwrap(),
+        ONE_DAY,
+        "--component",
+        "nope",
+    ]);
+    assert_eq!(o.status.code(), Some(1));
+    assert!(
+        stdout(&o).contains("`nope` is not an active"),
+        "{}",
+        stdout(&o)
+    );
+}
+
+#[test]
+fn bench_reports_each_stage() {
+    let Some(m) = national() else { return };
+    let o = run(&["bench", m.to_str().unwrap(), ONE_DAY, "--json"]);
+    let out = stdout(&o);
+    assert!(o.status.success(), "{out}");
+    for stage in ["preprocess", "build", "solve", "write"] {
+        assert!(
+            out.contains(&format!("\"{stage}\": {{\"wall_s\": ")),
+            "{out}"
+        );
+    }
+    assert!(out.contains("\"total_wall_s\": "), "{out}");
+    let o = run(&["bench", m.to_str().unwrap(), ONE_DAY]);
+    let out = stdout(&o);
+    assert!(out.contains("Model name:"), "{out}");
+    assert!(out.lines().any(|l| l.starts_with("total ")), "{out}");
+}
