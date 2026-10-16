@@ -132,7 +132,7 @@ Deviations and extensions:
 | Where | Calliope | calliope-rs |
 |---|---|---|
 | HiGHS output | highspy prints the banner and log unless `output_flag: false` | Quiet unless `solver_options.output_flag: true`. `calliope run` sets it unless `--quiet`, as Python's CLI shows solver output. |
-| Parquet data tables | Not supported: a non-CSV `table` must be a `data_table_dfs` key | `*.parquet` tables are read as `pd.read_parquet` reads a file that `DataFrame.to_parquet` wrote. The pandas metadata restores index levels and MultiIndex columns. Built with the `parquet` crate without arrow, snappy only (feature `parquet`, on by default, about 12 s of build and 30 small crates). |
+| Parquet data tables | Not supported: a non-CSV `table` must be a `data_table_dfs` key | `*.parquet` tables are read as `pd.read_parquet` reads a file that `DataFrame.to_parquet` wrote. The pandas metadata restores index levels and MultiIndex columns. Built with the `parquet` crate without arrow, snappy only (feature `parquet`, on by default, about 12 s of build and 40 small crates in `Cargo.lock`). |
 | Backend interface (Python) | `as_backend_objs=True` returns solver objects | Values only. `True` raises `NotImplementedError`, and `get_constraint` returns `lb`/`ub`/`body`. |
 | `calliope inspect` / `calliope bench` | none | `inspect` prints one component: its definition, the expanded equations, the active index set and the LP rows/columns/expressions of the first items. `bench` reports wall time and per-stage peak RSS (`VmHWM`, reset through `/proc/self/clear_refs`) for preprocess, build, solve and write, as a table or `--json`. |
 
