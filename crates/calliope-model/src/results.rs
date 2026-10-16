@@ -40,6 +40,7 @@ impl Results {
             let dims: Vec<Coord> = var.dims.iter().map(|d| ds.coords[d].clone()).collect();
             let values: Vec<f64> = match &var.data {
                 Data::Float(v) => v.clone(),
+                Data::Sparse(s) => s.to_dense(),
                 #[allow(clippy::cast_precision_loss)]
                 Data::Int(v) => v.iter().map(|i| *i as f64).collect(),
                 Data::Bool(v) => v.iter().map(|b| f64::from(u8::from(*b))).collect(),

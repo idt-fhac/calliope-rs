@@ -76,7 +76,7 @@ impl Dataset {
                     .unwrap_or_else(|| c.clone())
             })
             .collect();
-        let da = da.conform(&dst, DType::Float);
+        let da = da.conform_into(&dst, DType::Float);
         for c in &dst {
             self.coords
                 .entry(c.name().to_owned())
@@ -97,6 +97,17 @@ impl Dataset {
                 },
             );
         }
+    }
+
+    /// A variable as an array, moved out: the variable keeps its place (and dims) but holds
+    /// no values until [`Dataset::set`] puts an array back.
+    pub fn take(&mut self, name: &str) -> Option<DataArray> {
+        let v = self.vars.get_mut(name)?;
+        let data = std::mem::replace(&mut v.data, Data::Float(Vec::new()));
+        Some(DataArray::new(
+            v.dims.iter().map(|d| self.coords[d].clone()).collect(),
+            data,
+        ))
     }
 
     /// Removes a variable.
@@ -142,7 +153,7 @@ impl Dataset {
         let names: Vec<String> = self.vars.keys().cloned().collect();
         for name in names {
             if self.vars[&name].dims.iter().any(|d| d == dim) {
-                let da = self.get(&name).expect("exists").reindex(&new);
+                let da = self.take(&name).expect("exists").reindex_into(&new);
                 self.vars[&name].data = da.data;
             }
         }
@@ -228,16 +239,54 @@ impl Dataset {
     }
 
     /// `Dataset.fillna(other)`: missing values of shared variables are taken from `other`.
-    pub fn fillna(&self, other: &Dataset) -> Dataset {
-        let mut out = self.clone();
-        for name in self.vars.keys() {
-            if let Some(o) = other.get(name) {
-                let a = self.get(name).expect("exists");
-                let filled = a.fillna(&o);
-                out.set(name, filled);
+    pub fn fillna(mut self, other: &Dataset) -> Dataset {
+        for name in self.names() {
+            if let Some(o) = other.get(&name) {
+                let a = self.take(&name).expect("exists");
+                self.set(&name, a.fillna_into(&o));
             }
         }
-        out
+        self
+    }
+
+    /// `xr.merge([new, self], join="outer", compat="override").fillna(self)`, in place:
+    /// variables of `new` come first and win, their missing values are filled from `self`;
+    /// other variables are reindexed to the joined coordinates only where these changed.
+    pub fn merge_over(&mut self, new: Dataset) {
+        let mut coords: IndexMap<String, Coord> = new.coords.clone();
+        for (name, c) in &self.coords {
+            let j = match coords.get(name) {
+                Some(prev) => join_coords(prev, c, Join::Outer),
+                None => c.clone(),
+            };
+            coords.insert(name.clone(), j);
+        }
+        let mut old = std::mem::take(&mut self.vars);
+        let old_coords = std::mem::replace(&mut self.coords, coords);
+        let dims_of = |dims: &[String], coords: &IndexMap<String, Coord>| -> Vec<Coord> {
+            dims.iter().map(|d| coords[d].clone()).collect()
+        };
+        let mut new = new;
+        let new_names = new.names();
+        for name in &new_names {
+            let v = new.vars.shift_remove(name).expect("listed");
+            let da = DataArray::new(dims_of(&v.dims, &new.coords), v.data);
+            let da = da.conform_into(&dims_of(&v.dims, &self.coords), DType::Float);
+            let filled = match old.shift_remove(name) {
+                Some(o) => {
+                    let o = DataArray::new(dims_of(&o.dims, &old_coords), o.data);
+                    da.fillna_into(&o)
+                }
+                None => da,
+            };
+            self.set(name, filled);
+        }
+        for (name, v) in old {
+            let src = dims_of(&v.dims, &old_coords);
+            let dst = dims_of(&v.dims, &self.coords);
+            let data = super::array::conform_data(v.data, &src, &dst, DType::Float);
+            self.vars.insert(name, Var { dims: v.dims, data });
+        }
     }
 
     /// Data variable names.

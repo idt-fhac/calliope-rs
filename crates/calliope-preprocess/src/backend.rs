@@ -68,7 +68,20 @@ pub fn math_inputs(ds: &Dataset, math: &CalliopeBuildMath) -> Result<Inputs, Mod
         let dims: Vec<Coord> = var.dims.iter().map(|d| ds.coords[d].clone()).collect();
         let err = |e: calliope_array::ArrayError| ModelError::new(format!("{name}: {e}"));
         let v = match &var.data {
-            Data::Float(v) => Value::Num(LArray::from_dense(dims, v.clone()).map_err(err)?),
+            Data::Float(v) => Value::Num(
+                LArray::from_cells(
+                    dims.clone(),
+                    v.iter()
+                        .enumerate()
+                        .filter(|(_, x)| !x.is_nan())
+                        .map(|(i, x)| (codes(&dims, i), *x)),
+                )
+                .map_err(err)?,
+            ),
+            Data::Sparse(s) => Value::Num(
+                LArray::from_cells(dims.clone(), s.iter().map(|(i, x)| (codes(&dims, i), x)))
+                    .map_err(err)?,
+            ),
             #[allow(clippy::cast_precision_loss)]
             Data::Int(v) => Value::Num(
                 LArray::from_dense(dims, v.iter().map(|i| *i as f64).collect()).map_err(err)?,
@@ -90,6 +103,17 @@ pub fn math_inputs(ds: &Dataset, math: &CalliopeBuildMath) -> Result<Inputs, Mod
         arrays.insert(name.clone(), v);
     }
     Ok(Inputs::new(coords, arrays, math))
+}
+
+/// The per-dimension codes of flat (C order) position `i` over `dims`.
+fn codes(dims: &[Coord], mut i: usize) -> Vec<u32> {
+    let mut out = vec![0u32; dims.len()];
+    for (k, d) in dims.iter().enumerate().rev() {
+        let n = d.len();
+        out[k] = u32::try_from(i % n).expect("codes fit in u32");
+        i /= n;
+    }
+    out
 }
 
 fn obj_label(o: &Obj) -> Option<Label> {

@@ -250,8 +250,84 @@ impl fmt::Display for DType {
     }
 }
 
+/// `float64` values stored sparsely: the flat positions (ascending) and values of the
+/// non-missing cells of an array of `len` cells. Equivalent to a dense `float64` vector with
+/// NaN everywhere else.
+#[derive(Debug, Clone, Default)]
+pub struct SparseF64 {
+    /// Number of cells.
+    pub len: usize,
+    /// Flat positions of the stored values, strictly ascending.
+    pub idx: Vec<usize>,
+    /// Values (never NaN).
+    pub val: Vec<f64>,
+}
+
+impl SparseF64 {
+    /// The non-NaN values of `v`.
+    pub fn from_dense(v: &[f64]) -> Self {
+        let mut s = SparseF64 {
+            len: v.len(),
+            ..SparseF64::default()
+        };
+        for (i, x) in v.iter().enumerate() {
+            if !x.is_nan() {
+                s.idx.push(i);
+                s.val.push(*x);
+            }
+        }
+        s
+    }
+
+    /// From `(position, value)` pairs in any order (NaN values are dropped; for repeated
+    /// positions the last value wins).
+    pub fn from_pairs(len: usize, mut pairs: Vec<(usize, f64)>) -> Self {
+        if !pairs.windows(2).all(|w| w[0].0 < w[1].0) {
+            pairs.sort_by_key(|p| p.0);
+            let mut dedup: Vec<(usize, f64)> = Vec::with_capacity(pairs.len());
+            for p in pairs {
+                match dedup.last_mut() {
+                    Some(last) if last.0 == p.0 => *last = p,
+                    _ => dedup.push(p),
+                }
+            }
+            pairs = dedup;
+        }
+        let (idx, val) = pairs.into_iter().filter(|p| !p.1.is_nan()).unzip();
+        SparseF64 { len, idx, val }
+    }
+
+    /// Value at `i` (NaN if not stored).
+    pub fn get(&self, i: usize) -> f64 {
+        self.idx.binary_search(&i).map_or(f64::NAN, |k| self.val[k])
+    }
+
+    /// Number of stored values.
+    pub fn nnz(&self) -> usize {
+        self.idx.len()
+    }
+
+    /// Dense values (NaN where not stored).
+    pub fn to_dense(&self) -> Vec<f64> {
+        let mut v = vec![f64::NAN; self.len];
+        for (&i, &x) in self.idx.iter().zip(&self.val) {
+            v[i] = x;
+        }
+        v
+    }
+
+    /// Stored `(position, value)` pairs.
+    pub fn iter(&self) -> impl Iterator<Item = (usize, f64)> + '_ {
+        self.idx.iter().copied().zip(self.val.iter().copied())
+    }
+}
+
+/// Sparse storage pays off when at most this share of the cells holds a value (16 bytes per
+/// stored value against 8 per cell).
+const SPARSE_MAX_DENSITY: f64 = 0.25;
+
 /// A flat vector of values of one dtype.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum Data {
     /// `bool` (no missing values).
     Bool(Vec<bool>),
@@ -263,6 +339,26 @@ pub enum Data {
     Datetime(Vec<i64>),
     /// `object`.
     Object(Vec<Obj>),
+    /// `float64`, only the non-missing values stored ([`SparseF64`]).
+    Sparse(SparseF64),
+}
+
+/// Values compare as numpy arrays would with `==` on every cell (so NaN is never equal);
+/// sparse and dense `float64` data compare by value.
+impl PartialEq for Data {
+    fn eq(&self, other: &Data) -> bool {
+        match (self, other) {
+            (Data::Bool(a), Data::Bool(b)) => a == b,
+            (Data::Int(a), Data::Int(b)) | (Data::Datetime(a), Data::Datetime(b)) => a == b,
+            (Data::Float(a), Data::Float(b)) => a == b,
+            (Data::Object(a), Data::Object(b)) => a == b,
+            (Data::Sparse(a), Data::Sparse(b)) => a.to_dense() == b.to_dense(),
+            (Data::Sparse(a), Data::Float(b)) | (Data::Float(b), Data::Sparse(a)) => {
+                a.to_dense() == *b
+            }
+            _ => false,
+        }
+    }
 }
 
 impl Data {
@@ -274,6 +370,7 @@ impl Data {
             Data::Float(v) => v.len(),
             Data::Datetime(v) => v.len(),
             Data::Object(v) => v.len(),
+            Data::Sparse(s) => s.len,
         }
     }
 
@@ -287,7 +384,7 @@ impl Data {
         match self {
             Data::Bool(_) => DType::Bool,
             Data::Int(_) => DType::Int,
-            Data::Float(_) => DType::Float,
+            Data::Float(_) | Data::Sparse(_) => DType::Float,
             Data::Datetime(_) => DType::Datetime,
             Data::Object(_) => DType::Object,
         }
@@ -307,6 +404,7 @@ impl Data {
                 }
             }
             Data::Object(v) => v[i].clone(),
+            Data::Sparse(s) => Obj::float(s.get(i)),
         }
     }
 
@@ -317,6 +415,51 @@ impl Data {
             Data::Float(v) => v[i].is_nan(),
             Data::Datetime(v) => v[i] == NAT,
             Data::Object(v) => v[i].is_null(),
+            Data::Sparse(s) => s.idx.binary_search(&i).is_err(),
+        }
+    }
+
+    /// True if every value is missing.
+    pub fn all_null(&self) -> bool {
+        match self {
+            Data::Bool(v) => v.is_empty(),
+            Data::Int(v) => v.is_empty(),
+            Data::Float(v) => v.iter().all(|x| x.is_nan()),
+            Data::Datetime(v) => v.iter().all(|x| *x == NAT),
+            Data::Object(v) => v.iter().all(Obj::is_null),
+            Data::Sparse(s) => s.idx.is_empty(),
+        }
+    }
+
+    /// The data with sparse values made dense (other data unchanged).
+    pub fn into_dense(self) -> Data {
+        match self {
+            Data::Sparse(s) => Data::Float(s.to_dense()),
+            d => d,
+        }
+    }
+
+    /// The data, dense (borrowed unless sparse).
+    pub fn dense(&self) -> std::borrow::Cow<'_, Data> {
+        match self {
+            Data::Sparse(s) => std::borrow::Cow::Owned(Data::Float(s.to_dense())),
+            d => std::borrow::Cow::Borrowed(d),
+        }
+    }
+
+    /// `float64` data stored sparsely if few cells hold a value; other data unchanged.
+    pub fn into_sparse_if_sparse(self) -> Data {
+        match self {
+            Data::Float(v) => {
+                let nnz = v.iter().filter(|x| !x.is_nan()).count();
+                #[allow(clippy::cast_precision_loss)]
+                if !v.is_empty() && (nnz as f64) <= SPARSE_MAX_DENSITY * v.len() as f64 {
+                    Data::Sparse(SparseF64::from_dense(&v))
+                } else {
+                    Data::Float(v)
+                }
+            }
+            d => d,
         }
     }
 
@@ -338,42 +481,66 @@ impl Data {
     /// `fill_dtype` (`float64` for xarray alignment, see [`DType::with_missing`]).
     pub fn gather(&self, idx: &[Option<usize>], fill_dtype: DType) -> Data {
         let any_missing = idx.iter().any(Option::is_none);
+        self.gather_iter(idx.iter().copied(), idx.len(), any_missing, fill_dtype)
+    }
+
+    /// [`Data::gather`] over `n` positions from an iterator; `any_missing` must be true iff
+    /// it yields a `None`.
+    pub fn gather_iter(
+        &self,
+        idx: impl Iterator<Item = Option<usize>>,
+        n: usize,
+        any_missing: bool,
+        fill_dtype: DType,
+    ) -> Data {
+        if let Data::Sparse(s) = self {
+            let pairs: Vec<(usize, f64)> = idx
+                .enumerate()
+                .filter_map(|(k, i)| i.map(|i| (k, s.get(i))))
+                .filter(|p| !p.1.is_nan())
+                .collect();
+            return Data::Sparse(SparseF64::from_pairs(n, pairs));
+        }
         if !any_missing {
+            let mut idx = idx.map(|i| i.unwrap_or(0));
             return match self {
-                Data::Bool(v) => Data::Bool(idx.iter().map(|i| v[i.unwrap_or(0)]).collect()),
-                Data::Int(v) => Data::Int(idx.iter().map(|i| v[i.unwrap_or(0)]).collect()),
-                Data::Float(v) => Data::Float(idx.iter().map(|i| v[i.unwrap_or(0)]).collect()),
-                Data::Datetime(v) => {
-                    Data::Datetime(idx.iter().map(|i| v[i.unwrap_or(0)]).collect())
-                }
-                Data::Object(v) => {
-                    Data::Object(idx.iter().map(|i| v[i.unwrap_or(0)].clone()).collect())
-                }
+                Data::Bool(v) => Data::Bool(idx.by_ref().map(|i| v[i]).collect()),
+                Data::Int(v) => Data::Int(idx.by_ref().map(|i| v[i]).collect()),
+                Data::Float(v) => Data::Float(idx.by_ref().map(|i| v[i]).collect()),
+                Data::Datetime(v) => Data::Datetime(idx.by_ref().map(|i| v[i]).collect()),
+                Data::Object(v) => Data::Object(idx.by_ref().map(|i| v[i].clone()).collect()),
+                Data::Sparse(_) => unreachable!("handled above"),
             };
         }
         match (self, fill_dtype) {
-            (Data::Float(v), _) => {
-                Data::Float(idx.iter().map(|i| i.map_or(f64::NAN, |i| v[i])).collect())
-            }
+            (Data::Float(v), _) => Data::Float(idx.map(|i| i.map_or(f64::NAN, |i| v[i])).collect()),
             (Data::Datetime(v), _) => {
-                Data::Datetime(idx.iter().map(|i| i.map_or(NAT, |i| v[i])).collect())
+                Data::Datetime(idx.map(|i| i.map_or(NAT, |i| v[i])).collect())
             }
-            (Data::Object(v), _) => Data::Object(
-                idx.iter()
-                    .map(|i| i.map_or(Obj::Nan, |i| v[i].clone()))
+            (Data::Object(v), _) => {
+                Data::Object(idx.map(|i| i.map_or(Obj::Nan, |i| v[i].clone())).collect())
+            }
+            (d, DType::Object) => {
+                Data::Object(idx.map(|i| i.map_or(Obj::Nan, |i| d.get(i))).collect())
+            }
+            (Data::Bool(v), _) => Data::Float(
+                idx.map(|i| i.map_or(f64::NAN, |i| f64::from(u8::from(v[i]))))
                     .collect(),
             ),
-            (d, DType::Object) => Data::Object(
-                idx.iter()
-                    .map(|i| i.map_or(Obj::Nan, |i| d.get(i)))
-                    .collect(),
-            ),
-            (d, _) => Data::Float(
-                idx.iter()
-                    .map(|i| i.map_or(f64::NAN, |i| d.get(i).as_f64().unwrap_or(f64::NAN)))
-                    .collect(),
-            ),
+            #[allow(clippy::cast_precision_loss)]
+            (Data::Int(v), _) => {
+                Data::Float(idx.map(|i| i.map_or(f64::NAN, |i| v[i] as f64)).collect())
+            }
+            (Data::Sparse(_), _) => unreachable!("handled above"),
         }
+    }
+
+    /// [`Data::cast`] by value: no copy when the dtype is already `dtype`.
+    pub fn cast_into(self, dtype: DType) -> Result<Data, String> {
+        if self.dtype() == dtype {
+            return Ok(self);
+        }
+        self.cast(dtype)
     }
 
     /// Values converted to `dtype` (numpy `astype`, without the string case).
@@ -497,7 +664,19 @@ impl Data {
 
     /// Mask of non-missing values.
     pub fn notnull(&self) -> Vec<bool> {
-        (0..self.len()).map(|i| !self.is_null(i)).collect()
+        match self {
+            Data::Bool(v) => vec![true; v.len()],
+            Data::Int(v) => vec![true; v.len()],
+            Data::Float(v) => v.iter().map(|x| !x.is_nan()).collect(),
+            Data::Sparse(s) => {
+                let mut m = vec![false; s.len];
+                for &i in &s.idx {
+                    m[i] = true;
+                }
+                m
+            }
+            d => (0..d.len()).map(|i| !d.is_null(i)).collect(),
+        }
     }
 
     /// The float values (bools and ints converted), if numeric.
@@ -509,6 +688,7 @@ impl Data {
             Data::Bool(v) => Some(v.iter().map(|x| f64::from(u8::from(*x))).collect()),
             Data::Object(v) => v.iter().map(Obj::as_f64).collect(),
             Data::Datetime(_) => None,
+            Data::Sparse(s) => Some(s.to_dense()),
         }
     }
 }

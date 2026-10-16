@@ -2,7 +2,7 @@
 
 use calliope_array::{Coord, Label};
 
-use super::data::{DType, Data, Obj};
+use super::data::{DType, Data, Obj, SparseF64};
 
 /// How shared dimensions are aligned.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -69,56 +69,157 @@ pub(crate) fn strides(shape: &[usize]) -> Vec<usize> {
     s
 }
 
-/// For each cell of `dst`, the flat position in `src` (`None` if a label of `src` is
-/// missing in `dst`'s position). The dims of `src` must all be in `dst`.
-pub(crate) fn mapping(src: &[Coord], dst: &[Coord]) -> Vec<Option<usize>> {
+/// Maps the cells of `dst` (in C order) to flat positions in `src`, whose dims must all be
+/// in `dst` (`None` where a label of `dst` is not in `src`). Iterates without allocating per
+/// cell.
+#[derive(Debug, Clone)]
+pub(crate) struct Mapping {
+    /// Per `dst` axis: offset into `src` per label (`None`: not in `src`), or `None` for
+    /// axes `src` does not have.
+    per_axis: Vec<Option<Vec<Option<usize>>>>,
+    dst_shape: Vec<usize>,
+    total: usize,
+    any_missing: bool,
+}
+
+impl Mapping {
+    pub(crate) fn new(src: &[Coord], dst: &[Coord]) -> Self {
+        let src_shape: Vec<usize> = src.iter().map(Coord::len).collect();
+        let src_strides = strides(&src_shape);
+        let dst_shape: Vec<usize> = dst.iter().map(Coord::len).collect();
+        let total: usize = dst_shape.iter().product();
+        let mut per_axis: Vec<Option<Vec<Option<usize>>>> = vec![None; dst.len()];
+        for (si, sc) in src.iter().enumerate() {
+            let di = dst
+                .iter()
+                .position(|d| d.name() == sc.name())
+                .expect("source dims are a subset of destination dims");
+            let offs: Vec<Option<usize>> = if dst[di] == *sc {
+                (0..sc.len()).map(|c| Some(c * src_strides[si])).collect()
+            } else {
+                dst[di]
+                    .labels()
+                    .iter()
+                    .map(|l| sc.code(l).map(|c| c as usize * src_strides[si]))
+                    .collect()
+            };
+            per_axis[di] = Some(offs);
+        }
+        let any_missing = total > 0
+            && per_axis
+                .iter()
+                .flatten()
+                .any(|offs| offs.iter().any(Option::is_none));
+        Self {
+            per_axis,
+            dst_shape,
+            total,
+            any_missing,
+        }
+    }
+
+    /// Number of `dst` cells.
+    pub(crate) fn len(&self) -> usize {
+        self.total
+    }
+
+    /// True if some `dst` cell has no source.
+    pub(crate) fn any_missing(&self) -> bool {
+        self.any_missing
+    }
+
+    /// The source position of every `dst` cell, in C order.
+    pub(crate) fn iter(&self) -> impl Iterator<Item = Option<usize>> + '_ {
+        let mut idx = vec![0usize; self.dst_shape.len()];
+        (0..self.total).map(move |_| {
+            let mut flat = Some(0usize);
+            for (ax, offs) in self.per_axis.iter().enumerate() {
+                if let Some(offs) = offs {
+                    flat = match (flat, offs[idx[ax]]) {
+                        (Some(f), Some(o)) => Some(f + o),
+                        _ => None,
+                    };
+                }
+            }
+            for ax in (0..idx.len()).rev() {
+                idx[ax] += 1;
+                if idx[ax] < self.dst_shape[ax] {
+                    break;
+                }
+                idx[ax] = 0;
+            }
+            flat
+        })
+    }
+}
+
+/// Sparse values over `src` placed on `dst` (a superset of the dims, any labels and order):
+/// values whose labels are not in `dst` are dropped, new dims are broadcast.
+fn conform_sparse(s: &SparseF64, src: &[Coord], dst: &[Coord]) -> SparseF64 {
     let src_shape: Vec<usize> = src.iter().map(Coord::len).collect();
     let src_strides = strides(&src_shape);
     let dst_shape: Vec<usize> = dst.iter().map(Coord::len).collect();
+    let dst_strides = strides(&dst_shape);
     let total: usize = dst_shape.iter().product();
-    // Per dst axis: offset contribution per label (None if label not in src coord).
-    let mut per_axis: Vec<Option<Vec<Option<usize>>>> = vec![None; dst.len()];
-    for (si, sc) in src.iter().enumerate() {
-        let di = dst
-            .iter()
-            .position(|d| d.name() == sc.name())
-            .expect("source dims are a subset of destination dims");
-        let offs: Vec<Option<usize>> = if dst[di] == *sc {
-            (0..sc.len()).map(|c| Some(c * src_strides[si])).collect()
-        } else {
-            dst[di]
-                .labels()
+    // Per src axis: dst offset per src code.
+    let maps: Vec<Vec<Option<usize>>> = src
+        .iter()
+        .map(|sc| {
+            let di = dst
                 .iter()
-                .map(|l| sc.code(l).map(|c| c as usize * src_strides[si]))
-                .collect()
-        };
-        per_axis[di] = Some(offs);
+                .position(|d| d.name() == sc.name())
+                .expect("source dims are a subset of destination dims");
+            if dst[di] == *sc {
+                (0..sc.len()).map(|c| Some(c * dst_strides[di])).collect()
+            } else {
+                sc.labels()
+                    .iter()
+                    .map(|l| dst[di].code(l).map(|c| c as usize * dst_strides[di]))
+                    .collect()
+            }
+        })
+        .collect();
+    // Offsets of every combination of the new (broadcast) dims.
+    let mut extra = vec![0usize];
+    for (di, d) in dst.iter().enumerate() {
+        if src.iter().any(|c| c.name() == d.name()) {
+            continue;
+        }
+        let (n, stride) = (dst_shape[di], dst_strides[di]);
+        extra = extra
+            .iter()
+            .flat_map(|&o| (0..n).map(move |c| o + c * stride))
+            .collect();
     }
-    let mut out = Vec::with_capacity(total);
     if total == 0 {
-        return out;
+        extra.clear();
     }
-    let mut idx = vec![0usize; dst.len()];
-    for _ in 0..total {
-        let mut flat = Some(0usize);
-        for (ax, offs) in per_axis.iter().enumerate() {
-            if let Some(offs) = offs {
-                flat = match (flat, offs[idx[ax]]) {
-                    (Some(f), Some(o)) => Some(f + o),
-                    _ => None,
-                };
+    let mut pairs = Vec::with_capacity(s.nnz() * extra.len());
+    'cells: for (p, v) in s.iter() {
+        let mut base = 0usize;
+        for (ax, m) in maps.iter().enumerate() {
+            let code = (p / src_strides[ax]) % src_shape[ax];
+            match m[code] {
+                Some(o) => base += o,
+                None => continue 'cells,
             }
         }
-        out.push(flat);
-        for ax in (0..idx.len()).rev() {
-            idx[ax] += 1;
-            if idx[ax] < dst_shape[ax] {
-                break;
-            }
-            idx[ax] = 0;
+        for &e in &extra {
+            pairs.push((base + e, v));
         }
     }
-    out
+    SparseF64::from_pairs(total, pairs)
+}
+
+pub(crate) fn conform_data(data: Data, src: &[Coord], dst: &[Coord], fill: DType) -> Data {
+    if src == dst {
+        return data;
+    }
+    if let Data::Sparse(s) = &data {
+        return Data::Sparse(conform_sparse(s, src, dst));
+    }
+    let map = Mapping::new(src, dst);
+    data.gather_iter(map.iter(), map.len(), map.any_missing(), fill)
 }
 
 /// A dense labelled array: dims (with their labels) and values in C order.
@@ -177,8 +278,26 @@ impl DataArray {
         if self.coords == dst {
             return self.clone();
         }
-        let map = mapping(&self.coords, dst);
-        DataArray::new(dst.to_vec(), self.data.gather(&map, fill))
+        if let Data::Sparse(s) = &self.data {
+            return DataArray::new(
+                dst.to_vec(),
+                Data::Sparse(conform_sparse(s, &self.coords, dst)),
+            );
+        }
+        let map = Mapping::new(&self.coords, dst);
+        DataArray::new(
+            dst.to_vec(),
+            self.data
+                .gather_iter(map.iter(), map.len(), map.any_missing(), fill),
+        )
+    }
+
+    /// [`DataArray::conform`] by value: no copy when the coordinates are already `dst`.
+    pub fn conform_into(self, dst: &[Coord], fill: DType) -> DataArray {
+        if self.coords == dst {
+            return self;
+        }
+        self.conform(dst, fill)
     }
 
     /// Reorders dimensions (`transpose`).
@@ -192,6 +311,11 @@ impl DataArray {
 
     /// `reindex(dim=labels)` with missing values for new labels.
     pub fn reindex(&self, coord: &Coord) -> DataArray {
+        self.clone().reindex_into(coord)
+    }
+
+    /// [`DataArray::reindex`] by value.
+    pub fn reindex_into(self, coord: &Coord) -> DataArray {
         let dst: Vec<Coord> = self
             .coords
             .iter()
@@ -203,7 +327,7 @@ impl DataArray {
                 }
             })
             .collect();
-        self.conform(&dst, DType::Float)
+        self.conform_into(&dst, DType::Float)
     }
 
     /// Adds a new leading dimension (`expand_dims`).
@@ -220,6 +344,27 @@ impl DataArray {
         b: &DataArray,
         join: Join,
     ) -> (Vec<Coord>, DataArray, DataArray) {
+        let dims = Self::broadcast_dims(a, b, join);
+        let a2 = a.conform(&dims, DType::Float);
+        let b2 = b.conform(&dims, DType::Float);
+        (dims, a2, b2)
+    }
+
+    /// [`DataArray::broadcast_pair`] taking the left array by value.
+    fn broadcast_pair_into(
+        a: DataArray,
+        b: &DataArray,
+        join: Join,
+    ) -> (Vec<Coord>, DataArray, DataArray) {
+        let dims = Self::broadcast_dims(&a, b, join);
+        let a2 = a.conform_into(&dims, DType::Float);
+        let b2 = b.conform(&dims, DType::Float);
+        (dims, a2, b2)
+    }
+
+    /// The dims of [`DataArray::broadcast_pair`]: the left dims (labels joined), then the
+    /// right's new dims.
+    fn broadcast_dims(a: &DataArray, b: &DataArray, join: Join) -> Vec<Coord> {
         let mut dims: Vec<Coord> = a
             .coords
             .iter()
@@ -233,9 +378,7 @@ impl DataArray {
                 dims.push(c.clone());
             }
         }
-        let a2 = a.conform(&dims, DType::Float);
-        let b2 = b.conform(&dims, DType::Float);
-        (dims, a2, b2)
+        dims
     }
 
     /// Mask of non-missing values.
@@ -261,6 +404,98 @@ impl DataArray {
 
     /// `where(cond)`: keeps values where `cond` is true; missing elsewhere (inner join).
     pub fn where_(&self, cond: &DataArray) -> DataArray {
+        self.clone().where_into(cond)
+    }
+
+    /// [`DataArray::where_`] by value: the values are masked in place.
+    pub fn where_into(self, cond: &DataArray) -> DataArray {
+        if cond.coords.iter().any(|c| !self.has_dim(c.name())) {
+            return self.where_generic(cond);
+        }
+        let dims = Self::broadcast_dims(&self, cond, Join::Inner);
+        let a = self.conform_into(&dims, DType::Float);
+        // `cond` conformed to `dims` has no missing cells (inner join), so every cell maps.
+        let truth = cond.truthy();
+        let map = Mapping::new(&cond.coords, &dims);
+        let keep = |j: Option<usize>| j.is_none_or(|j| truth[j]);
+        let data = match a.data {
+            Data::Float(mut v) => {
+                for (x, j) in v.iter_mut().zip(map.iter()) {
+                    if !keep(j) {
+                        *x = f64::NAN;
+                    }
+                }
+                Data::Float(v)
+            }
+            Data::Sparse(mut s) => {
+                let src_shape: Vec<usize> = dims.iter().map(Coord::len).collect();
+                let st = strides(&src_shape);
+                // Position in `cond` of a cell of `dims`.
+                let offs: Vec<(usize, Vec<Option<usize>>)> = Mapping::new(&cond.coords, &dims)
+                    .per_axis
+                    .into_iter()
+                    .enumerate()
+                    .filter_map(|(ax, o)| o.map(|o| (ax, o)))
+                    .collect();
+                let mut k = 0;
+                for i in 0..s.idx.len() {
+                    let p = s.idx[i];
+                    let mut j = Some(0usize);
+                    for (ax, o) in &offs {
+                        let code = (p / st[*ax]) % src_shape[*ax];
+                        j = j.and_then(|j| o[code].map(|o| j + o));
+                    }
+                    if keep(j) {
+                        s.idx[k] = p;
+                        s.val[k] = s.val[i];
+                        k += 1;
+                    }
+                }
+                s.idx.truncate(k);
+                s.val.truncate(k);
+                Data::Sparse(s)
+            }
+            Data::Datetime(mut v) => {
+                for (x, j) in v.iter_mut().zip(map.iter()) {
+                    if !keep(j) {
+                        *x = super::data::NAT;
+                    }
+                }
+                Data::Datetime(v)
+            }
+            Data::Object(mut v) => {
+                for (x, j) in v.iter_mut().zip(map.iter()) {
+                    if !keep(j) {
+                        *x = Obj::Nan;
+                    }
+                }
+                Data::Object(v)
+            }
+            Data::Bool(v) => Data::Float(
+                v.iter()
+                    .zip(map.iter())
+                    .map(|(x, j)| {
+                        if keep(j) {
+                            f64::from(u8::from(*x))
+                        } else {
+                            f64::NAN
+                        }
+                    })
+                    .collect(),
+            ),
+            #[allow(clippy::cast_precision_loss)]
+            Data::Int(v) => Data::Float(
+                v.iter()
+                    .zip(map.iter())
+                    .map(|(x, j)| if keep(j) { *x as f64 } else { f64::NAN })
+                    .collect(),
+            ),
+        };
+        DataArray::new(dims, data)
+    }
+
+    /// `where(cond)` through a full broadcast (when `cond` adds dimensions).
+    fn where_generic(&self, cond: &DataArray) -> DataArray {
         let (dims, a, c) = DataArray::broadcast_pair(self, cond, Join::Inner);
         let mask = c.truthy();
         let idx: Vec<Option<usize>> = mask
@@ -301,24 +536,60 @@ impl DataArray {
 
     /// `fillna(other)`: missing values taken from `other` (left join).
     pub fn fillna(&self, other: &DataArray) -> DataArray {
-        let (dims, a, o) = DataArray::broadcast_pair(self, other, Join::Left);
+        self.clone().fillna_into(other)
+    }
+
+    /// [`DataArray::fillna`] by value: typed values are filled in place.
+    pub fn fillna_into(self, other: &DataArray) -> DataArray {
+        let (dims, a, o) = DataArray::broadcast_pair_into(self, other, Join::Left);
         let dtype = a.dtype().result_type(o.dtype());
-        let data = match (&a.data, &o.data) {
-            (Data::Float(x), Data::Float(y)) => Data::Float(
-                x.iter()
-                    .zip(y)
-                    .map(|(x, y)| if x.is_nan() { *y } else { *x })
-                    .collect(),
-            ),
-            _ => {
-                let objs: Vec<Obj> = (0..a.data.len())
-                    .map(|i| {
-                        if a.data.is_null(i) {
-                            o.data.get(i)
-                        } else {
-                            a.data.get(i)
-                        }
-                    })
+        let data = match (a.data, o.data) {
+            (Data::Float(mut x), Data::Float(y)) => {
+                for (x, y) in x.iter_mut().zip(y) {
+                    if x.is_nan() {
+                        *x = y;
+                    }
+                }
+                Data::Float(x)
+            }
+            (Data::Float(mut x), Data::Sparse(y)) => {
+                for (i, v) in y.iter() {
+                    if x[i].is_nan() {
+                        x[i] = v;
+                    }
+                }
+                Data::Float(x)
+            }
+            (Data::Sparse(x), Data::Float(mut y)) => {
+                for (i, v) in x.iter() {
+                    y[i] = v;
+                }
+                Data::Float(y)
+            }
+            (Data::Sparse(x), Data::Sparse(y)) => {
+                if y.nnz() == 0 {
+                    Data::Sparse(x)
+                } else {
+                    let len = x.len;
+                    let mut pairs: Vec<(usize, f64)> = y.iter().collect();
+                    pairs.extend(x.iter()); // later wins: `x` over `y`
+                    Data::Sparse(SparseF64::from_pairs(len, pairs))
+                }
+            }
+            // No missing values on the left.
+            (Data::Bool(x), Data::Bool(_)) => Data::Bool(x),
+            (Data::Int(x), Data::Int(_)) => Data::Int(x),
+            (Data::Datetime(mut x), Data::Datetime(y)) => {
+                for (x, y) in x.iter_mut().zip(y) {
+                    if *x == super::data::NAT {
+                        *x = y;
+                    }
+                }
+                Data::Datetime(x)
+            }
+            (x, y) => {
+                let objs: Vec<Obj> = (0..x.len())
+                    .map(|i| if x.is_null(i) { y.get(i) } else { x.get(i) })
                     .collect();
                 Data::from_objs(dtype, objs)
             }
@@ -424,15 +695,38 @@ impl DataArray {
         out: DType,
     ) -> DataArray {
         let (dims, a, b) = DataArray::broadcast_pair(self, other, Join::Inner);
-        let objs: Vec<Obj> = (0..a.data.len())
-            .map(|i| f(a.data.get(i), b.data.get(i)))
-            .collect();
-        DataArray::new(dims, Data::from_objs(out, objs))
+        let n = a.data.len();
+        let cell = |i: usize| f(a.data.get(i), b.data.get(i));
+        // Typed results without an `object` vector where the cast cannot fail.
+        let data = match out {
+            DType::Bool => Data::Bool((0..n).map(|i| cell(i).truthy()).collect()),
+            DType::Float => {
+                let mut v = Vec::with_capacity(n);
+                for i in 0..n {
+                    match cell(i) {
+                        o @ (Obj::Nan | Obj::Bool(_) | Obj::Int(_) | Obj::Float(_)) => {
+                            v.push(o.as_f64().unwrap_or(f64::NAN));
+                        }
+                        _ => {
+                            v.clear();
+                            break;
+                        }
+                    }
+                }
+                if v.len() == n {
+                    Data::Float(v)
+                } else {
+                    Data::from_objs(out, (0..n).map(cell).collect())
+                }
+            }
+            _ => Data::from_objs(out, (0..n).map(cell).collect()),
+        };
+        DataArray::new(dims, data)
     }
 
     /// True if every value is missing.
     pub fn all_null(&self) -> bool {
-        (0..self.data.len()).all(|i| self.data.is_null(i))
+        self.data.all_null()
     }
 
     /// The single value of a 1-cell array.

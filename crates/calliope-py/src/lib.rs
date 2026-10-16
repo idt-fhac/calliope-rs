@@ -276,6 +276,7 @@ fn data_to_py<'py>(py: Python<'py>, d: &Data) -> PyResult<(&'static str, Bound<'
     let bytes = |b: Vec<u8>| PyBytes::new(py, &b).into_any();
     Ok(match d {
         Data::Float(v) => ("f8", bytes(bytes_of(v, f64::to_le_bytes))),
+        Data::Sparse(s) => ("f8", bytes(bytes_of(&s.to_dense(), f64::to_le_bytes))),
         Data::Int(v) => ("i8", bytes(bytes_of(v, i64::to_le_bytes))),
         Data::Bool(v) => ("?", bytes(v.iter().map(|b| u8::from(*b)).collect())),
         Data::Datetime(v) => ("M8[ns]", bytes(bytes_of(v, i64::to_le_bytes))),

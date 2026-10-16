@@ -83,6 +83,8 @@ fn put_data(
 ) -> Result<(), IoError> {
     let compress = role == Role::Data && !shape.is_empty();
     match data {
+        // Sparse values are expanded only for writing.
+        Data::Sparse(_) => put_data(group, name, dims, &data.dense(), shape, role, attrs)?,
         Data::Float(v) => {
             let mut var = group.add_variable::<f64>(name, dims)?;
             if compress {
