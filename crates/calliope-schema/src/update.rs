@@ -156,6 +156,12 @@ impl<T: Schema> Validated<T> {
         to_tree(&self.value).expect("schema values serialise to mappings")
     }
 
+    /// `model_dump(exclude_unset=True)` with validated values: the keys that were set, with
+    /// the values the schema made of them (e.g. `dims: costs` becomes `dims: [costs]`).
+    pub fn dump_set(&self) -> AttrTree {
+        intersect(&self.dump(), &self.raw)
+    }
+
     /// `update(update_def, overwrite=...)`: a new model with the update applied.
     ///
     /// The update may use dotted keys. With `overwrite=false`, explicitly set values are
@@ -209,6 +215,35 @@ impl<T: Schema> Validated<T> {
     /// `update` with another model: its explicitly set values are the update.
     pub fn update_with(&self, other: &Self, overwrite: bool) -> Result<Self, SchemaError> {
         self.update(&other.raw, overwrite)
+    }
+}
+
+/// `full` restricted to the keys of `set`, recursively (values from `full`; keys only in
+/// `set` keep its value).
+fn intersect(full: &AttrTree, set: &AttrTree) -> AttrTree {
+    let mut out = AttrTree::new();
+    for (k, v) in set.iter() {
+        let node = match full.get(k) {
+            Some(f) => intersect_node(f, v),
+            None => v.clone(),
+        };
+        out.insert(k.clone(), node);
+    }
+    out
+}
+
+fn intersect_node(full: &Node, set: &Node) -> Node {
+    match (&full.value, &set.value) {
+        (Value::Map(fm), Value::Map(sm)) => Node::new(Value::Map(intersect(fm, sm))),
+        // `None` validated into a model with nothing set dumps as `{}`.
+        (Value::Map(_), Value::Null) => Node::new(Value::Map(AttrTree::new())),
+        (Value::Seq(fs), Value::Seq(ss)) if fs.len() == ss.len() => Node::new(Value::Seq(
+            fs.iter()
+                .zip(ss)
+                .map(|(f, s)| intersect_node(f, s))
+                .collect(),
+        )),
+        _ => full.clone(),
     }
 }
 
