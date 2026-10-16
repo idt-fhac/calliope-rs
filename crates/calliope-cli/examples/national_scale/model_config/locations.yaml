@@ -1,0 +1,44 @@
+##
+# nodes
+##
+
+nodes:
+  # --8<-- [start:region-1]
+  region1:
+    latitude: 40
+    longitude: -2
+    techs:
+      demand_power:
+      ccgt:
+        flow_cap_max: 30000 # increased to ensure no unmet_demand in first timestep
+  # --8<-- [end:region-1]
+  # --8<-- [start:other-locs]
+  region2:
+    latitude: 40
+    longitude: -8
+    techs:
+      demand_power:
+      battery:
+
+  region1_1:
+    template: csp_regions
+    latitude: 41
+    longitude: -2
+
+  region1_2:
+    template: csp_regions
+    latitude: 39
+    longitude: -1
+
+  region1_3:
+    template: csp_regions
+    latitude: 39
+    longitude: -2
+# --8<-- [end:other-locs]
+
+# --8<-- [start:templates]
+templates:
+  csp_regions:
+    techs:
+      csp:
+# --8<-- [end:templates]

@@ -1,0 +1,202 @@
+##
+# Scenarios are optional, named combinations of overrides
+##
+scenarios:
+  cold_fusion_with_production_share: ["cold_fusion", "cold_fusion_prod_share"]
+  cold_fusion_with_capacity_share: ["cold_fusion", "cold_fusion_cap_share"]
+
+##
+# Overrides are the building blocks from which scenarios can be defined
+##
+overrides:
+  profiling:
+    config:
+      init:
+        name: "National-scale example model (profiling run)"
+        subset:
+          timesteps: ["2005-01-01", "2005-01-15"]
+      solve.solver: cbc
+
+  time_resampling:
+    config:
+      init:
+        name: "National-scale example model with time resampling"
+        subset:
+          timesteps: ["2005-01", "2005-01"]
+        resample:
+          timesteps: "6h"
+
+  time_clustering:
+    data_definitions:
+      cyclic_storage: false
+    config:
+      init:
+        name: "National-scale example model with time clustering"
+        subset: {timesteps: null} # No time subsetting
+        time_cluster: cluster_days_param
+    data_tables:
+      cluster_days:
+        table: data_tables/cluster_days.csv
+        rows: datesteps
+        add_dims:
+          inputs: cluster_days_param
+
+  spores:
+    config.init:
+      broadcast_input_data: false
+      mode: spores
+    config.build:
+      ensure_feasibility: true
+    config.solve.spores:
+      tracking_parameter: spores_tracker
+      number: 3
+    data_definitions:
+      spores_slack: 0.5
+      spores_tracker: # defines which techs are going to be subject to the SPORES weighting process
+        data: [true, true, true]
+        index: [ccgt, csp, battery]
+        dims: techs
+
+  operate:
+    config:
+      init:
+        subset.timesteps: ["2005-01-01", "2005-01-10"]
+        mode: operate
+      build:
+        operate:
+          window: 12h
+          horizon: 24h
+    nodes:
+      region1.techs.ccgt.flow_cap: 30000
+
+      region2.techs.battery.flow_cap: 1000
+      region2.techs.battery.storage_cap: 5240
+
+      region1_1.techs.csp.flow_cap: 10000
+      region1_1.techs.csp.storage_cap: 244301
+      region1_1.techs.csp.area_use: 130385
+
+      region1_2.techs.csp.active: false
+
+      region1_3.techs.csp.flow_cap: 2534
+      region1_3.techs.csp.storage_cap: 25301
+      region1_3.techs.csp.area_use: 8487
+
+    techs:
+      region1_to_region1_1.flow_cap: 9000
+      region1_to_region1_2.active: false
+      region1_to_region1_3.flow_cap: 2281
+      csp.cyclic_storage: false
+      battery.cyclic_storage: false
+
+  check_feasibility:
+    config:
+      build:
+        ensure_feasibility: False
+        objective: "check_feasibility"
+      init.subset.timesteps: ["2005-01-04", "2005-01-04"]
+
+  reserve_margin:
+    data_definitions:
+      # Model-wide settings for the system-wide reserve margin
+      # Even setting a reserve margin of zero activates the constraint,
+      # forcing enough installed capacity to cover demand in
+      # the maximum demand timestep
+      reserve_margin:
+        data: 0.10 # 10% reserve margin for power
+        index: power
+        dims: carriers
+
+  ##
+  # Overrides to demonstrate the run generator ("calliope generate_runs")
+  ##
+
+  run1:
+    config.init.subset.timesteps: ["2005-01-01", "2005-01-31"]
+  run2:
+    config.init.subset.timesteps: ["2005-02-01", "2005-02-31"]
+  run3:
+    config.init.subset.timesteps: ["2005-01-01", "2005-01-31"]
+    nodes.region1.techs.ccgt.flow_cap_max: 0 # Disallow CCGT
+  run4:
+    config.init.subset.timesteps: ["2005-02-01", "2005-02-31"]
+    nodes.region1.techs.ccgt.flow_cap_max: 0 # Disallow CCGT
+
+  ##
+  # Overrides to demonstrate group constraints
+  ##
+
+  cold_fusion: # Defines a hypothetical cold fusion tech to use in group constraints
+    techs:
+      cold_fusion:
+        name: "Cold fusion"
+        color: "#233B39"
+        base_tech: supply
+        template: cost_dim_setter
+        carrier_out: power
+        flow_cap_max: 10000
+        lifetime: 50
+        cost_interest_rate.data: 0.20
+        cost_flow_cap.data: 100
+    nodes.region1.techs.cold_fusion: null
+    nodes.region2.techs.cold_fusion: null
+
+  # TODO: replace with non-group constraint
+  # cold_fusion_prod_share:
+  #     group_constraints:
+  #         min_carrier_prod_share_group:
+  #             techs: ['csp', 'cold_fusion']
+  #             carrier_prod_share_min:
+  #                 # At least 85% of power supply must come from CSP and cold fusion together
+  #                 power: 0.85
+
+  # cold_fusion_cap_share:
+  #     group_constraints:
+  #         max_cap_share_group:
+  #             techs: ['csp', 'cold_fusion']
+  #             # At most 20% of total flow_cap can come from CSP and cold fusion together
+  #             flow_cap_share_max: 0.20
+  #     nodes:
+  #         region1:
+  #             techs:
+  #                 ccgt:
+  #                     constraints:
+  #                         flow_cap_max: 100000  # Increased to keep model feasible
+
+  minimize_emissions_costs:
+    data_definitions:
+      objective_cost_weights.data: { "emissions": 1, "monetary": 0 }
+    techs:
+      ccgt:
+        cost_flow_out:
+          data: 100 # kgCO2/kWh
+          index: emissions
+          dims: costs
+      csp:
+        cost_flow_out:
+          data:
+            - 0.002 # EUR/kwh
+            - 10 # kgCO2/kWh
+          index: [monetary, emissions]
+          dims: costs
+
+  maximize_utility_costs:
+    data_definitions:
+      objective_cost_weights.data: { "utility": -1, "monetary": 0 }
+    techs:
+      ccgt:
+        cost_flow_out:
+          data: 10 # arbitrary utility value
+          index: utility
+          dims: costs
+      csp:
+        cost_flow_out:
+          data:
+            - 0.002 # EUR/kwh
+            - 100 # arbitrary utility value
+          index: [monetary, utility]
+          dims: costs
+
+  capacity_factor:
+    techs.ccgt.capacity_factor_min: 0.8
+    techs.ccgt.capacity_factor_max: 0.9

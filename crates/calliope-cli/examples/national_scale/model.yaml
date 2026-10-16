@@ -1,0 +1,56 @@
+# --8<-- [start:import]
+import: # Import other files from paths relative to this file, or absolute paths
+  - "model_config/techs.yaml" # This file specifies the model's technologies
+  - "model_config/locations.yaml" # This file specifies the model's nodes
+  - "scenarios.yaml" # Scenario and override group definitions
+# --8<-- [end:import]
+
+# Model configuration: all settings that affect the built model
+# --8<-- [start:config]
+config:
+  init:
+    name: National-scale example model
+    # What version of Calliope this model is intended for
+    calliope_version: 0.7.0
+    subset:
+      timesteps: ["2005-01-01", "2005-01-05"] # Subset of timesteps
+    broadcast_input_data: true  # allow single indexed parameter data entries to be broadcast across all index items, if there are multiple entries.
+    mode: base # Choices: base, operate, spores
+
+  build:
+    ensure_feasibility: true # Switches on the "unmet demand" constraint
+
+  solve:
+    solver: cbc
+    zero_threshold: 1e-10 # Any value coming out of the backend that is smaller than this (due to floating point errors, probably) will be set to zero
+# --8<-- [end:config]
+
+# --8<-- [start:parameter_data_definitions]
+data_definitions:
+  objective_cost_weights:
+    data: 1
+    index: monetary
+    dims: costs
+  # `bigM` sets the scale of unmet demand, which cannot be too high, otherwise the optimisation will not converge
+  bigM: 1e6
+  cost_interest_rate:
+    data: 0.10
+    index: monetary
+    dims: costs
+# --8<-- [end:parameter_data_definitions]
+
+# --8<-- [start:data-tables]
+data_tables:
+  time_varying_parameters:
+    table: data_tables/time_varying_params.csv
+    rows: timesteps
+    columns: [comment, nodes, techs, inputs]
+    drop: comment
+  cost_parameters:
+    table: data_tables/costs.csv
+    rows: techs
+    columns: [inputs, comment]
+    drop: comment
+    add_dims:
+      costs: monetary
+# --8<-- [end:data-tables]

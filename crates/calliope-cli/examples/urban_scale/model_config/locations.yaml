@@ -1,0 +1,58 @@
+nodes:
+  # --8<-- [start:X1]
+  X1:
+    techs:
+      chp:
+      pv:
+      supply_grid_power:
+        cost_flow_cap.data: 100 # cost of transformers
+      supply_gas:
+      demand_electricity:
+      demand_heat:
+    available_area: 500
+    latitude: 51.4596158
+    longitude: -0.1613446
+  # --8<-- [end:X1]
+  # --8<-- [start:other-locs]
+  X2:
+    techs:
+      boiler.cost_flow_cap.data: 43.1 # different boiler costs
+      pv:
+        cost_flow_out:
+          data: -0.0203 # revenue for just producing electricity
+          index: monetary
+          dims: costs
+        cost_export:
+          data: -0.0491 # FIT return for PV export
+          index: monetary
+          dims: costs
+      supply_gas:
+      demand_electricity:
+      demand_heat:
+    available_area: 1300
+    latitude: 51.4652373
+    longitude: -0.1141548
+
+  X3:
+    techs:
+      boiler.cost_flow_cap.data: 78 # different boiler costs
+      pv:
+        flow_cap_max: 50 # changing tariff structure below 50kW
+        cost_om_annual:
+          data: -80.5 # reimbursement per kWp from FIT
+          index: monetary
+          dims: costs
+      supply_gas:
+      demand_electricity:
+      demand_heat:
+    available_area: 900
+    latitude: 51.4287016
+    longitude: -0.1310635
+
+  # --8<-- [end:other-locs]
+  # --8<-- [start:N1]
+  N1: # node for branching heat transmission network
+    techs:
+    latitude: 51.4450766
+    longitude: -0.1247183
+  # --8<-- [end:N1]

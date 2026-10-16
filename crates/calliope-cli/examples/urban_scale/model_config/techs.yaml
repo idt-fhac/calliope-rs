@@ -1,0 +1,193 @@
+##
+# TECHNOLOGY DEFINITIONS
+##
+
+# --8<-- [start:--8<-- [end:Note: ']' and ']' is used in tutorial documentation only
+
+templates:
+# --8<-- [start:transmission-templates]
+  power_lines:
+    name: "Electrical power distribution"
+    color: "#6783E3"
+    base_tech: transmission
+    carrier_in: electricity
+    carrier_out: electricity
+    flow_cap_max: 2000
+    flow_out_eff: 0.98
+    lifetime: 25
+    cost_flow_cap_per_distance:
+      data: 0.01
+      index: monetary
+      dims: costs
+
+  heat_pipes:
+    name: "District heat distribution"
+    color: "#823739"
+    base_tech: transmission
+    carrier_in: heat
+    carrier_out: heat
+    flow_cap_max: 2000
+    flow_out_eff_per_distance: 0.975
+    lifetime: 25
+    cost_flow_cap_per_distance:
+      data: 0.3
+      index: monetary
+      dims: costs
+# --8<-- [end:transmission-templates]
+techs:
+  ##-GRID SUPPLY-##
+  # --8<-- [start:supply]
+  supply_grid_power:
+    name: "National grid import"
+    color: "#C5ABE3"
+    base_tech: supply
+    carrier_out: electricity
+    source_use_max: .inf
+    flow_cap_max: 2000
+    lifetime: 25
+    cost_flow_cap:
+      data: 15
+      index: monetary
+      dims: costs
+    cost_source_use:
+      data: 0.1 # 10p/kWh electricity price #ppt
+      index: monetary
+      dims: costs
+
+  supply_gas:
+    name: "Natural gas import"
+    color: "#C98AAD"
+    base_tech: supply
+    carrier_out: gas
+    source_use_max: .inf
+    flow_cap_max: 2000
+    lifetime: 25
+    cost_flow_cap:
+      data: 1
+      index: monetary
+      dims: costs
+    cost_source_use:
+      data: 0.025 # 2.5p/kWh gas price #ppt
+      index: monetary
+      dims: costs
+  # --8<-- [end:supply]
+
+  ##-Renewables-##
+  # --8<-- [start:pv]
+  pv:
+    name: "Solar photovoltaic power"
+    color: "#F9D956"
+    base_tech: supply
+    carrier_out: electricity
+    carrier_export: electricity
+    source_unit: per_area
+    area_use_per_flow_cap: 7 # 7m2 of panels needed to fit 1kWp of panels
+    flow_out_parasitic_eff: 0.85 # inverter losses
+    flow_cap_max: 250
+    area_use_max: 1500
+    lifetime: 25
+    cost_flow_cap:
+      data: 1350
+      index: monetary
+      dims: costs
+
+  # --8<-- [end:pv]
+
+  # Conversion
+  # --8<-- [start:boiler]
+  boiler:
+    name: "Natural gas boiler"
+    color: "#8E2999"
+    base_tech: conversion
+    carrier_in: gas
+    carrier_out: heat
+    cost_flow_cap:
+      data: 30
+      index: [[monetary, heat]]
+      dims: [costs, carriers]
+    flow_cap_max:
+      data: 600
+      index: heat
+      dims: carriers
+    flow_out_eff: 0.85
+    lifetime: 25
+    cost_flow_in:
+      data: 0.004 # .4p/kWh
+      index: monetary
+      dims: costs
+  # --8<-- [end:boiler]
+
+  # Conversion_plus
+  # --8<-- [start:chp]
+  chp:
+    name: "Combined heat and power"
+    color: "#E4AB97"
+    base_tech: conversion
+    carrier_in: gas
+    carrier_out: [electricity, heat]
+    carrier_export: electricity
+    flow_cap_max:
+      data: 1500
+      index: electricity
+      dims: carriers
+    flow_out_eff:
+      data: 0.405
+      index: electricity
+      dims: carriers
+    heat_to_power_ratio: 0.8
+    lifetime: 25
+    cost_flow_cap:
+      data: 750
+      index: [[monetary, electricity]]
+      dims: [costs, carriers]
+    cost_flow_out:
+      data: 0.004 # .4p/kWh for 4500 operating hours/year
+      index: [[monetary, electricity]]
+      dims: [costs, carriers]
+  # --8<-- [end:chp]
+
+  ##-DEMAND-##
+  # --8<-- [start:demand]
+  demand_electricity:
+    name: "Electrical demand"
+    color: "#072486"
+    base_tech: demand
+    carrier_in: electricity
+
+  demand_heat:
+    name: "Heat demand"
+    color: "#660507"
+    base_tech: demand
+    carrier_in: heat
+  # --8<-- [end:demand]
+
+  ##-DISTRIBUTION-##
+  # --8<-- [start:transmission]
+
+  X1_to_X2:
+    link_from: X1
+    link_to: X2
+    template: power_lines
+    distance: 10
+  X1_to_X3:
+    link_from: X1
+    link_to: X3
+    template: power_lines
+    distance: 5
+  X1_to_N1:
+    link_from: X1
+    link_to: N1
+    template: heat_pipes
+    distance: 3
+  N1_to_X2:
+    link_from: N1
+    link_to: X2
+    template: heat_pipes
+    distance: 3
+  N1_to_X3:
+    link_from: N1
+    link_to: X3
+    template: heat_pipes
+    distance: 4
+
+# --8<-- [end:transmission]
