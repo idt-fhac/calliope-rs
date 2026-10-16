@@ -9,12 +9,14 @@ publish.workspace = true
 
 [dependencies]
 calliope-array.workspace = true
+calliope-lp = { path = "../calliope-lp" }
 calliope-schema.workspace = true
 calliope-yaml.workspace = true
 indexmap.workspace = true
 miette = "7.6"
 pest = "2.8"
 pest_derive = "2.8"
+serde_json.workspace = true
 thiserror.workspace = true
 
 [lints]

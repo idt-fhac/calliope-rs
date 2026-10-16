@@ -14,6 +14,7 @@
 pub mod ast;
 pub mod component;
 pub mod diagnostic;
+pub mod eval;
 pub mod helpers;
 pub mod ir;
 pub mod names;

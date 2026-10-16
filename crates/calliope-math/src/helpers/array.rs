@@ -9,7 +9,7 @@
 
 use std::collections::BTreeMap;
 
-use calliope_array::{ArrayError, Coord, Join, LArray, Label};
+use calliope_array::{ArrayError, Coord, Element, Join, LArray, Label};
 
 /// An evaluated helper argument or result.
 #[derive(Debug, Clone, PartialEq)]
@@ -118,11 +118,11 @@ pub fn reduce_carrier_dim(array: &LArray<f64>, carrier: &LArray<bool>) -> Result
 /// `select_from_lookup_arrays(array, dim=lookup, ...)`: vectorised indexing. For each cell
 /// of the lookups, the array value at the coordinates the lookups name; NaN where a lookup is
 /// missing or names an item not on the dimension.
-pub fn select_from_lookup_arrays(
-    array: &LArray<f64>,
+pub fn select_from_lookup_arrays<T: Element>(
+    array: &LArray<T>,
     array_name: &str,
     lookups: &[(String, String, &LArray<Option<Label>>)],
-) -> Result<LArray<f64>> {
+) -> Result<LArray<T>> {
     let keys: Vec<&str> = lookups.iter().map(|(d, _, _)| d.as_str()).collect();
     let mut key_set: Vec<&str> = keys.clone();
     key_set.sort_unstable();
@@ -216,7 +216,7 @@ pub fn select_from_lookup_arrays(
         }
         if ok {
             let v = array.get(&acodes);
-            if !v.is_nan() {
+            if !v.is_missing() {
                 cells.push((idx.clone(), v));
             }
         }
@@ -246,10 +246,7 @@ pub fn get_val_at_index(coord: &Coord, index: i64) -> Result<Label> {
 
 /// `roll(array, dim=shift, ...)`: shifts data along each dimension (numpy `roll`, labels
 /// stay). Shifts are truncated to integers, as Python's `int()` does.
-pub fn roll<T: calliope_array::Element>(
-    array: &LArray<T>,
-    shifts: &[(String, f64)],
-) -> Result<LArray<T>> {
+pub fn roll<T: Element>(array: &LArray<T>, shifts: &[(String, f64)]) -> Result<LArray<T>> {
     let mut out = array.clone();
     for (dim, shift) in shifts {
         #[allow(clippy::cast_possible_truncation)]
@@ -313,6 +310,18 @@ pub fn group_datetime(
     let coord = array
         .coord(over)
         .ok_or_else(|| ArrayError::MissingDim(over.to_owned()))?;
+    let groupby = datetime_groupby(coord, group, dtype)?;
+    group_sum(array, &groupby, group)
+}
+
+/// The `group_datetime` grouping array: the datetime attribute `group` of each label of
+/// `coord`.
+pub fn datetime_groupby(
+    coord: &Coord,
+    group: &str,
+    dtype: GroupDtype,
+) -> Result<LArray<Option<Label>>> {
+    let over = coord.name();
     let labels: Vec<Option<Label>> = coord
         .labels()
         .iter()
@@ -323,14 +332,13 @@ pub fn group_datetime(
             ))),
         })
         .collect::<Result<_>>()?;
-    let groupby = LArray::from_cells(
+    Ok(LArray::from_cells(
         vec![coord.clone()],
         labels
             .into_iter()
             .enumerate()
             .map(|(i, l)| (vec![u32::try_from(i).expect("fits")], l)),
-    )?;
-    group_sum(array, &groupby, group)
+    )?)
 }
 
 fn datetime_attr(ns: i64, attr: &str, dtype: GroupDtype) -> Result<Option<Label>> {
@@ -417,4 +425,13 @@ pub fn sum_next_n(array: &LArray<f64>, over: &str, n: f64) -> Result<LArray<f64>
         }
     }
     Ok(LArray::from_cells(array.dims().to_vec(), cells)?)
+}
+
+/// `(year, month, day, hour, minute)` of a datetime in nanoseconds since the epoch.
+pub fn datetime_parts(ns: i64) -> (i64, i64, i64, i64, i64) {
+    const NS_PER_DAY: i64 = 86_400_000_000_000;
+    let days = ns.div_euclid(NS_PER_DAY);
+    let in_day = ns.rem_euclid(NS_PER_DAY) / 1_000_000_000;
+    let (y, m, d) = civil_from_days(days);
+    (y, m, d, in_day / 3600, in_day / 60 % 60)
 }
