@@ -456,7 +456,7 @@ impl HighsBackend {
             && (a.sense != b.sense
                 || a.label != b.label
                 || a.expr.constant.to_bits() != b.expr.constant.to_bits()
-                || a.expr.merged() != b.expr.merged())
+                || a.expr.terms != b.expr.terms)
         {
             self.set_objective(b.label.clone(), b.sense, b.expr.clone())?;
         }

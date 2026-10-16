@@ -43,6 +43,8 @@ pub struct Backend {
     deps: Dependencies,
     objective: String,
     verbose_strings: bool,
+    /// Components removed by `delete_component`.
+    deleted: Vec<(Group, String)>,
 }
 
 fn eval_err(e: calliope_math::eval::EvalError) -> Error {
@@ -97,6 +99,7 @@ impl Backend {
             solver: HighsBackend::new(lp),
             deps,
             verbose_strings: false,
+            deleted: Vec::new(),
         })
     }
 
@@ -105,7 +108,7 @@ impl Backend {
         &self.config
     }
 
-    /// The math the problem was built from (with deleted components inactive).
+    /// The math the problem was built from.
     pub fn math(&self) -> &CalliopeBuildMath {
         &self.math
     }
@@ -221,7 +224,21 @@ impl Backend {
     fn refresh(&mut self, affected: &[(Group, String)]) -> Result<(), Error> {
         let mut built =
             build_model(&self.inputs, &self.math, &self.build_config()).map_err(eval_err)?;
-        let lp = std::mem::take(&mut built.lp);
+        let mut lp = std::mem::take(&mut built.lp);
+        for (group, name) in &self.deleted {
+            remove_component(&mut built, name, *group, &mut |kind, n| {
+                Ok(match kind {
+                    ComponentKind::Variable => {
+                        let cols = lp.cols_of(kind, n);
+                        lp.delete_cols(&cols)
+                    }
+                    _ => {
+                        let rows = lp.rows_of(kind, n);
+                        lp.delete_rows(&rows)
+                    }
+                })
+            })?;
+        }
         let set: HashSet<(ComponentKind, &str)> = affected
             .iter()
             .filter_map(|(g, n)| kind_of(*g).map(|k| (k, n.as_str())))
@@ -481,58 +498,21 @@ impl Backend {
     }
 
     /// `delete_component`: removes a variable, global expression, constraint or objective
-    /// from the problem. The component is also marked inactive in the backend's math, so
-    /// later updates do not bring it back. Unknown names are ignored, as in Calliope.
+    /// from the problem. It stays deleted when later updates re-evaluate the problem.
+    /// Unknown names are ignored, as in Calliope.
     pub fn delete_component(&mut self, name: &str, group: Group) -> Result<(), Error> {
-        match group {
-            Group::Variables => {
-                if self.variable(name).is_err() {
-                    return Ok(());
-                }
-                let map = self
-                    .solver
-                    .delete_component(ComponentKind::Variable, name)?;
-                self.built.results.shift_remove(name);
-                remap_cols(&mut self.built, &map);
-                if let Some(v) = self.math.variables.get_mut(name) {
-                    v.active = false;
-                }
-            }
-            Group::Constraints | Group::PiecewiseConstraints => {
-                let kind = kind_of(group).expect("constraint kind");
-                if self.solver.model().rows_of(kind, name).is_empty()
-                    && !self.built.constraints.contains_key(name)
-                {
-                    return Ok(());
-                }
-                let map = self.solver.delete_component(kind, name)?;
-                self.built.constraints.shift_remove(name);
-                for rows in self.built.constraints.values_mut() {
-                    *rows = rows.map(|r| {
-                        r.and_then(|r| map.get(r as usize).copied().flatten())
-                            .map(|r| u32::try_from(r).expect("fits"))
-                    });
-                }
-                if let Some(c) = self.math.constraints.get_mut(name) {
-                    c.active = false;
-                }
-                if let Some(c) = self.math.piecewise_constraints.get_mut(name) {
-                    c.active = false;
-                }
-            }
-            Group::GlobalExpressions => {
-                self.built.results.shift_remove(name);
-                if let Some(c) = self.math.global_expressions.get_mut(name) {
-                    c.active = false;
-                }
-            }
-            Group::Objectives => {
-                self.built.objectives.shift_remove(name);
-                if let Some(c) = self.math.objectives.get_mut(name) {
-                    c.active = false;
-                }
-            }
-            Group::Postprocessed | Group::Checks => {}
+        if let Some(kind @ (ComponentKind::Constraint | ComponentKind::Piecewise)) = kind_of(group)
+            && self.solver.model().rows_of(kind, name).is_empty()
+            && !self.built.constraints.contains_key(name)
+        {
+            return Ok(());
+        }
+        let solver = &mut self.solver;
+        let deleted = remove_component(&mut self.built, name, group, &mut |kind, n| {
+            Ok(solver.delete_component(kind, n)?)
+        })?;
+        if deleted {
+            self.deleted.push((group, name.to_owned()));
         }
         Ok(())
     }
@@ -580,6 +560,48 @@ pub struct ConstraintValues {
     pub ub: LArray<f64>,
     /// Row activity at the last solution.
     pub body: Option<LArray<f64>>,
+}
+
+type Deleter<'a> = dyn FnMut(ComponentKind, &str) -> Result<Vec<Option<usize>>, Error> + 'a;
+
+/// Removes a component from the built arrays; `delete` removes its columns or rows from
+/// the problem and returns the old → new index map. Returns whether it existed.
+fn remove_component(
+    built: &mut BuiltModel,
+    name: &str,
+    group: Group,
+    delete: &mut Deleter<'_>,
+) -> Result<bool, Error> {
+    match group {
+        Group::Variables => {
+            if !matches!(built.results.get(name), Some(Value::Expr(_))) {
+                return Ok(false);
+            }
+            let map = delete(ComponentKind::Variable, name)?;
+            built.results.shift_remove(name);
+            remap_cols(built, &map);
+            Ok(true)
+        }
+        Group::Constraints | Group::PiecewiseConstraints => {
+            let kind = kind_of(group).expect("constraint kind");
+            let had = built.constraints.contains_key(name);
+            let map = delete(kind, name)?;
+            if !had && map.iter().all(Option::is_some) {
+                return Ok(false);
+            }
+            built.constraints.shift_remove(name);
+            for rows in built.constraints.values_mut() {
+                *rows = rows.map(|r| {
+                    r.and_then(|r| map.get(r as usize).copied().flatten())
+                        .map(|r| u32::try_from(r).expect("fits"))
+                });
+            }
+            Ok(true)
+        }
+        Group::GlobalExpressions => Ok(built.results.shift_remove(name).is_some()),
+        Group::Objectives => Ok(built.objectives.shift_remove(name).is_some()),
+        Group::Postprocessed | Group::Checks => Ok(false),
+    }
 }
 
 fn remap_cols(built: &mut BuiltModel, map: &[Option<usize>]) {

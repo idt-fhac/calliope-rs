@@ -184,6 +184,94 @@ impl Model {
         })
     }
 
+    /// `calliope.Model(inputs=..., attrs=model.all_attrs(), results=..., **init)`: a new model
+    /// with this model's attributes, the given input data (e.g. `inputs.assign(results)`
+    /// to fix capacities from a base run in operate mode, see [`Model::inputs_with_results`])
+    /// and optional results. `init` overrides `config.init` (e.g. `mode: operate`); the math
+    /// is rebuilt if the mode changes and the inputs are cleaned again, as in Python.
+    pub fn with_inputs(
+        &self,
+        inputs: Dataset,
+        results: Option<Results>,
+        init: &AttrTree,
+    ) -> Result<Self, Error> {
+        let config = if init.is_empty() {
+            self.config.clone()
+        } else {
+            self.config.update(&nested("init", init)?, true)?
+        };
+        let priority = calliope_preprocess::model_math::get_math_priority(&config.init);
+        let mut runtime = self.runtime.clone();
+        let math = if runtime
+            .math_priority
+            .iter()
+            .map(|p| p.as_str())
+            .eq(priority.iter().map(String::as_str))
+        {
+            self.math.clone()
+        } else {
+            runtime.math_priority = priority
+                .iter()
+                .filter_map(|p| calliope_schema::AttrStr::new(p.clone()).ok())
+                .collect();
+            calliope_preprocess::model_math::build_math(&priority, &self.math_init, None)?
+        };
+        let inputs = if inputs.vars.is_empty() {
+            inputs
+        } else {
+            let mut c = ModelDataCleaner::new(&config.init, inputs, &math, runtime.clone());
+            c.clean()?;
+            runtime = c.runtime;
+            c.dataset
+        };
+        runtime.timings.insert("init_complete".to_owned(), now());
+        Ok(Self {
+            inputs,
+            results: results.unwrap_or_default(),
+            config,
+            definition: self.definition.clone(),
+            math_init: self.math_init.clone(),
+            math,
+            runtime,
+            warnings: Vec::new(),
+            backend: None,
+            start_window_idx: 0,
+            rng: Mt19937::new(0),
+        })
+    }
+
+    /// `model.inputs.assign(model.results)`: the inputs with every result array added (on
+    /// the inputs' coordinates).
+    pub fn inputs_with_results(&self) -> Result<Dataset, Error> {
+        let mut ds = self.inputs.clone();
+        for (name, a) in &self.results.arrays {
+            let dims: Vec<calliope_array::Coord> = a
+                .dims()
+                .iter()
+                .map(|d| {
+                    ds.coords
+                        .get(d.name())
+                        .cloned()
+                        .unwrap_or_else(|| d.clone())
+                })
+                .collect();
+            for d in &dims {
+                if !ds.coords.contains_key(d.name()) {
+                    ds.coords.insert(d.name().to_owned(), d.clone());
+                }
+            }
+            let b = crate::backend::broadcast(a, &dims)?;
+            ds.vars.insert(
+                name.clone(),
+                calliope_preprocess::xr::Var {
+                    dims: dims.iter().map(|d| d.name().to_owned()).collect(),
+                    data: calliope_preprocess::xr::Data::Float(b.to_dense()),
+                },
+            );
+        }
+        Ok(ds)
+    }
+
     /// `model.name`.
     pub fn name(&self) -> Option<&str> {
         self.config.init.name.as_deref()
