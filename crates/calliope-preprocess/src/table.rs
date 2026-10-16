@@ -679,7 +679,9 @@ impl Long {
                 .iter()
                 .map(|v| v.clone().unwrap_or(Obj::Nan))
                 .collect();
-            let data = Data::from_objs(out_dtype, values);
+            // Long-format tables give mostly empty arrays once unstacked; they stay sparse
+            // through preprocessing.
+            let data = Data::from_objs(out_dtype, values).into_sparse_if_sparse();
             ds.set(&input.to_string(), DataArray::new(coords.clone(), data));
         }
         ds

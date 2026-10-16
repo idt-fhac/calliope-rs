@@ -50,7 +50,7 @@ fn math_dtype(math: &CalliopeBuildMath, name: &str) -> Option<MathDtype> {
     }
 }
 
-fn update_values(data: &Data, dtype: MathDtype, init: &Init) -> Result<Data, ModelError> {
+fn update_values(data: Data, dtype: MathDtype, init: &Init) -> Result<Data, ModelError> {
     let err = |e: String| ModelError::new(e);
     Ok(match dtype {
         MathDtype::String => Data::Object(
@@ -65,8 +65,8 @@ fn update_values(data: &Data, dtype: MathDtype, init: &Init) -> Result<Data, Mod
                 })
                 .collect(),
         ),
-        MathDtype::Float => data.cast(DType::Float).map_err(err)?,
-        MathDtype::Integer => data.cast(DType::Int).map_err(err)?,
+        MathDtype::Float => data.cast_into(DType::Float).map_err(err)?,
+        MathDtype::Integer => data.into_dense().cast_into(DType::Int).map_err(err)?,
         MathDtype::Bool => Data::Bool(
             data.objs()
                 .iter()
@@ -98,7 +98,8 @@ fn update_var_dtypes(
             continue;
         };
         let var = ds.vars.get_mut(&name).expect("exists");
-        var.data = update_values(&var.data, dt, init)?;
+        let data = std::mem::replace(&mut var.data, Data::Float(Vec::new()));
+        var.data = update_values(data, dt, init)?;
     }
     Ok(())
 }
@@ -116,7 +117,7 @@ fn update_coord_dtypes(
         };
         let c = ds.coords[&dim].clone();
         let data = Data::Object(c.labels().iter().map(Obj::from_label).collect());
-        let new = update_values(&data, dt, init)?;
+        let new = update_values(data, dt, init)?;
         let labels: Vec<Label> = (0..new.len()).map(|i| new.get(i).to_label()).collect();
         let coord = Coord::new(&dim, labels).map_err(|e| ModelError::new(e.to_string()))?;
         ds.assign_coord(coord);
@@ -684,9 +685,7 @@ impl<'a> ModelDataBuilder<'a> {
     fn add_to_dataset(&mut self, mut to_add: Dataset, id: &str) -> Result<(), ModelError> {
         tracing::debug!("{id} | adding to dataset");
         update_coord_dtypes(&mut to_add, self.math, self.config)?;
-        let merged = Dataset::merge(&[&to_add, &self.dataset], Join::Outer, Compat::Override)
-            .map_err(ModelError::new)?;
-        self.dataset = merged.fillna(&self.dataset);
+        self.dataset.merge_over(to_add);
         Ok(())
     }
 }
@@ -937,15 +936,16 @@ impl<'a> ModelDataCleaner<'a> {
         );
         let def_dims: Vec<String> = def.dims().iter().map(|s| (*s).to_owned()).collect();
         for name in self.dataset.names() {
-            let var = self.dataset.get(&name).expect("exists");
+            let var = self.dataset.take(&name).expect("exists");
             let non_dims: Vec<&str> = def_dims
                 .iter()
                 .filter(|d| !var.has_dim(d))
                 .map(String::as_str)
                 .collect();
             let cond = def.any(&non_dims);
-            let updated = var.where_(&cond);
-            let updated = if var.dtype() == DType::Bool {
+            let was_bool = var.dtype() == DType::Bool;
+            let updated = var.where_into(&cond);
+            let updated = if was_bool {
                 let objs = updated.data.objs();
                 DataArray::new(
                     updated.coords.clone(),
@@ -956,7 +956,7 @@ impl<'a> ModelDataCleaner<'a> {
             };
             self.dataset.set(&name, updated);
         }
-        self.dataset = drop_undefined(self.dataset.clone(), &def);
+        self.dataset = drop_undefined(std::mem::take(&mut self.dataset), &def);
         Ok(())
     }
 
@@ -1239,7 +1239,7 @@ pub fn drop_undefined(mut ds: Dataset, def_matrix: &DataArray) -> Dataset {
     let empty: Vec<String> = ds
         .vars
         .iter()
-        .filter(|(_, v)| (0..v.data.len()).all(|i| v.data.is_null(i)))
+        .filter(|(_, v)| v.data.all_null())
         .map(|(k, _)| k.clone())
         .collect();
     for k in empty {
