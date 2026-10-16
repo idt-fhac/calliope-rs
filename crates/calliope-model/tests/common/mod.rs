@@ -87,6 +87,7 @@ pub fn fixture(
             override_dict: tree("override_dict"),
             math_dict: tree("math_dict"),
             init_kwargs: tree("init_kwargs").unwrap_or_default(),
+            data_table_dfs: Default::default(),
         };
         return Ok(Some((root.join(fx["model"].as_str().unwrap()), opts, None)));
     }
@@ -113,6 +114,7 @@ pub fn fixture(
             .map(json_tree),
         math_dict: None,
         init_kwargs: json_tree(&meta["kwargs"]),
+        data_table_dfs: Default::default(),
     };
     if let Some(o) = &mut opts.override_dict {
         redirect_base_math(o, &base_path);

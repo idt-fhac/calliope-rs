@@ -14,6 +14,7 @@ use crate::error::ModelError;
 use crate::model_data::{ModelDataBuilder, ModelDataCleaner};
 use crate::model_definition::prepare_model_definition_with;
 use crate::model_math::{build_math, get_math_priority};
+use crate::table::Frame;
 use crate::xr::Dataset;
 
 /// A preprocessed model: the input dataset and the model attributes.
@@ -46,6 +47,8 @@ pub struct ReadOptions {
     pub math_dict: Option<AttrTree>,
     /// `config.init` keyword overrides.
     pub init_kwargs: AttrTree,
+    /// In-memory tables (`data_table_dfs`), by the name data tables refer to them with.
+    pub data_table_dfs: IndexMap<String, Frame>,
 }
 
 /// `calliope.read_yaml`.
@@ -76,7 +79,12 @@ pub fn read_dict(
     }
     let mut tables = Vec::new();
     for (name, t) in &prepared.definition.data_tables.0 {
-        tables.push(DataTable::new(name, t, definition_path)?);
+        tables.push(DataTable::load(
+            name,
+            t,
+            &opts.data_table_dfs,
+            definition_path,
+        )?);
     }
     let mut builder = ModelDataBuilder::new(init, prepared.definition.clone(), &math, &mut tables)?;
     builder.build()?;

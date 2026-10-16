@@ -1,13 +1,14 @@
 //! Ports of `tests/example_models/example_models_test.py`: the example models are solved
 //! and checked against the values Calliope's test suite asserts (`pytest.approx`, relative
-//! 1e-6, unless stated). The data-table variant of the national-scale test needs in-memory
-//! DataFrames and is not ported.
+//! 1e-6, unless stated). The data-table variant of the national-scale test passes its
+//! in-memory DataFrame as a [`Frame`] read from the same CSV file.
 
 use std::path::PathBuf;
 
 use calliope_array::{LArray, Label};
 use calliope_model::{BuildOptions, Model, SolveOptions};
 use calliope_preprocess::ReadOptions;
+use calliope_preprocess::table::{Frame, read_csv};
 use calliope_yaml::{AttrTree, Node, Value};
 
 mod common;
@@ -108,10 +109,54 @@ fn national_scale_sense_checks() {
     ) else {
         return;
     };
+    national_scale_checks(&m);
+}
+
+/// `nat_model_from_data_tables`: the model of `tests/example_models/
+/// national_scale_from_data_tables`, with the time series given as an in-memory table
+/// (`pd.read_csv(..., index_col=0, header=[0, 1, 2, 3])`).
+#[test]
+fn national_scale_from_data_tables_sense_checks() {
+    let Some(root) = common::reference() else {
+        return;
+    };
+    let path = root.join("tests/example_models/national_scale_from_data_tables/model.yaml");
+    let csv =
+        root.join("src/calliope/example_models/national_scale/data_tables/time_varying_params.csv");
+    let df: Frame = read_csv(&csv, 4, Some(1)).unwrap();
+    let mut opts = ReadOptions {
+        init_kwargs: subset("2005-01-01", "2005-01-01"),
+        ..ReadOptions::default()
+    };
+    opts.data_table_dfs.insert("time_varying_df".into(), df);
+    let mut m = Model::from_yaml(&path, &opts).unwrap();
+    m.build(&BuildOptions::default()).unwrap();
+    let mut o = AttrTree::new();
+    o.set_key("solver_options.output_flag", Node::new(Value::Bool(false)))
+        .unwrap();
+    m.solve(&SolveOptions {
+        overrides: o,
+        ..SolveOptions::default()
+    })
+    .unwrap();
+    national_scale_checks(&m);
+}
+
+#[test]
+fn missing_in_memory_table_is_an_error() {
+    let Some(root) = common::reference() else {
+        return;
+    };
+    let path = root.join("tests/example_models/national_scale_from_data_tables/model.yaml");
+    let err = Model::from_yaml(&path, &ReadOptions::default()).unwrap_err();
+    assert!(err.to_string().contains("time_varying_df"), "{err}");
+}
+
+fn national_scale_checks(m: &Model) {
     let r = 1e-6;
     approx(
         sel_sum(
-            &m,
+            m,
             "storage_cap",
             &[("nodes", "region1_1"), ("techs", "csp")],
         ),
@@ -121,7 +166,7 @@ fn national_scale_sense_checks() {
     );
     approx(
         sel_sum(
-            &m,
+            m,
             "storage_cap",
             &[("nodes", "region2"), ("techs", "battery")],
         ),
@@ -130,31 +175,27 @@ fn national_scale_sense_checks() {
         1e-12,
     );
     approx(
-        sel_sum(&m, "flow_cap", &[("nodes", "region1_1"), ("techs", "csp")]),
+        sel_sum(m, "flow_cap", &[("nodes", "region1_1"), ("techs", "csp")]),
         4626.588,
         r,
         1e-12,
     );
     approx(
-        sel_sum(
-            &m,
-            "flow_cap",
-            &[("nodes", "region2"), ("techs", "battery")],
-        ),
+        sel_sum(m, "flow_cap", &[("nodes", "region2"), ("techs", "battery")]),
         1000.0,
         r,
         1e-12,
     );
     approx(
-        sel_sum(&m, "flow_cap", &[("nodes", "region1"), ("techs", "ccgt")]),
+        sel_sum(m, "flow_cap", &[("nodes", "region1"), ("techs", "ccgt")]),
         30000.0,
         r,
         1e-12,
     );
-    approx(sel_sum(&m, "cost", &[]), 38988.7442, r, 1e-12);
+    approx(sel_sum(m, "cost", &[]), 38988.7442, r, 1e-12);
     approx(
         sel_sum(
-            &m,
+            m,
             "systemwide_levelised_cost",
             &[("carriers", "power"), ("techs", "battery")],
         ),
@@ -164,7 +205,7 @@ fn national_scale_sense_checks() {
     );
     approx(
         sel_sum(
-            &m,
+            m,
             "systemwide_capacity_factor",
             &[("carriers", "power"), ("techs", "battery")],
         ),

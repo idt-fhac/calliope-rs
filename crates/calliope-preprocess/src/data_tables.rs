@@ -6,6 +6,7 @@ use std::path::Path;
 use calliope_array::Label;
 use calliope_schema::{CalliopeDataTable, CalliopeTechs, Validated};
 use calliope_yaml::{AttrTree, Node, Value, relative_path};
+use indexmap::IndexMap;
 
 use crate::error::ModelError;
 use crate::table::{Frame, Long, read_csv};
@@ -57,6 +58,18 @@ impl DataTable {
         input: &CalliopeDataTable,
         model_definition_path: Option<&Path>,
     ) -> Result<Self, ModelError> {
+        Self::load(name, input, &IndexMap::new(), model_definition_path)
+    }
+
+    /// `DataTable(table_name, data_table, data_table_dfs, model_definition_path)`: a CSV
+    /// file (relative to the model definition file), or else the in-memory frame of that
+    /// name in `dfs` (pandas DataFrames passed as `data_table_dfs`).
+    pub fn load(
+        name: &str,
+        input: &CalliopeDataTable,
+        dfs: &IndexMap<String, Frame>,
+        model_definition_path: Option<&Path>,
+    ) -> Result<Self, ModelError> {
         let mut t = Self {
             name: name.to_owned(),
             input: input.clone(),
@@ -67,18 +80,20 @@ impl DataTable {
             .file_name()
             .and_then(|f| f.to_str())
             .is_some_and(|f| f.split('.').skip(1).any(|s| s == "csv"));
-        if !is_csv {
+        let frame = if is_csv {
+            let columns = t.columns();
+            let rows = t.rows();
+            let n_header = columns.as_ref().map_or(1, Vec::len);
+            let file = relative_path(model_definition_path, path);
+            read_csv(&file, n_header, rows.as_ref().map(Vec::len)).map_err(|e| t.error(&e))?
+        } else if let Some(df) = dfs.get(&input.table) {
+            df.clone()
+        } else {
             return Err(t.error(&format!(
-                "Only CSV data tables are supported (in-memory DataFrames are not); found `{}`",
+                "`{}` is neither a CSV file nor an in-memory table given in `data_table_dfs`",
                 input.table
             )));
-        }
-        let columns = t.columns();
-        let rows = t.rows();
-        let n_header = columns.as_ref().map_or(1, Vec::len);
-        let file = relative_path(model_definition_path, path);
-        let frame =
-            read_csv(&file, n_header, rows.as_ref().map(Vec::len)).map_err(|e| t.error(&e))?;
+        };
         t.dataset = t.frame_to_ds(frame)?;
         Ok(t)
     }

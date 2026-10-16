@@ -38,6 +38,7 @@ fn build(overrides: &str, scenario: &str, kwargs: &str) -> Result<ModelInputs, M
         } else {
             yaml(kwargs)
         },
+        data_table_dfs: Default::default(),
     };
     read_yaml(&model_path(), &opts)
 }

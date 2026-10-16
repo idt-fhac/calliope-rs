@@ -76,6 +76,7 @@ impl Runner for RustRunner {
             override_dict: tree("override_dict"),
             math_dict: tree("math_dict"),
             init_kwargs: tree("init_kwargs").unwrap_or_default(),
+            data_table_dfs: Default::default(),
         };
         let model_path = self.reference.join(
             fx["model"]
