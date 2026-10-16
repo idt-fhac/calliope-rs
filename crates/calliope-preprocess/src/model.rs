@@ -23,7 +23,7 @@ pub struct ModelInputs {
     pub inputs: Dataset,
     /// `config`.
     pub config: Validated<CalliopeConfig>,
-    /// The model definition (with what the data tables imply).
+    /// The model definition as read (`model.definition`; not what the data tables add).
     pub definition: Validated<CalliopeModelDef>,
     /// `math.init`.
     pub math_init: IndexMap<String, AttrTree>,
@@ -81,7 +81,7 @@ pub fn read_dict(
     let mut builder = ModelDataBuilder::new(init, prepared.definition.clone(), &math, &mut tables)?;
     builder.build()?;
     let mut warnings = std::mem::take(&mut builder.warnings);
-    let definition = builder.model_definition.clone();
+    let definition = prepared.definition.clone();
     let runtime = CalliopeRuntime {
         applied_overrides: Some(prepared.applied_overrides.clone()),
         scenario: prepared.scenario.clone(),
