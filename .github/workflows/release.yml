@@ -1,0 +1,30 @@
+name: Release
+on:
+  release:
+    types: [published]
+
+jobs:
+  wheel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake libclang-dev libnetcdf-dev libhdf5-dev pkg-config python3
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Install uv (provides maturin via uv tool)
+        uses: astral-sh/setup-uv@v10
+      - name: Build the calliope-rs wheel
+        run: crates/calliope-py/build_wheel.sh
+      - name: Smoke test the wheel
+        run: |
+          python3 -m venv ~/.venv-wheel
+          ~/.venv-wheel/bin/pip install target/wheels/calliope_rs-*.whl
+          ~/.venv-wheel/bin/calliope-rs --version
+          ~/.venv-wheel/bin/python -c "import calliope_rs"
+      - uses: softprops/action-gh-release@v3
+        with:
+          files: target/wheels/calliope_rs-*.whl

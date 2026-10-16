@@ -12,7 +12,11 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
-export LIBCLANG_PATH="${LIBCLANG_PATH:-$HOME/.local/opt/libclang/clang/native}"
+# Point bindgen at the pip-installed libclang only where it exists (dev machine);
+# CI installs libclang-dev, which bindgen finds on its own.
+if [ -z "${LIBCLANG_PATH:-}" ] && [ -d "$HOME/.local/opt/libclang/clang/native" ]; then
+  export LIBCLANG_PATH="$HOME/.local/opt/libclang/clang/native"
+fi
 
 cargo build --release -p calliope-cli
 mkdir -p python/calliope_rs/bin
