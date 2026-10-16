@@ -269,6 +269,13 @@ impl Highs {
             })
     }
 
+    /// `Highs::resetGlobalScheduler(blocking=true)`: shuts the calling thread's worker
+    /// threads down, so that the next run starts a scheduler with its own `threads` option.
+    pub fn reset_global_scheduler() {
+        // SAFETY: acts on the calling thread's scheduler, which no run uses between runs.
+        unsafe { sys::Highs_resetGlobalScheduler(1) }
+    }
+
     /// Reset all options to their defaults.
     pub fn reset_options(&mut self) -> Result<()> {
         // SAFETY: valid instance.

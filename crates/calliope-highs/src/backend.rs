@@ -5,14 +5,53 @@
 //! the solver state is cleared unless `warmstart`, `solver_options` are passed through,
 //! and `save_logs` sets `log_file=<dir>/highs.log`.
 //!
+//! Unlike highspy, HiGHS is quiet unless asked: `output_flag` is `false` until the
+//! `solver_options` set it to `true`. A `threads` option that differs from the thread count
+//! of HiGHS' (per-thread) scheduler restarts the scheduler (HiGHS itself refuses to run
+//! then), so models solved one after the other may use different `threads`.
+//!
 //! SOS2 sets are not supported by HiGHS; they are passed as an equivalent MILP (one binary
 //! per segment), appended after the model's own columns and rows so that model indices and
 //! HiGHS indices coincide.
 
 use crate::ffi::{self, Highs, ModelData, ModelStatus, OptionValue};
 use calliope_lp::{ColId, ComponentKind, LinExpr, LpModel, ObjSense, RowId};
+use std::cell::Cell;
 use std::collections::HashMap;
 use std::path::PathBuf;
+
+thread_local! {
+    /// The `threads` this thread's HiGHS scheduler was started with by
+    /// [`HighsBackend::solve`] (`None`: not set by us). HiGHS keeps one scheduler per
+    /// thread, alive while any instance uses it.
+    static SCHEDULER_THREADS: Cell<Option<i64>> = const { Cell::new(None) };
+}
+
+fn threads_option(options: &[(String, OptionValue)]) -> Option<i64> {
+    options
+        .iter()
+        .rev()
+        .find_map(|(k, v)| match (k.as_str(), v) {
+            ("threads", OptionValue::Int(i)) => Some(*i),
+            #[allow(clippy::cast_possible_truncation)]
+            ("threads", OptionValue::Double(d)) => Some(*d as i64),
+            _ => None,
+        })
+}
+
+/// Restarts this thread's HiGHS scheduler if `threads` asks for another thread count
+/// than it was started with. A run without `threads` may start a default scheduler, so
+/// the next explicit `threads` restarts it.
+fn ensure_scheduler(threads: Option<i64>) {
+    match threads.filter(|t| *t > 0) {
+        Some(t) if SCHEDULER_THREADS.get() != Some(t) => {
+            Highs::reset_global_scheduler();
+            SCHEDULER_THREADS.set(Some(t));
+        }
+        Some(_) => {}
+        None => SCHEDULER_THREADS.set(None),
+    }
+}
 
 /// Backend errors.
 #[derive(Debug, thiserror::Error)]
@@ -253,9 +292,12 @@ fn reformulate(model: &LpModel) -> Result<Reformulated> {
 impl HighsBackend {
     /// Wrap a model; it is passed to HiGHS on the first solve.
     pub fn new(model: LpModel) -> Self {
+        let mut highs = Highs::new();
+        // Quiet from the start: passing the model would otherwise print HiGHS' banner.
+        let _ = highs.set_option("output_flag", &OptionValue::Bool(false));
         Self {
             model,
-            highs: Highs::new(),
+            highs,
             synced: false,
             fixed: HashMap::new(),
             deactivated: HashMap::new(),
@@ -325,6 +367,7 @@ impl HighsBackend {
         self.sync()?;
         let h = &mut self.highs;
         h.reset_options()?;
+        h.set_option("output_flag", &OptionValue::Bool(false))?;
         h.set_option("small_matrix_value", &OptionValue::Double(1e-12))?;
         if !config.warmstart {
             h.clear_solver()?;
@@ -341,6 +384,7 @@ impl HighsBackend {
                 &OptionValue::Str(path.to_string_lossy().into_owned()),
             )?;
         }
+        ensure_scheduler(threads_option(&config.solver_options));
         h.run()?;
         let status = h.model_status();
         let (ncol, nrow) = (self.model.num_cols(), self.model.num_rows());

@@ -209,3 +209,19 @@ fn sos2_piecewise() {
     assert!(close(out.objective.unwrap(), -0.75), "{out:?}");
     assert!(out.row_dual.is_none(), "MILP has no duals");
 }
+
+/// HiGHS refuses to run with a `threads` option other than its running scheduler's; the
+/// backend restarts the scheduler instead, so consecutive solves may change `threads`.
+#[test]
+fn threads_may_change_between_solves() {
+    let mut alive = Vec::new();
+    for threads in [0, 1, 2, 1, 0] {
+        let mut be = HighsBackend::new(model());
+        let mut cfg = quiet();
+        cfg.solver_options
+            .push(("threads".into(), OptionValue::Int(threads)));
+        let out = be.solve(&cfg).unwrap();
+        assert!(close(out.objective.unwrap(), 9.5), "threads {threads}");
+        alive.push(be);
+    }
+}
