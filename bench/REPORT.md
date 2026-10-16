@@ -250,3 +250,72 @@ Bug tally:
 - **Does it stand out?** Partly. It has `check`, `lp-diff`, `inspect`, `bench`, piecewise
   constraints and `unfix_variable` on HiGHS, and deterministic runs. A single static
   binary, a WASM build and native math docs are not delivered.
+
+## Follow-up (2026-10-16)
+
+Follow-ups 1–3 of §1 are done, and the parity caveat of §3 is resolved. Raw data:
+`bench/results/followup/` (`memprobe.txt`, result JSONs, `parity.txt`, `cargo_test.txt`).
+All runs are release builds on the same machine, single runs.
+
+### Preprocessing memory
+
+Mostly empty data-table arrays are now stored sparsely (`Data::Sparse`). They stay sparse
+through alignment, `where` and `fillna`. They are expanded only when `inputs.nc` is
+written, and the math engine gets `LArray`s built from the stored cells. The dense paths
+no longer build `Obj` or `Option<usize>` vectors per cell. `add_to_dataset` merges in
+place, and `drop_undefined` no longer clones the dataset. See the ADR 0002 addendum.
+
+| `bench/memprobe` | Phase 9 peak RSS | now | Phase 9 time | now |
+|---|---|---|---|---|
+| 250 × 168 | 922 MB | 28 MB | 8.3 s | 1.6 s |
+| 250 × 2190 | 11 761 MB | 206 MB (CSV loading) | 70 s | 5.2 s |
+| 250 × 8760 | not measured | 786 MB (CSV loading) | – | 22 s |
+
+At 250 × 2190 the two time series take 5 MB and 4 MB instead of 1113 MB each. All 37
+golden fixtures and all 122 math LP fixtures still give inputs equal to Calliope's. They
+also do with every data-table float array forced sparse.
+
+### Build (`examples/build_timing`, build-only cases)
+
+| case | preprocess s (Phase 9 → now) | build s | peak RSS MB | Python `main` build s / peak MB |
+|---|---|---|---|---|
+| syn 250 × 168 | 10.8 → **1.5** | 36.0 → 32.3 | 2217 → **1893** | 196 / 4183 |
+| syn 50 × 8760 | 13.6 → **1.3** | 71.7 → 75.2 | 6692 → **6005** | 707 / 11006 |
+| syn 250 × 2190 | 70 → **5.5** | killed → 366 | > 28 GB → **24 595** | over 28 GB (Phase 0) |
+
+- **Preprocessing is now faster than Python at the measured sizes**: 8× at 50 × 8760 and
+  18× at 250 × 168, against 0.7× and 2.5× in Phase 9.
+- **250 × 2190 now builds within the 28 GB cap**: 5.0 M columns, 6.4 M rows, 17.5 M
+  nonzeros, built in 6.2 min with a 24.6 GB peak. It was not solved.
+- **Peak memory is now set by the build**, not by preprocessing. Against Python, it is
+  2.2× lower at 250 × 168 (1.9× in Phase 9) and 1.8× lower at 50 × 8760 (1.6×). That is
+  still short of the ≥5× target.
+- **Build times are unchanged within run-to-run noise**: single runs, and follow-up 4
+  (profiling the build) is not done.
+
+### Correctness, re-run
+
+- **`cargo run -p xtask -- parity`: 90 pass, 17 classified, 0 fail.**
+  - Result arrays of operate and SPORES runs now count. Every array difference fails
+    unless the fixture is classified.
+  - The 4 SPORES fixtures and `urban_scale` are classified `AlternativeOptimum`. Parity
+    verifies this classification on every run (`crates/xtask/src/altopt.rs`): it rebuilds
+    each solve, for SPORES with Calliope's recorded scores and cost budget, and puts
+    Calliope's solution into the port's LP.
+  - In all 17 solves, that solution is feasible: the worst row violation is 1.5e-9 and no
+    bound is violated. Its objective equals the port's optimum to at most 2.4e-16
+    relative.
+  - The scores of the port's own SPORES runs match Calliope's to 2e-11.
+  - So the array differences are alternative optima of the same LP. `docs/findings.md` P1
+    is corrected: `evolving_average` matches Calliope's objectives, not its vertex.
+  - The other 12 classified items are unchanged:
+    - 9 come from the expected-error fixtures (3 parts each);
+    - `docs_piecewise` was solved by CBC in the golden run (SOS2);
+    - `check_feasibility` hits bug #14;
+    - `urban_scale_milp` differs within its MIP gap.
+- **`cargo test --workspace`: 391 pass, 0 fail, 1 ignored.** The ignored test regenerates
+  the xarray oracle fixture and needs Python.
+- **Python bindings (`crates/calliope-py/tests`): 30 pass.** They were rebuilt with
+  maturin in a scratch virtual environment, which was then removed.
+- **`cargo fmt --check` and `cargo clippy --workspace --all-targets -D warnings` are
+  clean.**
