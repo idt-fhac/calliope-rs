@@ -11,7 +11,7 @@ publish.workspace = true
 calliope-array.workspace = true
 calliope-lp = { path = "../calliope-lp" }
 # Bundles HiGHS 1.15.0 and builds it with cmake; bindgen needs libclang (LIBCLANG_PATH).
-highs-sys = { version = "=1.15.0", default-features = false, features = ["build", "highs_release"] }
+highs-sys = { version = "=1.16.0", default-features = false, features = ["build", "highs_release"] }
 indexmap.workspace = true
 thiserror.workspace = true
 
